@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -45,6 +47,15 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,7 +82,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -85,6 +95,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -216,9 +227,12 @@ fun TextviewWithGradient(
 @Composable
 fun LabeledField(
     @StringRes labelRes: Int? = null,
+    labelText: String? = null,
+    subLabel: String? = null,
     value: String,
     onValueChange: (String) -> Unit,
-    @StringRes placeholderRes: Int,
+    @StringRes placeholderRes: Int = 0,
+    placeholder: String = "",
     modifier: Modifier = Modifier,
     // Label styling
     labelSize: TextUnit = font_14,
@@ -227,7 +241,7 @@ fun LabeledField(
     labelSemiBold: Boolean = false,
     labelColor: Color = DarkGrey,
     // Spacing
-    labelToFieldSpace: Dp = dimen_5,
+    labelToFieldSpace: Dp = dimen_8,
     bottomSpace: Dp = dimen_20,
     // AppEditText passthroughs
     isPassword: Boolean = false,
@@ -238,49 +252,294 @@ fun LabeledField(
     singleLine: Boolean = true,
     isPhoneNumber: Boolean = false,
     enabled: Boolean = true,
-    height: Dp = dimen_50,
+    height: Dp = dimen_52,
     moreText: Boolean = false,
     isRequired: Boolean = false,
     isLock: Boolean = false,
-    leftImage: Int? = null
+    leftImage: Int? = null,
+    rightImage: Int? = null,
+    rightContent: (@Composable () -> Unit)? = null,
+    readOnly: Boolean = false,
+    // Glassy styling & country code
+    isGlassy: Boolean = false,
+    isPhoneWithCountry: Boolean = false,
+    countryCode: String = "+91",
+    countryFlag: String = "🇮🇳",
+    onCountryCodeClick: (() -> Unit)? = null
 ) {
-    if (labelRes != null) {
-        val labelText = buildAnnotatedString {
-            append(stringResource(labelRes))
-            if (isRequired) {
-                append(" ")
-                withStyle(style = SpanStyle(color = Color.Red)) {
-                    append("*")
+    val resolvedLabel = when {
+        labelRes != null -> stringResource(labelRes)
+        labelText != null -> labelText
+        else -> null
+    }
+
+    val resolvedPlaceholder = when {
+        placeholder.isNotEmpty() -> placeholder
+        placeholderRes != 0 -> stringResource(placeholderRes)
+        else -> ""
+    }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        if (resolvedLabel != null || subLabel != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = labelToFieldSpace),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (resolvedLabel != null) {
+                    val labelAnnotated = buildAnnotatedString {
+                        append(resolvedLabel)
+                        if (isRequired) {
+                            append(" ")
+                            withStyle(style = SpanStyle(color = Color.Red)) {
+                                append("*")
+                            }
+                        }
+                    }
+                    LabelTextview(
+                        text = labelAnnotated,
+                        size = labelSize,
+                        bold = labelBold,
+                        medium = labelMedium,
+                        semiBold = labelSemiBold || isGlassy,
+                        color = if (isGlassy) White else labelColor
+                    )
+                } else {
+                    Spacer(modifier = Modifier.width(dimen_0))
+                }
+
+                if (subLabel != null) {
+                    Textview(
+                        text = subLabel,
+                        size = font_12,
+                        color = SubtitleGrey,
+                        fontWeight = FontWeight.Normal
+                    )
                 }
             }
         }
-        LabelTextview(
-            text = labelText,
-            size = labelSize,
-            bold = labelBold,
-            medium = labelMedium,
-            semiBold = labelSemiBold,
-            color = labelColor
-        )
-        Spacer(Modifier.height(labelToFieldSpace))
+
+        if (isGlassy) {
+            val fieldShape = RoundedCornerShape(dimen_14)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height)
+                    .clip(fieldShape)
+                    .background(Color(0x331B2028))
+                    .border(dimen_1, Color.White.copy(alpha = 0.15f), fieldShape)
+                .padding(horizontal = dimen_12),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (isPhoneWithCountry) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(dimen_6))
+                                .clickable(enabled = onCountryCodeClick != null) { onCountryCodeClick?.invoke() }
+                                .padding(vertical = dimen_4, horizontal = dimen_4),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Textview(
+                                text = countryFlag,
+                                size = font_16
+                            )
+                            Spacer(modifier = Modifier.width(dimen_4))
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.7f),
+                                modifier = Modifier.size(dimen_16)
+                            )
+                            Spacer(modifier = Modifier.width(dimen_6))
+                            Textview(
+                                text = countryCode,
+                                size = font_14,
+                                color = White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(dimen_10))
+
+                        // Vertical divider
+                        Box(
+                            modifier = Modifier
+                                .width(dimen_1)
+                                .height(dimen_24)
+                                .background(Color.White.copy(alpha = 0.15f))
+                        )
+
+                        Spacer(modifier = Modifier.width(dimen_12))
+                    } else if (leftImage != null) {
+                        Image(
+                            painter = painterResource(leftImage),
+                            contentDescription = null,
+                            modifier = Modifier.size(dimen_22)
+                        )
+                        Spacer(modifier = Modifier.width(dimen_12))
+                    }
+
+                    // BasicTextField
+                    BasicTextField(
+                        value = value,
+                        onValueChange = { input ->
+                            if (!readOnly) {
+                                if (isPhoneNumber || isPhoneWithCountry) {
+                                    val digitsOnly = input.filter { it.isDigit() }
+                                    if (digitsOnly.length <= 10) {
+                                        onValueChange(digitsOnly)
+                                    }
+                                } else {
+                                    onValueChange(input)
+                                }
+                            }
+                        },
+                        readOnly = readOnly,
+                        modifier = Modifier.weight(1f),
+                        singleLine = singleLine,
+                        enabled = enabled,
+                        keyboardOptions = if (isPhoneNumber || isPhoneWithCountry) {
+                            KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = imeAction)
+                        } else keyboardOptions,
+                        keyboardActions = KeyboardActions(onDone = { onImeAction() }, onNext = { onImeAction() }),
+                        textStyle = TextStyle(
+                            fontSize = font_15,
+                            color = White,
+                            fontWeight = FontWeight.Medium
+                        ),
+                        cursorBrush = SolidColor(AmberPrimary),
+                        decorationBox = { innerTextField ->
+                            if (value.isEmpty()) {
+                                Textview(
+                                    text = resolvedPlaceholder,
+                                    size = font_14,
+                                    color = Color(0xFF64748B)
+                                )
+                            }
+                            innerTextField()
+                        }
+                    )
+
+                    if (rightContent != null) {
+                        Spacer(modifier = Modifier.width(dimen_8))
+                        rightContent()
+                    } else if (rightImage != null) {
+                        Spacer(modifier = Modifier.width(dimen_8))
+                        Image(
+                            painter = painterResource(rightImage),
+                            contentDescription = null,
+                            modifier = Modifier.size(dimen_20)
+                        )
+                    }
+                }
+            }
+        } else {
+            CompactEditText(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier.fillMaxWidth(),
+                isPassword = isPassword,
+                imeAction = imeAction,
+                onImeAction = onImeAction,
+                placeholder = resolvedPlaceholder,
+                isPhoneNumber = isPhoneNumber,
+                enabled = enabled,
+                height = height,
+                singleLine = singleLine,
+                moreText = moreText,
+                isLock = isLock,
+                leftImage = leftImage
+            )
+        }
     }
-    CompactEditText(
+}
+
+/**
+ * Convenience alias for [LabeledField]
+ */
+@Composable
+fun LabelTextField(
+    @StringRes labelRes: Int? = null,
+    labelText: String? = null,
+    subLabel: String? = null,
+    value: String,
+    onValueChange: (String) -> Unit,
+    @StringRes placeholderRes: Int = 0,
+    placeholder: String = "",
+    modifier: Modifier = Modifier,
+    labelSize: TextUnit = font_14,
+    labelBold: Boolean = false,
+    labelMedium: Boolean = false,
+    labelSemiBold: Boolean = false,
+    labelColor: Color = DarkGrey,
+    labelToFieldSpace: Dp = dimen_8,
+    bottomSpace: Dp = dimen_20,
+    isPassword: Boolean = false,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeAction: () -> Unit = {},
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    singleLine: Boolean = true,
+    isPhoneNumber: Boolean = false,
+    enabled: Boolean = true,
+    height: Dp = dimen_52,
+    moreText: Boolean = false,
+    isRequired: Boolean = false,
+    isLock: Boolean = false,
+    leftImage: Int? = null,
+    rightImage: Int? = null,
+    rightContent: (@Composable () -> Unit)? = null,
+    readOnly: Boolean = false,
+    isGlassy: Boolean = false,
+    isPhoneWithCountry: Boolean = false,
+    countryCode: String = "+91",
+    countryFlag: String = "🇮🇳",
+    onCountryCodeClick: (() -> Unit)? = null
+) {
+    LabeledField(
+        labelRes = labelRes,
+        labelText = labelText,
+        subLabel = subLabel,
         value = value,
         onValueChange = onValueChange,
+        placeholderRes = placeholderRes,
+        placeholder = placeholder,
         modifier = modifier,
+        labelSize = labelSize,
+        labelBold = labelBold,
+        labelMedium = labelMedium,
+        labelSemiBold = labelSemiBold,
+        labelColor = labelColor,
+        labelToFieldSpace = labelToFieldSpace,
+        bottomSpace = bottomSpace,
         isPassword = isPassword,
         imeAction = imeAction,
         onImeAction = onImeAction,
-        placeholder = stringResource(placeholderRes),
+        keyboardOptions = keyboardOptions,
+        visualTransformation = visualTransformation,
+        singleLine = singleLine,
         isPhoneNumber = isPhoneNumber,
         enabled = enabled,
         height = height,
-        singleLine = singleLine,
         moreText = moreText,
+        isRequired = isRequired,
         isLock = isLock,
-        leftImage = leftImage
+        leftImage = leftImage,
+        rightImage = rightImage,
+        rightContent = rightContent,
+        readOnly = readOnly,
+        isGlassy = isGlassy,
+        isPhoneWithCountry = isPhoneWithCountry,
+        countryCode = countryCode,
+        countryFlag = countryFlag,
+        onCountryCodeClick = onCountryCodeClick
     )
-
 }
 
 @Composable
@@ -629,6 +888,453 @@ fun PasswordData(
                 modifier = Modifier
                     .width(dimen_244)
                     .height(dimen_340)
+            )
+        }
+    }
+}
+
+/**
+ * Reusable Green Verified Pill Badge
+ */
+@Composable
+fun VerifiedBadge(
+    modifier: Modifier = Modifier,
+    text: String = "Verified"
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(dimen_12))
+            .background(Color(0xFF00C853))
+            .padding(horizontal = dimen_8, vertical = dimen_4),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Check,
+            contentDescription = null,
+            tint = White,
+            modifier = Modifier.size(dimen_12)
+        )
+        Spacer(modifier = Modifier.width(dimen_4))
+        Textview(
+            text = text,
+            size = font_11,
+            color = White,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+/**
+ * Reusable Profile Photo Avatar with dashed circular border and add photo badge
+ */
+@Composable
+fun ProfileAvatarPicker(
+    onAddPhotoClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    photoRes: Int? = null
+) {
+    Box(
+        modifier = modifier.size(dimen_100),
+        contentAlignment = Alignment.Center
+    ) {
+        // Dashed circle border
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                color = Color.White.copy(alpha = 0.25f),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(
+                    width = 2.5f,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                )
+            )
+        }
+
+        // Inner circle
+        Box(
+            modifier = Modifier
+                .size(dimen_88)
+                .clip(CircleShape)
+                .background(Color(0x331B2028))
+                .clickable { onAddPhotoClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            if (photoRes != null) {
+                Image(
+                    painter = painterResource(id = photoRes),
+                    contentDescription = "Profile Photo",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_camera),
+                        contentDescription = "Add Photo",
+                        tint = Color.White.copy(alpha = 0.9f),
+                        modifier = Modifier.size(dimen_28)
+                    )
+                    Spacer(modifier = Modifier.height(dimen_4))
+                    Textview(
+                        text = "Add Photo",
+                        size = font_11,
+                        color = SubtitleGrey,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+
+        // Amber Plus Badge on bottom right
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(dimen_28)
+                .clip(CircleShape)
+                .background(AmberPrimary)
+                .clickable { onAddPhotoClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add",
+                tint = Color.Black,
+                modifier = Modifier.size(dimen_18)
+            )
+        }
+    }
+}
+
+/**
+ * Reusable Glass Role Selection Card
+ */
+@Composable
+fun GlassRoleCard(
+    title: String,
+    subtitle: String,
+    imageRes: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    activeBorderColor: Color = AmberPrimary,
+    inactiveBorderColor: Color = Color.White.copy(alpha = 0.15f),
+    backgroundColor: Color = Color(0x331B2028),
+    shape: Shape = RoundedCornerShape(dimen_16)
+) {
+    val borderColor = if (isSelected) activeBorderColor else inactiveBorderColor
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(backgroundColor)
+            .border(dimen_1, borderColor, shape)
+            .clickable { onClick() }
+            .padding(dimen_12)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Left Thumbnail
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = title,
+                modifier = Modifier
+                    .size(width = dimen_80, height = dimen_56)
+                    .clip(RoundedCornerShape(dimen_10)),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(dimen_14))
+
+            // Center Title & Subtitle
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Textview(
+                    text = title,
+                    size = font_16,
+                    color = White,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(dimen_4))
+                Textview(
+                    text = subtitle,
+                    size = font_12,
+                    color = SubtitleGrey,
+                    fontWeight = FontWeight.Normal,
+                    maxLines = 2
+                )
+            }
+
+            Spacer(modifier = Modifier.width(dimen_12))
+
+            // Right Radio / Check indicator
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(dimen_22)
+                        .clip(CircleShape)
+                        .background(AmberPrimary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Selected",
+                        tint = Color.Black,
+                        modifier = Modifier.size(dimen_14)
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(dimen_22)
+                        .clip(CircleShape)
+                        .border(dimen_1, Color.White.copy(alpha = 0.25f), CircleShape)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Reusable Circular Glass Back Button
+ */
+@Composable
+fun CommonBackButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = dimen_40,
+    iconSize: Dp = dimen_24,
+    backgroundColor: Color = Color(0x331B2028),
+    borderColor: Color = Color.White.copy(alpha = 0.2f),
+    iconColor: Color = White
+) {
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(backgroundColor)
+            .border(dimen_1, borderColor, CircleShape)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+            contentDescription = "Back",
+            tint = iconColor,
+            modifier = Modifier.size(iconSize)
+        )
+    }
+}
+
+/**
+ * Reusable Glassmorphic OTP Input Field with glowing active border and cursor
+ */
+@Composable
+fun GlassOtpField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    cells: Int = 6,
+    cellWidth: Dp = dimen_46,
+    cellHeight: Dp = dimen_56,
+    cornerRadius: Dp = dimen_12,
+    gap: Dp = dimen_8,
+    activeBorderColor: Color = AmberPrimary,
+    inactiveBorderColor: Color = Color.White.copy(alpha = 0.18f),
+    glassBgColor: Color = Color(0x331B2028),
+    textColor: Color = White,
+    cursorColor: Color = AmberPrimary,
+    onDone: () -> Unit = {}
+) {
+    val focusRequester = remember { FocusRequester() }
+    val shape = RoundedCornerShape(cornerRadius)
+
+    val infiniteTransition = rememberInfiniteTransition(label = "otpCursor")
+    val cursorAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "otpCursorAlpha"
+    )
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    BasicTextField(
+        value = value,
+        onValueChange = { input ->
+            val digitsOnly = input.filter { it.isDigit() }.take(cells)
+            onValueChange(digitsOnly)
+        },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.NumberPassword,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(onDone = { onDone() }),
+        cursorBrush = SolidColor(Color.Transparent),
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .onKeyEvent { event ->
+                if (event.type == KeyEventType.KeyUp && event.key == Key.Backspace && value.isNotEmpty()) {
+                    onValueChange(value.dropLast(1))
+                    true
+                } else false
+            },
+        decorationBox = { innerTextField ->
+            Box(contentAlignment = Alignment.Center) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(gap),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(cells) { index ->
+                        val isActive = index == value.length && value.length < cells
+                        val charAtCell = value.getOrNull(index)?.toString()
+
+                        val borderColor = when {
+                            isActive -> activeBorderColor
+                            charAtCell != null -> activeBorderColor.copy(alpha = 0.6f)
+                            else -> inactiveBorderColor
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .size(cellWidth, cellHeight)
+                                .clip(shape)
+                                .background(glassBgColor)
+                                .border(
+                                    width = dimen_1,
+                                    color = borderColor,
+                                    shape = shape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (charAtCell != null) {
+                                Textview(
+                                    text = charAtCell,
+                                    size = font_22,
+                                    color = textColor,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            } else if (isActive) {
+                                Textview(
+                                    text = "|",
+                                    size = font_20,
+                                    color = cursorColor.copy(alpha = cursorAlpha),
+                                    fontWeight = FontWeight.Light
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .alpha(0f)
+                ) {
+                    innerTextField()
+                }
+            }
+        }
+    )
+}
+
+/**
+ * Reusable Glassmorphic OTP Input View
+ */
+@Composable
+fun GlassOtpView(
+    modifier: Modifier = Modifier,
+    cells: Int = 6,
+    value: String = "",
+    onValueChanged: (String) -> Unit = {},
+    onFilled: (String) -> Unit = {},
+    cellWidth: Dp = dimen_46,
+    cellHeight: Dp = dimen_56,
+    cornerRadius: Dp = dimen_12,
+    gap: Dp = dimen_8
+) {
+    var internalValue by rememberSaveable { mutableStateOf(value) }
+    val currentValue = if (value.isNotEmpty()) value else internalValue
+
+    GlassOtpField(
+        value = currentValue,
+        onValueChange = { digits ->
+            internalValue = digits
+            onValueChanged(digits)
+            if (digits.length == cells) {
+                onFilled(digits)
+            }
+        },
+        cells = cells,
+        cellWidth = cellWidth,
+        cellHeight = cellHeight,
+        cornerRadius = cornerRadius,
+        gap = gap,
+        modifier = modifier
+    )
+}
+
+/**
+ * Reusable Glassmorphic Resend OTP Timer
+ */
+@Composable
+fun GlassResendOtpTimer(
+    onResendOtp: () -> Unit,
+    modifier: Modifier = Modifier,
+    totalSeconds: Int = 45,
+    text: String = "Resend OTP in "
+) {
+    var secondsLeft by rememberSaveable { mutableIntStateOf(totalSeconds) }
+    var timerKey by rememberSaveable { mutableIntStateOf(0) }
+
+    val isEnabled = secondsLeft == 0
+
+    LaunchedEffect(timerKey) {
+        secondsLeft = totalSeconds
+        while (secondsLeft > 0) {
+            delay(1000)
+            secondsLeft--
+        }
+    }
+
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (!isEnabled) {
+            Textview(
+                text = text,
+                size = font_14,
+                color = MutedSlate,
+                fontWeight = FontWeight.Normal
+            )
+            Spacer(modifier = Modifier.width(dimen_4))
+            Textview(
+                text = formatAsMMSS(secondsLeft),
+                size = font_14,
+                color = AmberPrimary,
+                fontWeight = FontWeight.Bold
+            )
+        } else {
+            Textview(
+                text = "Resend OTP",
+                size = font_14,
+                color = AmberPrimary,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable {
+                    onResendOtp()
+                    timerKey++
+                }
             )
         }
     }
@@ -1582,3 +2288,428 @@ fun <T : Any> LazyGridListViewMinMax(
         }
     }
 }
+
+/**
+ * Reusable frosted glass / glassmorphic effect for any Composable.
+ *
+ * @param shape Shape of the glass container (default rounded corners).
+ * @param backgroundColor Translucent tint for the glass background.
+ * @param borderColor Color of the frosted outline.
+ * @param borderWidth Width of the outline stroke.
+ */
+fun Modifier.glassEffect(
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_16),
+    backgroundColor: Color = Color(0x331B2028),
+    borderColor: Color = Color.White.copy(alpha = 0.12f),
+    borderWidth: Dp = dimen_1
+): Modifier = this
+    .clip(shape)
+    .background(backgroundColor)
+    .border(borderWidth, borderColor, shape)
+
+/**
+ * Reusable Glassmorphic Box container.
+ */
+@Composable
+fun GlassBox(
+    modifier: Modifier = Modifier,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_16),
+    backgroundColor: Color = Color(0x331B2028),
+    borderColor: Color = Color.White.copy(alpha = 0.12f),
+    borderWidth: Dp = dimen_1,
+    content: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit
+) {
+    Box(
+        modifier = modifier.glassEffect(
+            shape = shape,
+            backgroundColor = backgroundColor,
+            borderColor = borderColor,
+            borderWidth = borderWidth
+        ),
+        content = content
+    )
+}
+
+/**
+ * Reusable Continue / Action button with gradient background, rounded capsule shape, and optional trailing icon.
+ *
+ * Usage:
+ * ```
+ * ContinueButton(text = "Continue") {
+ *     // click action
+ * }
+ * ```
+ *
+ * @param text The text displayed on the button (default "Continue").
+ * @param modifier Custom modifier for the outer container.
+ * @param enabled Whether the button is clickable.
+ * @param showIcon Whether to display the trailing arrow icon (default true).
+ * @param icon The trailing vector icon (default ArrowForward).
+ * @param textColor Color of the label text (default Black).
+ * @param textSize Font size of the label text (default font_16).
+ * @param gradientColors List of colors for horizontal gradient.
+ * @param height Height of the button (default dimen_52).
+ * @param shape Corner radius shape (default RoundedCornerShape(dimen_28)).
+ * @param includeBottomPadding Whether to include bottom navigation bar padding (default true).
+ * @param onClick Click action lambda.
+ */
+@Composable
+fun ContinueButton(
+    text: String = "Continue",
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    showIcon: Boolean = true,
+    icon: ImageVector = Icons.AutoMirrored.Filled.ArrowForward,
+    textColor: Color = Color.Black,
+    textSize: TextUnit = font_16,
+    gradientColors: List<Color> = listOf(
+        Color(0xFFFFA000),
+        Color(0xFFFF8F00),
+        Color(0xFFF57C00)
+    ),
+    height: Dp = dimen_52,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_28),
+    includeBottomPadding: Boolean = true,
+    onClick: () -> Unit
+) {
+    val outerModifier = if (includeBottomPadding) {
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimen_20)
+            .navigationBarsPadding()
+            .padding(bottom = dimen_20)
+    } else {
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimen_20)
+    }
+
+    Box(
+        modifier = outerModifier
+    ) {
+        Button(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height),
+            shape = shape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            contentPadding = PaddingValues(dimen_0)
+        ) {
+            val backgroundBrush = if (enabled) {
+                Brush.horizontalGradient(gradientColors)
+            } else {
+                Brush.horizontalGradient(gradientColors.map { it.copy(alpha = 0.5f) })
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = backgroundBrush,
+                        shape = shape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Textview(
+                        text = text,
+                        size = textSize,
+                        color = if (enabled) textColor else textColor.copy(alpha = 0.5f),
+                        fontWeight = FontWeight.Bold
+                    )
+                    if (showIcon) {
+                        Spacer(modifier = Modifier.width(dimen_8))
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = if (enabled) textColor else textColor.copy(alpha = 0.5f),
+                            modifier = Modifier.size(dimen_18)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Reusable Common Gradient Button supporting customizable gradients, left image/icon, and right image/icon.
+ *
+ * Usage:
+ * ```
+ * CommonGradientButton(
+ *     text = "Get OTP",
+ *     gradientColors = listOf(AmberPrimary, AmberSecondary, AmberDark),
+ *     rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
+ *     onClick = { ... }
+ * )
+ *
+ * CommonGradientButton(
+ *     text = "Call for Emergency",
+ *     gradientColors = listOf(EmergencyRedStart, EmergencyRedCenter, EmergencyRedEnd),
+ *     leftImage = R.drawable.ic_emergency,
+ *     textColor = Color.White,
+ *     onClick = { ... }
+ * )
+ * ```
+ */
+@Composable
+fun CommonGradientButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    gradientColors: List<Color> = listOf(AmberPrimary, AmberSecondary, AmberDark),
+    textColor: Color = Color.Black,
+    textSize: TextUnit = font_16,
+    fontWeight: FontWeight = FontWeight.Bold,
+    height: Dp = dimen_52,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_28),
+    leftImage: Int? = null,
+    leftIcon: ImageVector? = null,
+    leftIconTint: Color? = textColor,
+    rightImage: Int? = null,
+    rightIcon: ImageVector? = null,
+    rightIconTint: Color? = textColor,
+    iconSize: Dp = dimen_20,
+    iconSpacing: Dp = dimen_8
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height),
+        shape = shape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
+        ),
+        contentPadding = PaddingValues(dimen_0)
+    ) {
+        val backgroundBrush = if (enabled) {
+            Brush.horizontalGradient(gradientColors)
+        } else {
+            Brush.horizontalGradient(gradientColors.map { it.copy(alpha = 0.5f) })
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(brush = backgroundBrush, shape = shape)
+                .padding(horizontal = dimen_16),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                // Show left image if provided, else show left icon if provided
+                if (leftImage != null) {
+                    if (leftIconTint != null) {
+                        Icon(
+                            painter = painterResource(id = leftImage),
+                            contentDescription = null,
+                            tint = leftIconTint,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = leftImage),
+                            contentDescription = null,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(iconSpacing))
+                } else if (leftIcon != null) {
+                    Icon(
+                        imageVector = leftIcon,
+                        contentDescription = null,
+                        tint = leftIconTint ?: textColor,
+                        modifier = Modifier.size(iconSize)
+                    )
+                    Spacer(modifier = Modifier.width(iconSpacing))
+                }
+
+                Textview(
+                    text = text,
+                    size = textSize,
+                    color = if (enabled) textColor else textColor.copy(alpha = 0.5f),
+                    fontWeight = fontWeight
+                )
+
+                // Show right image if provided, else show right icon if provided
+                if (rightImage != null) {
+                    Spacer(modifier = Modifier.width(iconSpacing))
+                    if (rightIconTint != null) {
+                        Icon(
+                            painter = painterResource(id = rightImage),
+                            contentDescription = null,
+                            tint = rightIconTint,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    } else {
+                        Image(
+                            painter = painterResource(id = rightImage),
+                            contentDescription = null,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    }
+                } else if (rightIcon != null) {
+                    Spacer(modifier = Modifier.width(iconSpacing))
+                    Icon(
+                        imageVector = rightIcon,
+                        contentDescription = null,
+                        tint = rightIconTint ?: textColor,
+                        modifier = Modifier.size(iconSize)
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Reusable Glassmorphic Phone input field with country code, flag, divider, and labels.
+ */
+@Composable
+fun GlassPhoneField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: String = "Mobile Number",
+    hint: String = "We'll send you an OTP",
+    placeholder: String = "Enter your mobile number",
+    countryCode: String = "+91",
+    countryFlag: String = "🇮🇳",
+    enabled: Boolean = true,
+    height: Dp = dimen_52,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_14),
+    onCountryCodeClick: (() -> Unit)? = null
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        // Header row: Label on left, Hint on right
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = dimen_8),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Textview(
+                text = label,
+                size = font_14,
+                color = White,
+                fontWeight = FontWeight.SemiBold
+            )
+            Textview(
+                text = hint,
+                size = font_12,
+                color = SubtitleGrey,
+                fontWeight = FontWeight.Normal
+            )
+        }
+
+        // Glassy Input Container
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height)
+                .clip(shape)
+                .background(Color(0x331B2028))
+                .border(dimen_1, Color.White.copy(alpha = 0.15f), shape)
+                .padding(horizontal = dimen_12),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Country code pill / section
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(dimen_6))
+                        .clickable(enabled = onCountryCodeClick != null) { onCountryCodeClick?.invoke() }
+                        .padding(vertical = dimen_4, horizontal = dimen_4),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Textview(
+                        text = countryFlag,
+                        size = font_16
+                    )
+                    Spacer(modifier = Modifier.width(dimen_4))
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.7f),
+                        modifier = Modifier.size(dimen_16)
+                    )
+                    Spacer(modifier = Modifier.width(dimen_6))
+                    Textview(
+                        text = countryCode,
+                        size = font_14,
+                        color = White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(dimen_10))
+
+                // Vertical divider
+                Box(
+                    modifier = Modifier
+                        .width(dimen_1)
+                        .height(dimen_24)
+                        .background(Color.White.copy(alpha = 0.15f))
+                )
+
+                Spacer(modifier = Modifier.width(dimen_12))
+
+                // Editable text field
+                BasicTextField(
+                    value = value,
+                    onValueChange = { input ->
+                        if (input.length <= 10 && input.all { char -> char.isDigit() }) {
+                            onValueChange(input)
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    enabled = enabled,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Done
+                    ),
+                    textStyle = TextStyle(
+                        fontSize = font_15,
+                        color = White,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    cursorBrush = SolidColor(AmberPrimary),
+                    decorationBox = { innerTextField ->
+                        if (value.isEmpty()) {
+                            Textview(
+                                text = placeholder,
+                                size = font_14,
+                                color = Color(0xFF64748B)
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
+            }
+        }
+    }
+}
+
+

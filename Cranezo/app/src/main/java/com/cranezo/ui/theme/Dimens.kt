@@ -42,6 +42,7 @@ val dimen_50 = 50.dp
 val dimen_52 = 52.dp
 val dimen_54 = 54.dp
 val dimen_55 = 55.dp
+val dimen_56 = 56.dp
 val dimen_58 = 58.dp
 val dimen_60 = 60.dp
 val dimen_62 = 62.dp

@@ -28,3 +28,19 @@ val MidSkyBlue = Color(0xFFA5C8FD)
 val DarkGreyish = Color(0xFF6D6D6D)
 val MidLightGreen = Color(0xFFC8E6C9)
 
+// --- Added for Login & Brand UI ---
+val AmberPrimary = Color(0xFFFFA000)
+val AmberSecondary = Color(0xFFFF8F00)
+val AmberDark = Color(0xFFF57C00)
+val AmberLight = Color(0xFFFFB300)
+
+val EmergencyRedStart = Color(0xFFE53935)
+val EmergencyRedCenter = Color(0xFFC62828)
+val EmergencyRedEnd = Color(0xFFB71C1C)
+
+val GlassDarkBg = Color(0x66181C24)
+val GlassCardBg = Color(0xE60D1117)
+val GlassBorder = Color(0x26FFFFFF)
+val MutedSlate = Color(0xFF94A3B8)
+val DarkSlate = Color(0xFF64748B)
+val SubtitleGrey = Color(0xFF758295)

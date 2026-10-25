@@ -17,6 +17,7 @@ class SessionManager(context: Context) {
         const val IS_USER_LOGIN = "IsUserLoggedIn"
         const val USER_ID = "userId"
         const val KEY_APP_THEME = "app_theme_mode" // "system", "light", "dark"
+        const val KEY_USER_ROLE = "user_role"
     }
 
     init {
@@ -72,6 +73,14 @@ class SessionManager(context: Context) {
 
     fun setAppTheme(theme: String) {
         sharedPreferences.edit().putString(KEY_APP_THEME, theme).apply()
+    }
+
+    fun getUserRole(): String {
+        return sharedPreferences.getString(KEY_USER_ROLE, "CRANE_OWNER") ?: "CRANE_OWNER"
+    }
+
+    fun setUserRole(role: String) {
+        sharedPreferences.edit().putString(KEY_USER_ROLE, role).apply()
     }
 
     fun clearSession() {

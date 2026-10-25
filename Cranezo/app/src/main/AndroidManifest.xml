@@ -27,6 +27,26 @@
             android:name=".ui.splash.SplashActivity"
             android:exported="false"
             android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.chooselanguage.ChooseLanguageActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.verifyotp.VerifyOtpActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.chooserole.ChooseRoleActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
     </application>
 
 </manifest>
