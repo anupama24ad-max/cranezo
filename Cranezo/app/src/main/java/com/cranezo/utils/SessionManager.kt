@@ -16,9 +16,7 @@ class SessionManager(context: Context) {
 
         const val IS_USER_LOGIN = "IsUserLoggedIn"
         const val USER_ID = "userId"
-
-
-
+        const val KEY_APP_THEME = "app_theme_mode" // "system", "light", "dark"
     }
 
     init {
@@ -68,6 +66,13 @@ class SessionManager(context: Context) {
         sharedPreferences.edit().putBoolean(IS_USER_LOGIN, value).apply()
     }
 
+    fun getAppTheme(): String {
+        return sharedPreferences.getString(KEY_APP_THEME, "system") ?: "system"
+    }
+
+    fun setAppTheme(theme: String) {
+        sharedPreferences.edit().putString(KEY_APP_THEME, theme).apply()
+    }
 
     fun clearSession() {
         editor.clear()

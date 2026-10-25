@@ -1,23 +1,75 @@
 package com.cranezo.ui.theme
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import com.cranezo.utils.SessionManager
 
 /**
- * Returns true if the device is currently in Dark Theme based on phone settings.
+ * Theme selection modes.
+ */
+enum class AppThemeMode(val key: String, val title: String) {
+    LIGHT("light", "Always Light"),
+    DARK("dark", "Always Dark"),
+    SYSTEM("system", "System");
+
+    companion object {
+        fun fromKey(key: String?): AppThemeMode {
+            return entries.firstOrNull { it.key.equals(key, ignoreCase = true) } ?: SYSTEM
+        }
+    }
+}
+
+/**
+ * Global reactive state for application theme mode.
+ */
+object AppThemeState {
+    var currentThemeMode = mutableStateOf(AppThemeMode.SYSTEM)
+        private set
+
+    private var isInitialized = false
+
+    fun init(context: Context) {
+        if (!isInitialized) {
+            val sm = SessionManager(context.applicationContext)
+            val saved = sm.getAppTheme()
+            currentThemeMode.value = AppThemeMode.fromKey(saved)
+            isInitialized = true
+        }
+    }
+
+    fun setThemeMode(mode: AppThemeMode, context: Context) {
+        currentThemeMode.value = mode
+        SessionManager(context.applicationContext).setAppTheme(mode.key)
+    }
+}
+
+/**
+ * Returns true if the device / app is currently displaying Dark Theme,
+ * taking into account the user's preference (Always Light, Always Dark, or System).
  */
 @Composable
-fun isDarkTheme(): Boolean = isSystemInDarkTheme()
+fun isDarkTheme(): Boolean {
+    val mode by AppThemeState.currentThemeMode
+    val systemDark = isSystemInDarkTheme()
+    return when (mode) {
+        AppThemeMode.LIGHT -> false
+        AppThemeMode.DARK -> true
+        AppThemeMode.SYSTEM -> systemDark
+    }
+}
 
 /**
- * Dynamically selects a [Color] based on phone setting (Light or Dark mode).
+ * Dynamically selects a [Color] based on active theme (Always Light, Always Dark, or System).
  *
  * Example:
  * ```
@@ -30,16 +82,16 @@ fun isDarkTheme(): Boolean = isSystemInDarkTheme()
  */
 @Composable
 fun themeColor(light: Color, dark: Color): Color {
-    return if (isSystemInDarkTheme()) dark else light
+    return if (isDarkTheme()) dark else light
 }
 
 /**
- * Dynamically selects a [Painter] for images/icons based on phone setting (Light or Dark mode).
+ * Dynamically selects a [Painter] for images/icons based on active theme (Always Light, Always Dark, or System).
  *
  * Example:
  * ```
  * Image(
- *     painter = themePainter(lightResId = R.drawable.logo_light, darkResId = R.drawable.logo_dark),
+ *     painter = themePainter(lightResId = R.drawable.cranezo_light_logo, darkResId = R.drawable.cranezo_logo),
  *     contentDescription = null
  * )
  * ```
@@ -52,11 +104,11 @@ fun themePainter(
     @DrawableRes lightResId: Int,
     @DrawableRes darkResId: Int
 ): Painter {
-    return painterResource(id = if (isSystemInDarkTheme()) darkResId else lightResId)
+    return painterResource(id = if (isDarkTheme()) darkResId else lightResId)
 }
 
 /**
- * Dynamically selects a Drawable resource ID based on phone setting (Light or Dark mode).
+ * Dynamically selects a Drawable resource ID based on active theme (Always Light, Always Dark, or System).
  *
  * @param lightResId Drawable resource ID for Light Mode.
  * @param darkResId Drawable resource ID for Dark Mode.
@@ -66,12 +118,12 @@ fun themeDrawable(
     @DrawableRes lightResId: Int,
     @DrawableRes darkResId: Int
 ): Int {
-    return if (isSystemInDarkTheme()) darkResId else lightResId
+    return if (isDarkTheme()) darkResId else lightResId
 }
 
 /**
  * Dynamically selects any generic value (Dp, Float, String, Modifier, etc.)
- * based on phone setting (Light or Dark mode).
+ * based on active theme (Always Light, Always Dark, or System).
  *
  * Example:
  * ```
@@ -84,13 +136,14 @@ fun themeDrawable(
  */
 @Composable
 fun <T> themeValue(light: T, dark: T): T {
-    return if (isSystemInDarkTheme()) dark else light
+    return if (isDarkTheme()) dark else light
 }
 
 /**
  * Unified helper object for accessing theme colors, painters, and states.
  *
  * Usage:
+ * - AppTheme.mode
  * - AppTheme.isDark
  * - AppTheme.colors.background
  * - AppTheme.color(light = White, dark = DarkBlack)
@@ -98,9 +151,13 @@ fun <T> themeValue(light: T, dark: T): T {
  * - AppTheme.value(light = 8.dp, dark = 0.dp)
  */
 object AppTheme {
+    val mode: AppThemeMode
+        @Composable
+        get() = AppThemeState.currentThemeMode.value
+
     val isDark: Boolean
         @Composable
-        get() = isSystemInDarkTheme()
+        get() = isDarkTheme()
 
     val colors: ColorScheme
         @Composable

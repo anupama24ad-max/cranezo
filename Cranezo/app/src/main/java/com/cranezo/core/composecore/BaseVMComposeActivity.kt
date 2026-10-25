@@ -44,7 +44,10 @@ import com.cranezo.interfaces.BannerEvent
 import com.cranezo.ui.components.TopBannerHost
 import com.cranezo.ui.components.dialogUtils.SessionExpiredDialog
 import com.cranezo.ui.components.rememberTopBannerHostState
+import com.cranezo.ui.theme.AppThemeMode
+import com.cranezo.ui.theme.AppThemeState
 import com.cranezo.ui.theme.CranezoTheme
+import com.cranezo.ui.theme.isDarkTheme
 import com.cranezo.ui.theme.themeColor
 import com.cranezo.ui.theme.themePainter
 import com.cranezo.ui.theme.themeValue
@@ -63,7 +66,7 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
 
     /**
      * Override this in any activity if you want to force light or dark mode.
-     * - `null` = Follow phone/system settings (Default).
+     * - `null` = Follow user/system settings from AppThemeState (Default).
      * - `true` = Force Dark Mode.
      * - `false` = Force Light Mode.
      */
@@ -77,7 +80,7 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
      */
     val isDarkTheme: Boolean
         @Composable
-        get() = forceDarkTheme ?: isSystemInDarkTheme()
+        get() = forceDarkTheme ?: isDarkTheme()
 
     /**
      * Common helper to select a color dynamically based on phone setting.
@@ -110,10 +113,16 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[vmClass]
+        AppThemeState.init(applicationContext)
 
         setContent {
+            val appThemeMode by AppThemeState.currentThemeMode
             val systemDark = isSystemInDarkTheme()
-            val isDark = forceDarkTheme ?: systemDark
+            val isDark = forceDarkTheme ?: when (appThemeMode) {
+                AppThemeMode.LIGHT -> false
+                AppThemeMode.DARK -> true
+                AppThemeMode.SYSTEM -> systemDark
+            }
 
             // Dynamically adjust status bar and navigation bar icon colors to match theme
             val view = LocalView.current

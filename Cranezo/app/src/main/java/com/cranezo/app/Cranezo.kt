@@ -24,6 +24,7 @@ class Cranezo : Application(), Application.ActivityLifecycleCallbacks {
 //        FirebaseApp.initializeApp(this)
         instance = this
         sm = SessionManager(this)
+        com.cranezo.ui.theme.AppThemeState.init(this)
 
         val userId = sm.getData(AppStrings.SessionValues.userId, "")
         //  val channel = sm.getData(AppStrings.SessionValues.tripChannel, "")
