@@ -11,7 +11,13 @@ abstract class BaseComposeActivity : ComponentActivity() {
     /** Toggle edge-to-edge globally */
     protected open val useEdgeToEdge: Boolean = true
 
-    /** True = dark icons (for light bg). False = light icons (for dark bg). */
+    /**
+     * When true (default), automatically adapts status and navigation bar icon colors
+     * based on the phone's light / dark mode.
+     */
+    protected open val autoSystemBarIcons: Boolean = true
+
+    /** True = dark icons (for light bg). False = light icons (for dark bg). Used if autoSystemBarIcons is false. */
     protected open val darkStatusBarIcons: Boolean = true
     protected open val darkNavBarIcons: Boolean = true
 
@@ -24,7 +30,9 @@ abstract class BaseComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         if (useEdgeToEdge) {
-            val statusStyle = if (darkStatusBarIcons) {
+            val statusStyle = if (autoSystemBarIcons) {
+                SystemBarStyle.auto(statusBarColor, statusBarColor)
+            } else if (darkStatusBarIcons) {
                 // Light style = dark icons (for light backgrounds)
                 SystemBarStyle.light(statusBarColor, statusBarColor)
             } else {
@@ -32,7 +40,9 @@ abstract class BaseComposeActivity : ComponentActivity() {
                 SystemBarStyle.dark(statusBarColor)
             }
 
-            val navStyle = if (darkNavBarIcons) {
+            val navStyle = if (autoSystemBarIcons) {
+                SystemBarStyle.auto(navBarColor, navBarColor)
+            } else if (darkNavBarIcons) {
                 SystemBarStyle.light(navBarColor, navBarColor)
             } else {
                 SystemBarStyle.dark(navBarColor)

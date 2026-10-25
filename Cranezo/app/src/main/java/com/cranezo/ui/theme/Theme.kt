@@ -14,25 +14,36 @@ import androidx.compose.ui.text.font.FontFamily
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
+    onPrimary = Blackish,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    onSecondary = Blackish,
+    tertiary = Pink80,
+    onTertiary = Blackish,
+    background = DarkBlack, // #121212
+    onBackground = White,
+    surface = BlackGrey,    // #212121
+    onSurface = White,
+    surfaceVariant = DarkGrey,
+    onSurfaceVariant = MidGrey,
+    outline = Greyish
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
+    onPrimary = White,
     secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    onSecondary = White,
+    tertiary = Pink40,
+    onTertiary = White,
+    background = White,     // #FFFFFF
+    onBackground = Blackish,// #222222
+    surface = White,
+    onSurface = Blackish,
+    surfaceVariant = WhitishGrey,
+    onSurfaceVariant = DarkGreyish,
+    outline = Greyish
 )
+
 private fun Typography.withFont(font: FontFamily) = Typography(
     displayLarge = displayLarge.copy(fontFamily = font),
     displayMedium = displayMedium.copy(fontFamily = font),
@@ -51,12 +62,11 @@ private fun Typography.withFont(font: FontFamily) = Typography(
     labelSmall = labelSmall.copy(fontFamily = font),
 )
 
-
 @Composable
 fun CranezoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -65,12 +75,13 @@ fun CranezoTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> LightColorScheme
+        darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = Typography,
         content = content
     )
 }
