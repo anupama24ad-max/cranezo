@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,15 +43,15 @@ import com.cranezo.R
 import com.cranezo.ui.components.ContinueButton
 import com.cranezo.ui.components.GlassBox
 import com.cranezo.ui.components.Textview
+import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.theme.*
 
 @Composable
 fun ChooseLanguageScreen(
     vm: ChooseLanguageViewModel? = null,
-    onSkipClick: () -> Unit = {},
-    onContinueClick: () -> Unit = {}
 ) {
-    val selectedLang by vm?.selectedLanguage ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("en") }
+    val selectedLang by vm?.selectedLanguage
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("en") }
 
     val languages = vm?.languageList ?: listOf(
         LanguageItem(
@@ -101,162 +102,158 @@ fun ChooseLanguageScreen(
 
         // --- 3. Screen Content Layout ---
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
-            // Top Bar with "Skip"
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .statusBarsPadding()
-                    .padding(horizontal = dimen_20, vertical = dimen_12),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Textview(
-                    text = "Skip",
-                    size = font_16,
-                    color = Color(0xFF94A3B8),
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable { onSkipClick() }
-                )
-            }
-
             // Header Texts
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimen_20, vertical = dimen_4)
-            ) {
+                    .padding(horizontal = dimen_24, vertical = dimen_20)
+            )
+            {
                 Textview(
                     text = "Choose Your",
                     size = font_32,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
+                    color = White,
+                    fontWeight = FontWeight.ExtraBold
                 )
-                Textview(
+                TextviewWithGradient(
                     text = "Language",
-                    size = font_32,
-                    color = Color(0xFFF59E0B),
-                    fontWeight = FontWeight.Bold
+                    size = font_30,
+                    fontWeight = FontWeight.ExtraBold
                 )
                 Spacer(modifier = Modifier.height(dimen_8))
                 Textview(
                     text = "Select your preferred language\nto continue.",
-                    size = font_14,
-                    color = Color(0xFF94A3B8),
+                    size = font_16,
+                    color = Grey,
                     fontWeight = FontWeight.Normal
                 )
-            }
 
-            // Spacious area to show the crane hero illustration
-            Spacer(modifier = Modifier.weight(1f))
 
-            // Glassmorphic Language Options
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimen_20),
-                verticalArrangement = Arrangement.spacedBy(dimen_12)
-            ) {
-                languages.forEach { item ->
-                    val isSelected = selectedLang == item.code
+                // Spacious area to show the crane hero illustration
+                Spacer(modifier = Modifier.weight(1f))
 
-                    GlassBox(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                vm?.onLanguageSelected(item.code)
-                            },
-                        shape = RoundedCornerShape(dimen_16),
-                        backgroundColor = if (isSelected) Color(0x66181C24) else Color(0x4014171E),
-                        borderColor = if (isSelected) Color(0xFFF59E0B) else Color.White.copy(alpha = 0.12f),
-                        borderWidth = if (isSelected) dimen_1 * 1.5f else dimen_1
-                    ) {
-                        Row(
+                // Glassmorphic Language Options
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(dimen_16)
+                ) {
+                    languages.forEach { item ->
+                        val isSelected = selectedLang == item.code
+
+                        GlassBox(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = dimen_16, vertical = dimen_14),
-                            verticalAlignment = Alignment.CenterVertically
+                                .clickable {
+                                    vm?.onLanguageSelected(item.code)
+                                },
+                            shape = RoundedCornerShape(dimen_16),
+                            backgroundColor = if (isSelected) LightYellow.copy(alpha = 0.10f) else White.copy(
+                                alpha = 0.10f
+                            ),
+                            borderColor = if (isSelected) LightYellow else White.copy(alpha = 0.10f),
+                            borderWidth = if (isSelected) dimen_1 * 1.5f else dimen_1
                         ) {
-                            // Badge with Language character
-                            Box(
+                            Row(
                                 modifier = Modifier
-                                    .size(dimen_44)
-                                    .clip(RoundedCornerShape(dimen_12))
-                                    .background(Color(0x33FFFFFF))
-                                    .border(
-                                        width = dimen_1,
-                                        color = Color.White.copy(alpha = 0.08f),
-                                        shape = RoundedCornerShape(dimen_12)
-                                    ),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(horizontal = dimen_16, vertical = dimen_14),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Textview(
-                                    text = item.badge,
-                                    size = font_18,
-                                    color = if (isSelected) Color(0xFFF59E0B) else Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(dimen_14))
-
-                            // Name and Subtitle
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Textview(
-                                    text = item.name,
-                                    size = font_16,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                                Spacer(modifier = Modifier.height(dimen_2))
-                                Textview(
-                                    text = item.subtitle,
-                                    size = font_12,
-                                    color = if (isSelected) Color(0xFFCBD5E1) else Color(0xFF64748B)
-                                )
-                            }
-
-                            // Selection Indicator
-                            if (isSelected) {
+                                // Badge with Language character
                                 Box(
                                     modifier = Modifier
-                                        .size(dimen_24)
-                                        .background(Color(0xFFF59E0B), shape = CircleShape),
+                                        .size(dimen_44)
+                                        .clip(RoundedCornerShape(dimen_12))
+                                        .background(White.copy(alpha = 0.10f))
+                                        .border(
+                                            width = dimen_1,
+                                            color = White.copy(alpha = 0.10f),
+                                            shape = RoundedCornerShape(dimen_12)
+                                        ),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = "Selected",
-                                        tint = Color(0xFF1E2128),
-                                        modifier = Modifier.size(dimen_14)
+                                    Textview(
+                                        text = item.badge,
+                                        size = font_18,
+                                        color = if (isSelected) LightYellow else White,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .size(dimen_24)
-                                        .border(
-                                            width = dimen_1 * 1.5f,
-                                            color = Color(0xFF475569),
-                                            shape = CircleShape
+
+                                Spacer(modifier = Modifier.width(dimen_14))
+
+                                // Name and Subtitle
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Textview(
+                                        text = item.name,
+                                        size = font_16,
+                                        color = White,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Spacer(modifier = Modifier.height(dimen_2))
+                                    Textview(
+                                        text = item.subtitle,
+                                        size = font_12,
+                                        color = LightGreyish
+                                    )
+                                }
+
+                                // Selection Indicator
+                                if (isSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(dimen_24)
+                                            .background(
+                                                brush = Brush.linearGradient(
+                                                    listOf(
+                                                        LightYellow,
+                                                        DarkYellow
+                                                    )
+                                                ), shape = CircleShape
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = "Selected",
+                                            tint = Black,
+                                            modifier = Modifier.size(dimen_14)
                                         )
-                                )
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(dimen_24)
+                                            .border(
+                                                width = dimen_1,
+                                                color = DarkBlackish,
+                                                shape = CircleShape
+                                            )
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(dimen_30))
+
+                // Bottom Continue Button
+                ContinueButton(
+                    text = "Continue",
+                    onClick = {
+
+                    }
+                )
             }
-
-            Spacer(modifier = Modifier.height(dimen_20))
-
-            // Bottom Continue Button
-            ContinueButton(
-                text = "Continue",
-                onClick = onContinueClick
-            )
         }
     }
 }

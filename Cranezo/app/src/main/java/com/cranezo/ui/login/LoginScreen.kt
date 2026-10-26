@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,15 +44,13 @@ import com.cranezo.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    vm: LoginViewModel? = null,
-    onBackClick: () -> Unit = {},
-    onGetOtpClick: (String) -> Unit = {},
-    onManagerLoginClick: () -> Unit = {},
-    onEmergencyCallClick: () -> Unit = {}
-) {
-    val mobileNumber by vm?.mobileNumber ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
-    val countryCode by vm?.countryCode ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("+91") }
-    val countryFlag by vm?.countryFlag ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("🇮🇳") }
+    vm: LoginViewModel? = null) {
+    val mobileNumber by vm?.mobileNumber
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    val countryCode by vm?.countryCode
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("+91") }
+    val countryFlag by vm?.countryFlag
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("🇮🇳") }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -80,45 +80,41 @@ fun LoginScreen(
 
         // --- 3. Screen Layout ---
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = dimen_24, vertical = dimen_20)
+                .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
             // Common Circular Back Button
             CommonBackButton(
-                onClick = onBackClick,
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(start = dimen_20, top = dimen_14)
+                onClick = {
+                },
             )
 
-            Spacer(modifier = Modifier.height(dimen_16))
+            Spacer(modifier = Modifier.height(dimen_30))
 
             // Header Texts
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimen_20)
-            ) {
-                Textview(
-                    text = "W E L C O M E   T O",
-                    size = font_11,
-                    color = MutedSlate,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(dimen_4))
-                Textview(
-                    text = "Cranzo",
-                    size = font_32,
-                    color = White,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(dimen_6))
-                Textview(
-                    text = "Book the right crane.\nGet the job moving.",
-                    size = font_14,
-                    color = MutedSlate,
-                    fontWeight = FontWeight.Normal
-                )
-            }
+            Textview(
+                text = "W E L C O M E   T O",
+                size = font_12,
+                color = Grey,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(dimen_4))
+            Textview(
+                text = "Cranezo",
+                size = font_32,
+                color = White,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.height(dimen_6))
+            Textview(
+                text = "Book the right crane.\nGet the job moving.",
+                size = font_16,
+                color = Grey,
+                fontWeight = FontWeight.Normal
+            )
 
             // Spacious area to heroically display the crane
             Spacer(modifier = Modifier.weight(1f))
@@ -127,16 +123,16 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(topStart = dimen_32, topEnd = dimen_32))
-                    .background(GlassCardBg)
+                    .clip(RoundedCornerShape(dimen_26))
+                    .background(Black.copy(0.50f))
                     .border(
                         BorderStroke(
                             dimen_1,
                             Brush.verticalGradient(
-                                listOf(Color.White.copy(alpha = 0.2f), Color.Transparent)
+                                listOf(White.copy(alpha = 0.2f), Transparent)
                             )
                         ),
-                        RoundedCornerShape(topStart = dimen_32, topEnd = dimen_32)
+                        shape = RoundedCornerShape(dimen_26)
                     )
                     .padding(horizontal = dimen_20, vertical = dimen_24)
                     .navigationBarsPadding()
@@ -162,39 +158,29 @@ fun LoginScreen(
                     // Get OTP Gradient Button
                     CommonGradientButton(
                         text = "Get OTP",
-                        gradientColors = listOf(AmberPrimary, AmberSecondary, AmberDark),
-                        textColor = Color.Black,
+                        gradientColors = listOf(LightYellow, DarkYellow),
+                        textColor = Black,
                         rightImage = R.drawable.ic_arrow_right,
-                        rightIconTint = Color.Black,
-                        onClick = { onGetOtpClick(mobileNumber) }
+                        rightIconTint = Black,
+                        iconSize = dimen_16,
+                        onClick = { }
                     )
-
-                    Spacer(modifier = Modifier.height(dimen_18))
-
-                    // Login as Manager link
-                    Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Textview(
-                            text = "Login as Manager",
-                            size = font_14,
-                            color = AmberPrimary,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.clickable { onManagerLoginClick() }
-                        )
-                    }
 
                     Spacer(modifier = Modifier.height(dimen_20))
 
                     // Call for Emergency Red Gradient Button
                     CommonGradientButton(
                         text = "Call for Emergency",
-                        gradientColors = listOf(EmergencyRedStart, EmergencyRedCenter, EmergencyRedEnd),
+                        gradientColors = listOf(
+                            Red,
+                            DarkRed,
+                            Maroon
+                        ),
                         textColor = White,
-                        leftImage = R.drawable.ic_emergency,
+                        leftImage = R.drawable.ambulance_ic,
                         leftIconTint = White,
-                        onClick = { onEmergencyCallClick() }
+                        iconSpacing = dimen_16,
+                        onClick = { }
                     )
                 }
             }

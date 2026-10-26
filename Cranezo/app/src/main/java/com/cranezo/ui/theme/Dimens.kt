@@ -47,6 +47,7 @@ val dimen_58 = 58.dp
 val dimen_60 = 60.dp
 val dimen_62 = 62.dp
 val dimen_64 = 64.dp
+val dimen_66 = 66.dp
 val dimen_70 = 70.dp
 val dimen_75 = 75.dp
 val dimen_78 = 78.dp

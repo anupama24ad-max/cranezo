@@ -15,15 +15,7 @@ class ChooseLanguageActivity : BaseVMComposeActivity<ChooseLanguageViewModel>(Ch
 
     @Composable
     override fun Content(vm: ChooseLanguageViewModel) {
-        ChooseLanguageScreen(
-            vm = vm,
-            onSkipClick = {
-                // Handle Skip action
-            },
-            onContinueClick = {
-                // Handle Continue action
-            }
-        )
+        ChooseLanguageScreen(vm = vm)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

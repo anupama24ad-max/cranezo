@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +29,7 @@ import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassOtpField
 import com.cranezo.ui.components.GlassResendOtpTimer
 import com.cranezo.ui.components.Textview
+import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.theme.*
 
 @Composable
@@ -38,8 +40,10 @@ fun VerifyOtpScreen(
     onVerifyClick: (String) -> Unit = {},
     onEmergencyCallClick: () -> Unit = {}
 ) {
-    val otp by vm?.otp ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
-    val phoneNumber by vm?.phoneNumber ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("+91 98765 43210") }
+    val otp by vm?.otp
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
+    val phoneNumber by vm?.phoneNumber
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("+91 98765 43210") }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -71,64 +75,60 @@ fun VerifyOtpScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = dimen_24, vertical = dimen_20)
                 .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
-            // Common Circular Glass Back Button
             CommonBackButton(
-                onClick = onBackClick,
-                modifier = Modifier.padding(start = dimen_20, top = dimen_14)
+                onClick = {
+                },
             )
 
-            Spacer(modifier = Modifier.height(dimen_28))
+            Spacer(modifier = Modifier.height(dimen_30))
 
             // Header Texts
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimen_20)
-            ) {
-                Textview(
-                    text = "Verify",
-                    size = font_32,
-                    color = White,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(dimen_2))
-                Textview(
-                    text = "Your Number",
-                    size = font_32,
-                    color = AmberPrimary,
-                    fontWeight = FontWeight.Bold
-                )
+            Textview(
+                text = "Verify",
+                size = font_32,
+                color = White,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.height(dimen_2))
+            TextviewWithGradient(
+                text = "Your Number",
+                size = font_32,
+                fontWeight = FontWeight.ExtraBold
+            )
 
-                Spacer(modifier = Modifier.height(dimen_12))
+            Spacer(modifier = Modifier.height(dimen_12))
 
-                Textview(
-                    text = "We've sent a 6- digit OTP to",
-                    size = font_14,
-                    color = MutedSlate,
-                    fontWeight = FontWeight.Normal
-                )
+            Textview(
+                text = "We've sent a 6- digit OTP to",
+                size = font_14,
+                color = Grey,
+                fontWeight = FontWeight.Normal
+            )
 
-                Spacer(modifier = Modifier.height(dimen_4))
+            Spacer(modifier = Modifier.height(dimen_4))
 
-                Textview(
-                    text = phoneNumber,
-                    size = font_15,
-                    color = White,
-                    fontWeight = FontWeight.Bold
-                )
+            Textview(
+                text = phoneNumber,
+                size = font_16,
+                color = White,
+                fontWeight = FontWeight.Bold
+            )
 
-                Spacer(modifier = Modifier.height(dimen_8))
+            Spacer(modifier = Modifier.height(dimen_8))
 
-                Textview(
-                    text = "Edit",
-                    size = font_14,
-                    color = AmberPrimary,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { onEditPhoneClick() }
-                )
-            }
+            TextviewWithGradient(
+                text = "Edit",
+                size = font_14,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable {
+
+                }
+            )
+
 
             // Spacious area showing the JCB worker
             Spacer(modifier = Modifier.weight(1f))
@@ -137,9 +137,6 @@ fun VerifyOtpScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimen_20)
-                    .navigationBarsPadding()
-                    .padding(bottom = dimen_24)
             ) {
                 // 6 Glassy OTP cells
                 Box(
@@ -150,14 +147,12 @@ fun VerifyOtpScreen(
                         value = otp,
                         onValueChange = { vm?.onOtpChange(it) },
                         cells = 6,
-                        cellWidth = dimen_46,
-                        cellHeight = dimen_56,
-                        cornerRadius = dimen_12,
+                        cellWidth = dimen_45,
+                        cellHeight = dimen_66,
+                        cornerRadius = dimen_8,
                         gap = dimen_8,
                         onDone = {
-                            if (otp.length == 6) {
-                                onVerifyClick(otp)
-                            }
+
                         }
                     )
                 }
@@ -171,28 +166,34 @@ fun VerifyOtpScreen(
                     text = "Resend OTP in "
                 )
 
-                Spacer(modifier = Modifier.height(dimen_28))
+                Spacer(modifier = Modifier.height(dimen_30))
 
-                // Verify & Continue Gradient Button
+                // Get OTP Gradient Button
                 CommonGradientButton(
                     text = "Verify & Continue",
-                    gradientColors = listOf(AmberPrimary, AmberSecondary, AmberDark),
-                    textColor = Color.Black,
+                    gradientColors = listOf(LightYellow, DarkYellow),
+                    textColor = Black,
                     rightImage = R.drawable.ic_arrow_right,
-                    rightIconTint = Color.Black,
-                    onClick = { onVerifyClick(otp) }
+                    rightIconTint = Black,
+                    iconSize = dimen_16,
+                    onClick = { }
                 )
 
-                Spacer(modifier = Modifier.height(dimen_16))
+                Spacer(modifier = Modifier.height(dimen_20))
 
                 // Call for Emergency Red Gradient Button
                 CommonGradientButton(
                     text = "Call for Emergency",
-                    gradientColors = listOf(EmergencyRedStart, EmergencyRedCenter, EmergencyRedEnd),
+                    gradientColors = listOf(
+                        Red,
+                        DarkRed,
+                        Maroon
+                    ),
                     textColor = White,
-                    leftImage = R.drawable.ic_emergency,
+                    leftImage = R.drawable.ambulance_ic,
                     leftIconTint = White,
-                    onClick = { onEmergencyCallClick() }
+                    iconSpacing = dimen_16,
+                    onClick = { }
                 )
             }
         }

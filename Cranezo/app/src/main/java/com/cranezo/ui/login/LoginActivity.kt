@@ -20,24 +20,7 @@ class LoginActivity : BaseVMComposeActivity<LoginViewModel>(LoginViewModel::clas
     @Composable
     override fun Content(vm: LoginViewModel) {
         LoginScreen(
-            vm = vm,
-            onBackClick = { finish() },
-            onGetOtpClick = { mobileNumber ->
-                val fullPhone = "${vm.countryCode.value} $mobileNumber"
-                val intent = Intent(this@LoginActivity, VerifyOtpActivity::class.java).apply {
-                    putExtra("phone_number", fullPhone)
-                }
-                startActivity(intent)
-            },
-            onManagerLoginClick = {
-                // Handle Manager Login
-            },
-            onEmergencyCallClick = {
-                val intent = Intent(Intent.ACTION_DIAL).apply {
-                    data = Uri.parse("tel:112")
-                }
-                startActivity(intent)
-            }
+            vm = vm
         )
     }
 

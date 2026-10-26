@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -30,6 +32,7 @@ import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassRoleCard
 import com.cranezo.ui.components.Textview
+import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.theme.*
 
 @Composable
@@ -38,7 +41,11 @@ fun ChooseRoleScreen(
     onBackClick: () -> Unit = {},
     onContinueClick: (UserRole) -> Unit = {}
 ) {
-    val selectedRole by vm?.selectedRole ?: remember { androidx.compose.runtime.mutableStateOf(UserRole.CRANE_OWNER) }
+    val selectedRole by vm?.selectedRole ?: remember {
+        androidx.compose.runtime.mutableStateOf(
+            UserRole.CRANE_OWNER
+        )
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -70,53 +77,49 @@ fun ChooseRoleScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = dimen_24, vertical = dimen_20)
                 .statusBarsPadding()
+                .navigationBarsPadding()
         ) {
-            // Common Circular Glass Back Button
+            // Common Circular Back Button
             CommonBackButton(
-                onClick = onBackClick,
-                modifier = Modifier.padding(start = dimen_20, top = dimen_14)
+                onClick = {
+                },
             )
 
-            Spacer(modifier = Modifier.height(dimen_24))
+            Spacer(modifier = Modifier.height(dimen_30))
 
             // Header Texts
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimen_20)
-            ) {
-                Textview(
-                    text = "Choose Your",
-                    size = font_32,
-                    color = White,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(dimen_2))
-                Textview(
-                    text = "Role",
-                    size = font_32,
-                    color = AmberPrimary,
-                    fontWeight = FontWeight.Bold
-                )
+            Textview(
+                text = "Choose Your",
+                size = font_32,
+                color = White,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(modifier = Modifier.height(dimen_2))
+            TextviewWithGradient(
+                text = "Role",
+                size = font_32,
+                fontWeight = FontWeight.ExtraBold
+            )
 
-                Spacer(modifier = Modifier.height(dimen_10))
+            Spacer(modifier = Modifier.height(dimen_10))
 
-                val subtitle = buildAnnotatedString {
-                    append("Select how you want to use\n")
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = White)) {
-                        append("Cranzo")
-                    }
-                    append(" app to continue.")
+            val subtitle = buildAnnotatedString {
+                append("Select how you want to use\n")
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append("Cranezo")
                 }
-
-                androidx.compose.material3.Text(
-                    text = subtitle,
-                    color = MutedSlate,
-                    fontSize = font_14,
-                    lineHeight = font_20
-                )
+                append(" app to continue.")
             }
+
+            Text(
+                text = subtitle,
+                color = Grey,
+                fontSize = font_14,
+                lineHeight = font_20
+            )
+
 
             // Spacious area to show the crane hero
             Spacer(modifier = Modifier.weight(1f))
@@ -124,9 +127,8 @@ fun ChooseRoleScreen(
             // --- 4. Role Selection Cards ---
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimen_20),
-                verticalArrangement = Arrangement.spacedBy(dimen_14)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(dimen_16)
             ) {
                 UserRole.values().forEach { role ->
                     GlassRoleCard(
@@ -141,25 +143,19 @@ fun ChooseRoleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(dimen_24))
+            Spacer(modifier = Modifier.height(dimen_30))
 
             // --- 5. Continue Button ---
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimen_20)
-                    .navigationBarsPadding()
-                    .padding(bottom = dimen_24)
-            ) {
-                CommonGradientButton(
-                    text = "Continue",
-                    gradientColors = listOf(AmberPrimary, AmberSecondary, AmberDark),
-                    textColor = Color.Black,
-                    rightImage = R.drawable.ic_arrow_right,
-                    rightIconTint = Color.Black,
-                    onClick = { onContinueClick(selectedRole) }
-                )
-            }
+
+            CommonGradientButton(
+                text = "Continue",
+                gradientColors = listOf(LightYellow, DarkYellow),
+                textColor = Black,
+                rightImage = R.drawable.ic_arrow_right,
+                rightIconTint = Black,
+                iconSize = dimen_16,
+                onClick = { }
+            )
         }
     }
 }

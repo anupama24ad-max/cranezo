@@ -197,7 +197,7 @@ fun Textview(
 fun TextviewWithGradient(
     text: String,
     size: TextUnit = font_16,      // e.g., 14.sp, 20.sp
-    color: List<Color> = listOf(DarkBlue, Grey),
+    color: List<Color> = listOf(LightYellow, DarkYellow),
     fontWeight: FontWeight = FontWeight.Normal,
     italic: Boolean = false,
     modifier: Modifier = Modifier,
@@ -330,7 +330,7 @@ fun LabeledField(
                     .clip(fieldShape)
                     .background(Color(0x331B2028))
                     .border(dimen_1, Color.White.copy(alpha = 0.15f), fieldShape)
-                .padding(horizontal = dimen_12),
+                    .padding(horizontal = dimen_12),
                 contentAlignment = Alignment.CenterStart
             ) {
                 Row(
@@ -405,9 +405,14 @@ fun LabeledField(
                         singleLine = singleLine,
                         enabled = enabled,
                         keyboardOptions = if (isPhoneNumber || isPhoneWithCountry) {
-                            KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = imeAction)
+                            KeyboardOptions(
+                                keyboardType = KeyboardType.Phone,
+                                imeAction = imeAction
+                            )
                         } else keyboardOptions,
-                        keyboardActions = KeyboardActions(onDone = { onImeAction() }, onNext = { onImeAction() }),
+                        keyboardActions = KeyboardActions(
+                            onDone = { onImeAction() },
+                            onNext = { onImeAction() }),
                         textStyle = TextStyle(
                             fontSize = font_15,
                             color = White,
@@ -707,7 +712,7 @@ fun GradientButton(
     rightImage: Int? = null,
     textSize: TextUnit = font_16,
     rightIconSize: Dp = dimen_20,
-    isCircle : Boolean = true,
+    isCircle: Boolean = true,
     shape: RoundedCornerShape = RoundedCornerShape(dimen_8),
     onClick: () -> Unit,
 ) {
@@ -753,7 +758,7 @@ fun GradientButton(
 
             // Left Image
             leftImage?.let {
-                if (isCircle){
+                if (isCircle) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
@@ -1017,12 +1022,14 @@ fun GlassRoleCard(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    activeBorderColor: Color = AmberPrimary,
-    inactiveBorderColor: Color = Color.White.copy(alpha = 0.15f),
-    backgroundColor: Color = Color(0x331B2028),
-    shape: Shape = RoundedCornerShape(dimen_16)
+    activeBorderColor: Color = LightYellow,
+    inactiveBorderColor: Color = White.copy(alpha = 0.10f),
+    inActiveBackgroundColor: Color = White.copy(alpha = 0.10f),
+    activeBackgroundColor: Color = LightYellow.copy(alpha = 0.10f),
+    shape: Shape = RoundedCornerShape(dimen_12)
 ) {
     val borderColor = if (isSelected) activeBorderColor else inactiveBorderColor
+    val backgroundColor = if (isSelected) activeBackgroundColor else inActiveBackgroundColor
 
     Box(
         modifier = modifier
@@ -1057,13 +1064,13 @@ fun GlassRoleCard(
                     text = title,
                     size = font_16,
                     color = White,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(dimen_4))
                 Textview(
                     text = subtitle,
                     size = font_12,
-                    color = SubtitleGrey,
+                    color = LightGreyish,
                     fontWeight = FontWeight.Normal,
                     maxLines = 2
                 )
@@ -1071,28 +1078,37 @@ fun GlassRoleCard(
 
             Spacer(modifier = Modifier.width(dimen_12))
 
-            // Right Radio / Check indicator
+            // Selection Indicator
             if (isSelected) {
                 Box(
                     modifier = Modifier
-                        .size(dimen_22)
-                        .clip(CircleShape)
-                        .background(AmberPrimary),
+                        .size(dimen_24)
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    LightYellow,
+                                    DarkYellow
+                                )
+                            ), shape = CircleShape
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Selected",
-                        tint = Color.Black,
+                        tint = Black,
                         modifier = Modifier.size(dimen_14)
                     )
                 }
             } else {
                 Box(
                     modifier = Modifier
-                        .size(dimen_22)
-                        .clip(CircleShape)
-                        .border(dimen_1, Color.White.copy(alpha = 0.25f), CircleShape)
+                        .size(dimen_24)
+                        .border(
+                            width = dimen_1,
+                            color = DarkBlackish,
+                            shape = CircleShape
+                        )
                 )
             }
         }
@@ -1108,8 +1124,8 @@ fun CommonBackButton(
     modifier: Modifier = Modifier,
     size: Dp = dimen_40,
     iconSize: Dp = dimen_24,
-    backgroundColor: Color = Color(0x331B2028),
-    borderColor: Color = Color.White.copy(alpha = 0.2f),
+    backgroundColor: Color = White.copy(0.20f),
+    borderColor: Color = LightWhitish.copy(alpha = 0.12f),
     iconColor: Color = White
 ) {
     Box(
@@ -1143,11 +1159,11 @@ fun GlassOtpField(
     cellHeight: Dp = dimen_56,
     cornerRadius: Dp = dimen_12,
     gap: Dp = dimen_8,
-    activeBorderColor: Color = AmberPrimary,
-    inactiveBorderColor: Color = Color.White.copy(alpha = 0.18f),
-    glassBgColor: Color = Color(0x331B2028),
+    activeBorderColor: Color = LightYellow,
+    inactiveBorderColor: Color = White.copy(alpha = 0.18f),
+    glassBgColor: Color = White.copy(alpha = 0.18f),
     textColor: Color = White,
-    cursorColor: Color = AmberPrimary,
+    cursorColor: Color = LightYellow,
     onDone: () -> Unit = {}
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -1315,21 +1331,21 @@ fun GlassResendOtpTimer(
             Textview(
                 text = text,
                 size = font_14,
-                color = MutedSlate,
+                color = White,
                 fontWeight = FontWeight.Normal
             )
             Spacer(modifier = Modifier.width(dimen_4))
             Textview(
                 text = formatAsMMSS(secondsLeft),
                 size = font_14,
-                color = AmberPrimary,
+                color = LightYellow,
                 fontWeight = FontWeight.Bold
             )
         } else {
             Textview(
                 text = "Resend OTP",
                 size = font_14,
-                color = AmberPrimary,
+                color = LightYellow,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable {
                     onResendOtp()
@@ -1732,12 +1748,12 @@ fun <T : Any> LazyColumnListViewMinMax(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-         /*   LottiePlayer(
-                lottieRes = R.raw.app_loader,
-                modifier = Modifier.size(150.dp),
-                loop = true,
-                speed = 1f
-            )*/
+            /*   LottiePlayer(
+                   lottieRes = R.raw.app_loader,
+                   modifier = Modifier.size(150.dp),
+                   loop = true,
+                   speed = 1f
+               )*/
         }
     } else {
         LazyColumn(
@@ -1749,7 +1765,9 @@ fun <T : Any> LazyColumnListViewMinMax(
         {
             itemsIndexed(
                 items,
-                key = { index, item -> key?.invoke(item) ?: "${item.hashCode()}_$index" }) { _, item ->
+                key = { index, item ->
+                    key?.invoke(item) ?: "${item.hashCode()}_$index"
+                }) { _, item ->
                 itemContent(item)
             }
 
@@ -1809,11 +1827,11 @@ fun HeaderWithBackIcon(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-               /* Image(
-                    painter = painterResource(R.drawable.back_arrow_ic),
-                    contentDescription = null,
-                    modifier = Modifier.size(dimen_10)
-                )*/
+                /* Image(
+                     painter = painterResource(R.drawable.back_arrow_ic),
+                     contentDescription = null,
+                     modifier = Modifier.size(dimen_10)
+                 )*/
             }
         }
 
@@ -2070,8 +2088,8 @@ fun CompactEditTextForDes(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LogoutBottomSheet(
-    title : String,
-    subtitle : String,
+    title: String,
+    subtitle: String,
     onCancel: () -> Unit,
     onLogout: () -> Unit,
     onDismiss: () -> Unit
@@ -2313,7 +2331,7 @@ fun Modifier.glassEffect(
 @Composable
 fun GlassBox(
     modifier: Modifier = Modifier,
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_16),
+    shape: Shape = RoundedCornerShape(dimen_16),
     backgroundColor: Color = Color(0x331B2028),
     borderColor: Color = Color.White.copy(alpha = 0.12f),
     borderWidth: Dp = dimen_1,
@@ -2360,32 +2378,17 @@ fun ContinueButton(
     enabled: Boolean = true,
     showIcon: Boolean = true,
     icon: ImageVector = Icons.AutoMirrored.Filled.ArrowForward,
-    textColor: Color = Color.Black,
+    textColor: Color = Black,
     textSize: TextUnit = font_16,
-    gradientColors: List<Color> = listOf(
-        Color(0xFFFFA000),
-        Color(0xFFFF8F00),
-        Color(0xFFF57C00)
-    ),
+    gradientColors: List<Color> = listOf(LightYellow, DarkYellow),
     height: Dp = dimen_52,
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_28),
+    shape: Shape = RoundedCornerShape(dimen_34),
     includeBottomPadding: Boolean = true,
     onClick: () -> Unit
 ) {
-    val outerModifier = if (includeBottomPadding) {
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimen_20)
-            .navigationBarsPadding()
-            .padding(bottom = dimen_20)
-    } else {
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimen_20)
-    }
 
     Box(
-        modifier = outerModifier
+        modifier = modifier
     ) {
         Button(
             onClick = onClick,
@@ -2467,12 +2470,12 @@ fun CommonGradientButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    gradientColors: List<Color> = listOf(AmberPrimary, AmberSecondary, AmberDark),
-    textColor: Color = Color.Black,
+    gradientColors: List<Color> = listOf(AmberPrimary, AmberSecondary),
+    textColor: Color = Black,
     textSize: TextUnit = font_16,
     fontWeight: FontWeight = FontWeight.Bold,
-    height: Dp = dimen_52,
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_28),
+    height: Dp = dimen_42,
+    shape: Shape = RoundedCornerShape(dimen_34),
     leftImage: Int? = null,
     leftIcon: ImageVector? = null,
     leftIconTint: Color? = textColor,
@@ -2490,8 +2493,8 @@ fun CommonGradientButton(
             .height(height),
         shape = shape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent
+            containerColor = Transparent,
+            disabledContainerColor = Transparent
         ),
         contentPadding = PaddingValues(dimen_0)
     ) {
