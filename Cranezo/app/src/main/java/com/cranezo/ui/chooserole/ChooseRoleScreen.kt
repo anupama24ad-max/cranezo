@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -65,9 +66,9 @@ fun ChooseRoleScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.60f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.90f)
+                            Black.copy(alpha = 0.60f),
+                            Transparent,
+                            Transparent
                         )
                     )
                 )
@@ -122,7 +123,8 @@ fun ChooseRoleScreen(
 
 
             // Spacious area to show the crane hero
-            Spacer(modifier = Modifier.weight(1f))
+//            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(dimen_150))
 
             // --- 4. Role Selection Cards ---
             Column(

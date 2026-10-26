@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -63,9 +64,9 @@ fun VerifyOtpScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.65f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.92f)
+                            Black.copy(alpha = 0.60f),
+                            Transparent,
+                            Transparent
                         )
                     )
                 )

@@ -70,9 +70,9 @@ fun LoginScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.65f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.9f)
+                            Black.copy(alpha = 0.60f),
+                            Transparent,
+                            Transparent
                         )
                     )
                 )

@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -92,9 +93,9 @@ fun ChooseLanguageScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color.Black.copy(alpha = 0.55f),
-                            Color.Black.copy(alpha = 0.15f),
-                            Color.Black.copy(alpha = 0.85f)
+                            Black.copy(alpha = 0.60f),
+                            Transparent,
+                            Transparent
                         )
                     )
                 )
