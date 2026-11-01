@@ -27,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,10 @@ import com.cranezo.ui.theme.*
 fun ChooseLanguageScreen(
     vm: ChooseLanguageViewModel? = null,
 ) {
+    LaunchedEffect(Unit) {
+        vm?.dropDownApi()
+    }
+
     val selectedLang by vm?.selectedLanguage
         ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("en") }
 

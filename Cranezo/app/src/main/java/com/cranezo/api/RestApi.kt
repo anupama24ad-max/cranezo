@@ -1,5 +1,6 @@
 package com.cranezo.api
 
+import com.cranezo.ui.chooselanguage.model.ChooseLanguageApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -18,6 +19,20 @@ interface RestApi {
         @HeaderMap headers: Map<String, String>,
         @Body jsonObject: RequestBody?=null
     ): Response<ApiResult<Any>>
+
+
+    @POST(RESTURLS.dropDown)
+    suspend fun dropDownApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody?=null
+    ): Response<ApiResult<ChooseLanguageApiResponse>>
+
+    @POST(RESTURLS.login)
+    suspend fun loginApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody?=null
+    ): Response<ApiResult<Any>>
+
 
 
 }

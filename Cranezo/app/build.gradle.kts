@@ -35,7 +35,7 @@ android {
             buildConfigField(
                 "String",
                 "SERVER_URL",
-                value = "\"https://chits.frelenz.tech/api/\""
+                value = "\"https://cranezo.com/api/\""
             )
             buildConfigField("String", "API_KEY", "$defaultToken")
         }
@@ -43,92 +43,9 @@ android {
             buildConfigField(
                 "String",
                 "SERVER_URL",
-                value = "\"https://scrapdaddy.in/api/customer/\""
+                value = "\"https://cranezo.com/api/\""
             )
 
-            buildConfigField(
-                "String",
-                "IMAGE_URL",
-                value = "\"https://scrapdaddy.in/\""
-            )
-
-            buildConfigField(
-                "String",
-                "PRIVACY_POLICY_URL",
-                value = "\"https://nscompaniesgrouptraining.website/privacyPolicy\""
-            );
-
-            buildConfigField(
-                "String",
-                "TERMS",
-                value = "\"https://nscompaniesgrouptraining.website/termsofservice\""
-            );
-
-            buildConfigField(
-                "String",
-                "GUIDANCE_VIDEO_LINK",
-                value = "\"https://www.youtube.com/@nstaxconsultancy7845\""
-            )
-            buildConfigField(
-                "String",
-                "SERVICE_LINK",
-                value = "\"https://www.nscompaniesgrouptraining.website/auth/workservices/\""
-            )
-            buildConfigField(
-                "String",
-                "RATE_US_YES",
-                value = "\"https://www.nscompaniesgrouptraining.website/rateUs\""
-            )
-            buildConfigField(
-                "String",
-                "RATE_US_NO",
-                value = "\"https://www.nscompaniesgrouptraining.website/grievenceForm\""
-            )
-            buildConfigField(
-                "String",
-                "GIVE_TESTIMONIAL",
-                value = "\"https://www.nscompaniesgrouptraining.website/nstaxconsultancy/giveTestimonial\""
-            )
-            buildConfigField(
-                "String",
-                "YOU_TUBE",
-                value = "\"https://www.nscompaniesgrouptraining.website/nstaxconsultancy/videos/011d2040-ae23-4b90-ab5c-1120f1fe7bc7?flag=011d2040-ae23-4b90-ab5c-1120f1fe7bc7\""
-            )
-            buildConfigField(
-                "String",
-                "IS0",
-                value = "\"https://nscompaniesgrouptraining.website/images/Iso%20Certificate.pdf\""
-            )
-            buildConfigField(
-                "String",
-                "BRANCHES",
-                value = "\"https://nscompaniesgrouptraining.website/branches\""
-            )
-            buildConfigField(
-                "String",
-                "CALL_US",
-                value = "\"https://nscompaniesgrouptraining.website/callUs\""
-            )
-            buildConfigField(
-                "String",
-                "WHATS_UP",
-                value = "\"https://nscompaniesgrouptraining.website/whatsappUpUser\""
-            )
-            buildConfigField(
-                "String",
-                "LATEST_UPDATES",
-                value = "\"https://www.nscompaniesgrouptraining.website/getLatestUpdates\""
-            )
-            buildConfigField(
-                "String",
-                "YOUTUBE_CHANNEL",
-                value = "\"https://www.youtube.com/@nstaxconsultancy7845\""
-            )
-            buildConfigField(
-                "String",
-                "CALL",
-                value = "\"https://www.nscompaniesgrouptraining.website/callUs\""
-            )
             buildConfigField("String", "API_KEY", "$defaultToken")
 
         }
@@ -217,6 +134,6 @@ dependencies {
     // Razorpay
     implementation("com.razorpay:checkout:1.6.33")
 
-    implementation (libs.lottie.compose)
-    implementation (libs.coil.compose)
+    implementation(libs.lottie.compose)
+    implementation(libs.coil.compose)
 }

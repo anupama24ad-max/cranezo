@@ -139,10 +139,10 @@ class AppStrings {
             var totalAmount = "totalAmount"
         }
     }
-    class Type{
+    class DropDown{
         companion object{
-            var email = 1
-            var phoneNumber = 2
+            var language = 1
+            var owner = 2
         }
     }
     class FromAcivity{

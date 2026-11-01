@@ -19,10 +19,10 @@ import kotlinx.coroutines.delay
 fun SplashScreen(vm: SplashViewModel? = null) {
     val context = LocalContext.current
 
-    /* LaunchedEffect(Unit) {
+   LaunchedEffect(Unit) {
          delay(2000)
          (context as? SplashActivity)?.navigations()
-     }*/
+     }
 
     Box(
         modifier = Modifier

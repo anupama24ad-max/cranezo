@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.cranezo.core.composecore.BaseVMComposeActivity
+import com.cranezo.ui.chooselanguage.ChooseLanguageActivity
+import com.cranezo.ui.chooselanguage.ChooseLanguageViewModel
 
 import com.cranezo.utils.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,8 +18,9 @@ class SplashActivity : BaseVMComposeActivity<SplashViewModel>(SplashViewModel::c
     override fun Content(vm: SplashViewModel) {
         return SplashScreen(vm)
     }
+
     @Inject
-    lateinit var sm : SessionManager
+    lateinit var sm: SessionManager
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -32,5 +35,12 @@ class SplashActivity : BaseVMComposeActivity<SplashViewModel>(SplashViewModel::c
             // You can animate the splash icon if you like, then:
             provider.remove() // remove immediately when you’re done
         }
-  }
+    }
+
+    fun navigations() {
+        startActivity(Intent(this, ChooseLanguageActivity::class.java))
+        finish()
+    }
+
+
 }
