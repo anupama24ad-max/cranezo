@@ -6,6 +6,11 @@ import com.cranezo.ui.cranes.model.CraneFormOptionsResponse
 import com.cranezo.ui.cranes.model.FormOption
 import com.cranezo.ui.cranes.model.Operator
 import com.cranezo.ui.login.model.RegisterOrLoginApiResponse
+import com.cranezo.ui.myprofile.model.AppearanceOption
+import com.cranezo.ui.myprofile.model.LanguageOption
+import com.cranezo.ui.myprofile.model.LegalContent
+import com.cranezo.ui.myprofile.model.NotificationGroup
+import com.cranezo.ui.myprofile.model.ProfileData
 import com.cranezo.ui.profile.model.UpdateProfileApiResponse
 import com.cranezo.ui.verifyotp.model.VerifyOtpApiResponse
 import okhttp3.MultipartBody
@@ -130,5 +135,76 @@ interface RestApi {
         @HeaderMap headers: Map<String, String>,
         @Body jsonObject: RequestBody? = null
     ): Response<ApiResult<Operator>>
+
+
+    // ---- My Profile (every call is a POST with a JSON body, {} when there is nothing to send) ----
+
+    @POST(RESTURLS.profileMe)
+    suspend fun profileMeApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<ProfileData>>
+
+    @POST(RESTURLS.profileUpdate)
+    suspend fun profileUpdateApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<ProfileData>>
+
+    @POST(RESTURLS.profileLanguages)
+    suspend fun profileLanguagesApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<LanguageOption>>>
+
+    @POST(RESTURLS.profileLanguageSave)
+    suspend fun profileLanguageSaveApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<LanguageOption>>>
+
+    @POST(RESTURLS.profileAppearance)
+    suspend fun profileAppearanceApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<AppearanceOption>>>
+
+    @POST(RESTURLS.profileAppearanceSave)
+    suspend fun profileAppearanceSaveApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<AppearanceOption>>>
+
+    @POST(RESTURLS.profileNotifications)
+    suspend fun profileNotificationsApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<NotificationGroup>>>
+
+    @POST(RESTURLS.profileNotificationsSave)
+    suspend fun profileNotificationsSaveApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<NotificationGroup>>>
+
+    // No token needed
+    @POST(RESTURLS.contentLegal)
+    suspend fun legalApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<LegalContent>>
+
+    // Details body { crane_id }: data is one crane
+    @POST(RESTURLS.assignedCranes)
+    suspend fun assignedCraneDetailsApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<Crane>>
+
+    @POST(RESTURLS.logout)
+    suspend fun logoutApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<Any>>
 
 }

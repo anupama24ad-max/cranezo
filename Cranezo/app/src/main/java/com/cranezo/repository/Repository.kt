@@ -11,6 +11,11 @@ import com.cranezo.ui.cranes.model.CraneFormOptionsResponse
 import com.cranezo.ui.cranes.model.FormOption
 import com.cranezo.ui.cranes.model.Operator
 import com.cranezo.ui.login.model.RegisterOrLoginApiResponse
+import com.cranezo.ui.myprofile.model.AppearanceOption
+import com.cranezo.ui.myprofile.model.LanguageOption
+import com.cranezo.ui.myprofile.model.LegalContent
+import com.cranezo.ui.myprofile.model.NotificationGroup
+import com.cranezo.ui.myprofile.model.ProfileData
 import com.cranezo.ui.profile.model.UpdateProfileApiResponse
 import com.cranezo.ui.verifyotp.model.VerifyOtpApiResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -152,5 +157,63 @@ class Repository @Inject constructor(val api: RestApi) {
         headers: Map<String, String>, jsonObj: JSONObject,
     ): Resource<ApiResult<Operator>?> =
         safeApiCall(conflictAsError = true) { api.addOperatorApi(headers, json(jsonObj)) }
+
+
+    // ---- My Profile ----
+
+    suspend fun profileMeApi(
+        headers: Map<String, String>, jsonObj: JSONObject = JSONObject(),
+    ): Resource<ApiResult<ProfileData>?> =
+        safeApiCall(conflictAsError = true) { api.profileMeApi(headers, json(jsonObj)) }
+
+    suspend fun profileUpdateApi(
+        headers: Map<String, String>, jsonObj: JSONObject,
+    ): Resource<ApiResult<ProfileData>?> =
+        safeApiCall(conflictAsError = true) { api.profileUpdateApi(headers, json(jsonObj)) }
+
+    suspend fun profileLanguagesApi(
+        headers: Map<String, String>, jsonObj: JSONObject = JSONObject(),
+    ): Resource<ApiResult<List<LanguageOption>>?> =
+        safeApiCall(conflictAsError = true) { api.profileLanguagesApi(headers, json(jsonObj)) }
+
+    suspend fun profileLanguageSaveApi(
+        headers: Map<String, String>, jsonObj: JSONObject,
+    ): Resource<ApiResult<List<LanguageOption>>?> =
+        safeApiCall(conflictAsError = true) { api.profileLanguageSaveApi(headers, json(jsonObj)) }
+
+    suspend fun profileAppearanceApi(
+        headers: Map<String, String>, jsonObj: JSONObject = JSONObject(),
+    ): Resource<ApiResult<List<AppearanceOption>>?> =
+        safeApiCall(conflictAsError = true) { api.profileAppearanceApi(headers, json(jsonObj)) }
+
+    suspend fun profileAppearanceSaveApi(
+        headers: Map<String, String>, jsonObj: JSONObject,
+    ): Resource<ApiResult<List<AppearanceOption>>?> =
+        safeApiCall(conflictAsError = true) { api.profileAppearanceSaveApi(headers, json(jsonObj)) }
+
+    suspend fun profileNotificationsApi(
+        headers: Map<String, String>, jsonObj: JSONObject = JSONObject(),
+    ): Resource<ApiResult<List<NotificationGroup>>?> =
+        safeApiCall(conflictAsError = true) { api.profileNotificationsApi(headers, json(jsonObj)) }
+
+    suspend fun profileNotificationsSaveApi(
+        headers: Map<String, String>, jsonObj: JSONObject,
+    ): Resource<ApiResult<List<NotificationGroup>>?> =
+        safeApiCall(conflictAsError = true) { api.profileNotificationsSaveApi(headers, json(jsonObj)) }
+
+    suspend fun legalApi(
+        headers: Map<String, String>, jsonObj: JSONObject,
+    ): Resource<ApiResult<LegalContent>?> =
+        safeApiCall(conflictAsError = true) { api.legalApi(headers, json(jsonObj)) }
+
+    suspend fun assignedCraneDetailsApi(
+        headers: Map<String, String>, jsonObj: JSONObject,
+    ): Resource<ApiResult<Crane>?> =
+        safeApiCall(conflictAsError = true) { api.assignedCraneDetailsApi(headers, json(jsonObj)) }
+
+    suspend fun logoutApi(
+        headers: Map<String, String>, jsonObj: JSONObject = JSONObject(),
+    ): Resource<ApiResult<Any>?> =
+        safeApiCall(conflictAsError = true) { api.logoutApi(headers, json(jsonObj)) }
 
 }

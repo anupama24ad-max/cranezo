@@ -47,6 +47,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import com.cranezo.ui.cranes.CranesActivity
 import com.cranezo.ui.cranes.MyCranesScreen
+import com.cranezo.ui.myprofile.MyProfileActivity
 import com.cranezo.ui.mainhome.model.MyCranesState
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeTabs
@@ -68,6 +69,7 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: MainHomeUiState()
     val onIntent: (MainHomeIntent) -> Unit = { vm?.onIntent(it) }
     val cranes = vm?.cranesState?.collectAsStateWithLifecycle()?.value ?: MyCranesState()
+    val profile = vm?.profile?.collectAsStateWithLifecycle()?.value
 
     // Add Crane and Crane Details open in their own screen; reload the list if something changed there
     val context = LocalContext.current
@@ -75,6 +77,14 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
         if (result.resultCode == Activity.RESULT_OK) onIntent(MainHomeIntent.RefreshCranes)
     }
     val addCrane: () -> Unit = { cranesLauncher.launch(CranesActivity.addIntent(context)) }
+
+    // My Profile screens. A language change restarts this screen so it is shown in the new language.
+    val profileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.data?.getBooleanExtra(MyProfileActivity.EXTRA_LANGUAGE_CHANGED, false) == true) {
+            (context as? Activity)?.recreate()
+        }
+    }
+    val openProfile: (String) -> Unit = { route -> profileLauncher.launch(MyProfileActivity.intent(context, route)) }
 
     // The bottom bar (and the screens behind it) depend on the user's role
     val tabs = MainHomeTabs.forRole(state.role)
@@ -120,7 +130,7 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
                                 onRefresh = { onIntent(MainHomeIntent.RefreshCranes) },
                                 onLoadMore = { onIntent(MainHomeIntent.LoadMoreCranes) }
                             )
-                            Dest.Profile -> HomeProfileScreen(state, onIntent)
+                            Dest.Profile -> HomeProfileScreen(state, profile, onIntent, openProfile)
                             else -> TabPlaceholderScreen(stringResource(tab.titleRes), tab.icon)
                         }
                     }

@@ -52,8 +52,8 @@ val DarkAppColors = AppColors(
     glassBottom = White.copy(alpha = 0.02f),
     glassSheen = White.copy(alpha = 0.05f),
     // Strongest point of the shine on the edge (see Modifier.glassEffect)
-    glassBorderTop = White.copy(alpha = 0.90f),
-    glassBorderBottom = White.copy(alpha = 0.05f),
+    glassBorderTop = White.copy(alpha = 0.30f),
+    glassBorderBottom = White.copy(alpha = 0.02f),
     glassShadow = Color.Transparent,
     glassInset = Color.Black.copy(alpha = 0.30f),
     subtleFill = White.copy(alpha = 0.08f),

@@ -49,6 +49,11 @@ object AppThemeState {
         }
     }
 
+    /** Shows [mode] right away without saving it, e.g. while the user is still choosing on Appearance. */
+    fun preview(mode: AppThemeMode) {
+        currentThemeMode.value = mode
+    }
+
     fun setThemeMode(mode: AppThemeMode, context: Context) {
         currentThemeMode.value = mode
         SessionManager(context.applicationContext).setAppTheme(mode.key)

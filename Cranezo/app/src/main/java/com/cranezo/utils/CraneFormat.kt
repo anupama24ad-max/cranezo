@@ -47,3 +47,9 @@ fun isDateExpired(value: String?): Boolean {
     val today = parseDate(SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())) ?: return false
     return date.before(today)
 }
+
+/** "2025-09-15" -> "15 September 2025". Anything else is shown as it is. */
+fun formatLongDate(value: String?): String {
+    val date = parseDate(value) ?: return value.orEmpty()
+    return SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()).format(date)
+}

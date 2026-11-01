@@ -153,6 +153,7 @@ data class MyCranesState(
 
 sealed interface MainHomeIntent {
     data object RefreshCranes : MainHomeIntent
+    data object RefreshProfile : MainHomeIntent
     data object LoadMoreCranes : MainHomeIntent
     data object ToggleOnline : MainHomeIntent
     data class ThemeSelected(val mode: AppThemeMode) : MainHomeIntent
@@ -161,4 +162,6 @@ sealed interface MainHomeIntent {
 
 sealed interface MainHomeEffect {
     data object NavigateToLogin : MainHomeEffect
+    // The language was changed on another device and applied here: restart to show it
+    data object LanguageChanged : MainHomeEffect
 }

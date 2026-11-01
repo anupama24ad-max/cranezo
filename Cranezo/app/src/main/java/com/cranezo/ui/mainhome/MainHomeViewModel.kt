@@ -11,6 +11,8 @@ import com.cranezo.ui.mainhome.model.MainHomeEffect
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeUiState
 import com.cranezo.ui.mainhome.model.MyCranesState
+import com.cranezo.ui.myprofile.ProfileStore
+import com.cranezo.ui.myprofile.model.ProfileData
 import com.cranezo.utils.AppMethods
 import org.json.JSONObject
 import com.cranezo.ui.theme.AppThemeState
@@ -24,13 +26,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @HiltViewModel
 class MainHomeViewModel @Inject constructor(
     var app: Application,
     var repo: Repository,
-    var sm: SessionManager
+    var sm: SessionManager,
+    private val store: ProfileStore
 ) : BaseViewModel(app) {
 
     private val TAG = "MainHomeViewModel"
@@ -50,8 +54,12 @@ class MainHomeViewModel @Inject constructor(
     )
     val uiState: StateFlow<MainHomeUiState> = _uiState.asStateFlow()
 
+    /** The signed-in user's profile from POST /profile/me (null until it has been loaded). */
+    val profile: StateFlow<ProfileData?> = store.profile
+
     private companion object {
         const val CRANES_PAGE_SIZE = 10
+        const val LOGOUT_TIMEOUT_MS = 4000L
     }
 
     private val _cranes = MutableStateFlow(MyCranesState())
@@ -61,7 +69,13 @@ class MainHomeViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        if (role == UserRole.CRANE_OWNER) loadCranes(reset = true)
+        // One network check for both calls: calls started in parallel would cancel each other's
+        val loadCranes = role == UserRole.CRANE_OWNER
+        if (loadCranes) _cranes.update { it.copy(isLoading = true, error = null) }
+        runWhenOnline {
+            fetchProfile()
+            if (loadCranes) fetchCranes(min = 0, reset = true)
+        }
     }
 
     fun onIntent(intent: MainHomeIntent) {
@@ -70,12 +84,31 @@ class MainHomeViewModel @Inject constructor(
 
             MainHomeIntent.LoadMoreCranes -> loadCranes(reset = false)
 
+            MainHomeIntent.RefreshProfile -> runWhenOnline { fetchProfile() }
+
             MainHomeIntent.ToggleOnline -> _uiState.update { it.copy(isOnline = !it.isOnline) }
 
             is MainHomeIntent.ThemeSelected -> AppThemeState.setThemeMode(intent.mode, app)
 
             MainHomeIntent.Logout -> logout()
         }
+    }
+
+    /**
+     * POST /profile/me. It also brings the theme in line with the server. When the language was
+     * changed on another device it is applied and the screens restart to show it.
+     */
+    private suspend fun fetchProfile() {
+        val languageChanged = store.refresh(repo, sm, app)
+        store.profile.value?.let { data ->
+            _uiState.update {
+                it.copy(
+                    userName = data.full_name ?: it.userName,
+                    memberId = data.member_id ?: it.memberId
+                )
+            }
+        }
+        if (languageChanged) _effect.send(MainHomeEffect.LanguageChanged)
     }
 
     /**
@@ -93,39 +126,52 @@ class MainHomeViewModel @Inject constructor(
             if (reset) it.copy(isLoading = true, error = null) else it.copy(isLoadingMore = true)
         }
 
-        runWhenOnline {
-            val body = JSONObject().put("min", min).put("max", min + CRANES_PAGE_SIZE)
-            repo.getCranesApi(AppMethods.getToken(sm), body).isRequestCallSuspendSuccess(
-                success = { response ->
-                    val page = response?.data.orEmpty()
-                    val paging = response?.pagination
-                    _cranes.update {
-                        val known = if (reset) emptyList() else it.items
-                        it.copy(
-                            items = known + page.filter { crane -> known.none { k -> k.id == crane.id } },
-                            isLoading = false,
-                            isLoadingMore = false,
-                            loaded = true,
-                            hasMore = paging?.has_more == true,
-                            nextMin = paging?.max ?: (min + CRANES_PAGE_SIZE)
-                        )
-                    }
-                },
-                failure = { _, _, message ->
-                    val text = message?.takeIf { m -> m.isNotBlank() } ?: string(R.string.crane_msg_generic_error)
-                    _cranes.update { it.copy(isLoading = false, isLoadingMore = false, loaded = true, error = text) }
-                    showError(text)
-                })
-        }
+        runWhenOnline { fetchCranes(min, reset) }
     }
 
+    private suspend fun fetchCranes(min: Int, reset: Boolean) {
+        val body = JSONObject().put("min", min).put("max", min + CRANES_PAGE_SIZE)
+        repo.getCranesApi(AppMethods.getToken(sm), body).isRequestCallSuspendSuccess(
+            success = { response ->
+                val page = response?.data.orEmpty()
+                val paging = response?.pagination
+                _cranes.update {
+                    val known = if (reset) emptyList() else it.items
+                    it.copy(
+                        items = known + page.filter { crane -> known.none { k -> k.id == crane.id } },
+                        isLoading = false,
+                        isLoadingMore = false,
+                        loaded = true,
+                        hasMore = paging?.has_more == true,
+                        nextMin = paging?.max ?: (min + CRANES_PAGE_SIZE)
+                    )
+                }
+            },
+            failure = { _, _, message ->
+                val text = message?.takeIf { m -> m.isNotBlank() } ?: string(R.string.crane_msg_generic_error)
+                _cranes.update { it.copy(isLoading = false, isLoadingMore = false, loaded = true, error = text) }
+                showError(text)
+            })
+    }
+
+    /**
+     * POST /auth/logout only detaches this device from push notifications, and tokens are stateless,
+     * so a failure (no network, expired token) must never block the logout. What logs the user out
+     * is deleting the tokens and the cached profile.
+     */
     private fun logout() {
-        // The theme and language are device preferences, so they survive a logout
-        val theme = sm.getAppTheme()
-        val languageId = sm.getData(AppStrings.SessionValues.languageId, AppStrings.Constants.defaultLanguageId)
-        sm.clearSession()
-        sm.setAppTheme(theme)
-        sm.setData(AppStrings.SessionValues.languageId, languageId)
-        viewModelScope.launch { _effect.send(MainHomeEffect.NavigateToLogin) }
+        val headers = AppMethods.getToken(sm)
+        viewModelScope.launch {
+            withTimeoutOrNull(LOGOUT_TIMEOUT_MS) { runCatching { repo.logoutApi(headers) } }
+
+            // The theme and language are device preferences, so they survive a logout
+            val theme = sm.getAppTheme()
+            val languageId = sm.getData(AppStrings.SessionValues.languageId, AppStrings.Constants.defaultLanguageId)
+            sm.clearSession()
+            sm.setAppTheme(theme)
+            sm.setData(AppStrings.SessionValues.languageId, languageId)
+            store.clear()
+            _effect.send(MainHomeEffect.NavigateToLogin)
+        }
     }
 }
