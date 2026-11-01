@@ -29,6 +29,8 @@ data class AppColors(
     val glassBorderTop: Color,
     val glassBorderBottom: Color,
     val glassShadow: Color,
+    // Darker layer for tiles that sit on top of a glass card (nested glass)
+    val glassInset: Color,
     // Small chips, dividers and icon backplates sitting on top of glass
     val subtleFill: Color,
     val subtleBorder: Color,
@@ -45,12 +47,15 @@ val DarkAppColors = AppColors(
     textPrimary = White,
     textSecondary = Grey,
     textHint = DarkSlate,
-    glassTop = White.copy(alpha = 0.11f),
-    glassBottom = White.copy(alpha = 0.03f),
-    glassSheen = White.copy(alpha = 0.10f),
-    glassBorderTop = White.copy(alpha = 0.30f),
+    // Nearly transparent: the screen background shows through, like real glass
+    glassTop = White.copy(alpha = 0.07f),
+    glassBottom = White.copy(alpha = 0.02f),
+    glassSheen = White.copy(alpha = 0.05f),
+    // Strongest point of the shine on the edge (see Modifier.glassEffect)
+    glassBorderTop = White.copy(alpha = 0.90f),
     glassBorderBottom = White.copy(alpha = 0.05f),
     glassShadow = Color.Transparent,
+    glassInset = Color.Black.copy(alpha = 0.30f),
     subtleFill = White.copy(alpha = 0.08f),
     subtleBorder = White.copy(alpha = 0.12f),
     imageVeil = Color.Transparent,
@@ -70,6 +75,7 @@ val LightAppColors = AppColors(
     glassBorderTop = White,
     glassBorderBottom = Color(0xFFCBD5E1).copy(alpha = 0.70f),
     glassShadow = Color(0xFF1E3A5F).copy(alpha = 0.25f),
+    glassInset = Color(0xFF0F172A).copy(alpha = 0.04f),
     subtleFill = Color(0xFF0F172A).copy(alpha = 0.05f),
     subtleBorder = Color(0xFF0F172A).copy(alpha = 0.10f),
     imageVeil = White,

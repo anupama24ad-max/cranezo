@@ -53,6 +53,10 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.LinearGradientShader
+import androidx.compose.ui.graphics.Shader
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -2329,11 +2333,15 @@ fun <T : Any> LazyGridListViewMinMax(
  * 2. a translucent top-to-bottom gradient fill,
  * 3. an optional [backgroundColor] tint on top (selected / highlighted states),
  * 4. a sheen that catches light in the top-left corner,
- * 5. a gradient edge: bright at the top-left, fading out at the bottom-right.
+ * 5. a shining edge: a diagonal gradient stroke that peaks across the middle and fades to
+ *    transparent at one corner (dark mode), or a soft white-to-grey edge (light mode).
  *
  * Usage:
  * ```
  * Column(Modifier.glassEffect(RoundedCornerShape(dimen_20)).padding(dimen_16)) { ... }
+ *
+ * // A tile that sits on top of another glass card: darker, so it reads as inset
+ * Modifier.glassEffect(RoundedCornerShape(dimen_14), inset = true)
  *
  * // Highlighted state
  * Modifier.glassEffect(backgroundColor = AmberPrimary.copy(0.12f), borderColor = AmberPrimary)
@@ -2341,20 +2349,25 @@ fun <T : Any> LazyGridListViewMinMax(
  *
  * @param shape Shape of the glass container.
  * @param backgroundColor Optional tint drawn over the glass fill. Unspecified = plain glass.
- * @param borderColor Optional solid edge color. Unspecified = theme gradient edge.
+ * @param borderColor Optional solid edge color. Unspecified = the shining edge of the theme.
  * @param borderWidth Width of the edge stroke.
+ * @param inset Darkens the fill, for tiles nested inside another glass card.
  */
 fun Modifier.glassEffect(
     shape: Shape = RoundedCornerShape(dimen_16),
     backgroundColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
-    borderWidth: Dp = dimen_1
+    borderWidth: Dp = dimen_1,
+    inset: Boolean = false
 ): Modifier = composed {
     val colors = appColors
-    val borderBrush = if (borderColor.isSpecified) {
-        SolidColor(borderColor)
-    } else {
-        Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
+    // Tiles nested in a card shine softer than the card itself, so the card stays the brighter level
+    val shinePeak = colors.glassBorderTop.let { it.copy(alpha = it.alpha * if (inset) 0.5f else 1f) }
+    val shine = remember(shinePeak) { shineBrush(shinePeak) }
+    val borderBrush = when {
+        borderColor.isSpecified -> SolidColor(borderColor)
+        colors.isDark -> shine
+        else -> Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
     }
 
     this
@@ -2369,6 +2382,7 @@ fun Modifier.glassEffect(
         )
         .clip(shape)
         .background(Brush.verticalGradient(listOf(colors.glassTop, colors.glassBottom)))
+        .then(if (inset) Modifier.background(colors.glassInset) else Modifier)
         .then(if (backgroundColor.isSpecified) Modifier.background(backgroundColor) else Modifier)
         .drawBehind {
             drawRect(
@@ -2380,6 +2394,24 @@ fun Modifier.glassEffect(
             )
         }
         .border(borderWidth, borderBrush, shape)
+}
+
+/**
+ * Gradient for the shining edge: runs from the top-right to the bottom-left corner, starts dim,
+ * peaks across the middle and fades to transparent. The edge therefore catches the light at the
+ * top-left and bottom-right of a card and disappears at the opposite corners.
+ */
+private fun shineBrush(peak: Color): Brush = object : ShaderBrush() {
+    override fun createShader(size: Size): Shader = LinearGradientShader(
+        from = Offset(size.width, 0f),
+        to = Offset(0f, size.height),
+        colors = listOf(
+            peak.copy(alpha = peak.alpha * 0.25f),
+            peak,
+            peak.copy(alpha = peak.alpha * 0.8f),
+            Color.Transparent
+        )
+    )
 }
 
 /**
@@ -2416,11 +2448,16 @@ fun GlassCard(
     backgroundColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
     onClick: (() -> Unit)? = null,
+    isGlassy: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = modifier
-            .glassEffect(shape, backgroundColor, borderColor)
+        modifier = if(isGlassy){
+            modifier
+                .glassEffect(shape, backgroundColor, borderColor)
+        }else{
+            modifier
+        }
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
             .padding(contentPadding),
         content = content

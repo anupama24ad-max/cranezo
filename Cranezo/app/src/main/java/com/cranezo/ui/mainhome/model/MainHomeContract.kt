@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.cranezo.R
 import com.cranezo.ui.chooserole.UserRole
 import com.cranezo.ui.theme.AppThemeMode
+import com.cranezo.ui.cranes.model.Crane
 
 // ---------------------------------------------------------------------------------------------
 // Navigation
@@ -138,7 +139,21 @@ data class MainHomeUiState(
     val operator: OperatorHomeData = OperatorHomeData()
 )
 
+/** The owner's My Cranes list, loaded page by page from POST /owner/getCranes. */
+data class MyCranesState(
+    val items: List<Crane> = emptyList(),
+    val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val hasMore: Boolean = false,
+    // min of the next page: the max of the page before
+    val nextMin: Int = 0,
+    val loaded: Boolean = false,
+    val error: String? = null
+)
+
 sealed interface MainHomeIntent {
+    data object RefreshCranes : MainHomeIntent
+    data object LoadMoreCranes : MainHomeIntent
     data object ToggleOnline : MainHomeIntent
     data class ThemeSelected(val mode: AppThemeMode) : MainHomeIntent
     data object Logout : MainHomeIntent

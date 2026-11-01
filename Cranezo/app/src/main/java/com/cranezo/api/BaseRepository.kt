@@ -26,6 +26,8 @@ import java.net.SocketTimeoutException
 
 @Suppress("UNCHECKED_CAST")
 suspend inline fun <T> safeApiCall(
+    // 409 is "logged in on another device" for the auth APIs, but a plain validation answer for others
+    conflictAsError: Boolean = false,
     crossinline callFunction: suspend () -> Response<T>
 ): Resource<T?> {
     try {
@@ -40,8 +42,8 @@ suspend inline fun <T> safeApiCall(
         return if (myObject.isSuccessful) {
             Resource.Success(myObject.body() as T)
         } else if (myObject.code() == Error.Companion.UN_AUTHORISED_ERROR) {
-            Resource.UnAuthorised(myObject.body(), ErrorType.SESSION_EXPIRED, myObject.message())
-        } else if (myObject.code() == Error.Companion.UN_AUTHORISED_LOGOUT) {
+            Resource.UnAuthorised(myObject.body(), ErrorType.SESSION_EXPIRED, message.ifBlank { myObject.message() })
+        } else if (myObject.code() == Error.Companion.UN_AUTHORISED_LOGOUT && !conflictAsError) {
             Resource.Logout(myObject.body(), ErrorType.SESSION_EXPIRED, message)
         } else if (myObject.code() == Error.Companion.ACCOUNT_BLOCKED) {
             Resource.BlockOrDelete(myObject.body(), ErrorType.ACCOUNT_BLOCKED, message)
@@ -112,19 +114,8 @@ suspend fun <T> Resource<T>?.isRequestCallSuspendSuccess(
     } else if (this is Resource.Error<*>) {
         failure(resData?.data, resData?.errorType!!, resData.message ?: "")
     } else if (this is Resource.UnAuthorised<*>) {
-
-       /* AppMethods.refreshAccessToken(activity) { refreshed ->
-            GlobalScope.launch {
-                if (refreshed) {
-                    unAuthorised(resData?.data, resData?.errorType!!, resData?.message)
-                } else {
-                    // Handle failure to refresh token
-                    failure(resData?.data, resData?.errorType!!, resData.message ?: "")
-                }
-            }
-
-        }*/
-
+        // The token refresh (see AppModule.TokenAuthenticator) already ran and did not help
+        failure(resData?.data, resData?.errorType ?: ErrorType.SESSION_EXPIRED, resData?.message ?: "")
     } else if (this is Resource.Logout<*>) {
         SessionManagerEvent.show(
             resData.message ?: "Some Exception Occurred",

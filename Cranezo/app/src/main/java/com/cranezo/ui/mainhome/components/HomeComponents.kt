@@ -23,6 +23,7 @@ import com.cranezo.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -60,22 +61,22 @@ fun HomeHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Textview(text = greeting(), size = font_12, color = appColors.textSecondary)
+            Textview(text = greeting(), size = font_11, color = appColors.textSecondary)
             Spacer(modifier = Modifier.height(dimen_2))
             Textview(
                 text = name,
-                size = font_24,
+                size = font_22,
                 color = appColors.textPrimary,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1
             )
             Spacer(modifier = Modifier.height(dimen_2))
-            Textview(text = subtitle, size = font_12, color = appColors.textSecondary)
+            Textview(text = subtitle, size = font_11, color = appColors.textSecondary)
         }
         if (showNotification) {
             Box(
                 modifier = Modifier
-                    .size(dimen_44)
+                    .size(dimen_40)
                     .glassEffect(CircleShape),
                 contentAlignment = Alignment.Center
             ) {
@@ -83,7 +84,16 @@ fun HomeHeader(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = stringResource(R.string.common_notifications),
                     tint = AmberPrimary,
-                    modifier = Modifier.size(dimen_22)
+                    modifier = Modifier.size(dimen_20)
+                )
+                // Unread dot
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = dimen_9, end = dimen_9)
+                        .size(dimen_8)
+                        .clip(CircleShape)
+                        .background(AmberPrimary)
                 )
             }
         }
@@ -112,12 +122,12 @@ fun SectionTitle(
         Column(modifier = Modifier.weight(1f)) {
             Textview(
                 text = text,
-                size = font_16,
+                size = font_14,
                 color = appColors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
             if (subtitle != null) {
-                Textview(text = subtitle, size = font_12, color = appColors.textSecondary)
+                Textview(text = subtitle, size = font_11, color = appColors.textSecondary)
             }
         }
         if (actionText != null) {
@@ -138,19 +148,24 @@ fun IconBadge(
     icon: ImageVector,
     accent: Color,
     modifier: Modifier = Modifier,
-    size: androidx.compose.ui.unit.Dp = dimen_36
+    size: androidx.compose.ui.unit.Dp = dimen_32,
+    // A solid accent circle with a dark icon, e.g. the "+" of Add Crane
+    filled: Boolean = false
 ) {
     Box(
         modifier = modifier
             .size(size)
-            .clip(RoundedCornerShape(dimen_10))
-            .background(accent.copy(alpha = 0.18f)),
+            .clip(if (filled) CircleShape else RoundedCornerShape(dimen_8))
+            .background(
+                if (filled) Brush.verticalGradient(listOf(LightYellow, DarkYellow))
+                else Brush.verticalGradient(listOf(accent.copy(alpha = 0.22f), accent.copy(alpha = 0.12f)))
+            ),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = accent,
+            tint = if (filled) Color.Black else accent,
             modifier = Modifier.size(size * 0.55f)
         )
     }
@@ -165,10 +180,11 @@ fun StatTile(
     accent: Color,
     modifier: Modifier = Modifier
 ) {
+    // Sits on the Fleet Overview glass card, so it is the darker inset level
     Row(
         modifier = modifier
-            .glassEffect(RoundedCornerShape(dimen_14))
-            .padding(dimen_12),
+            .glassEffect(RoundedCornerShape(dimen_12), inset = true)
+            .padding(horizontal = dimen_10, vertical = dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconBadge(icon = icon, accent = accent)
@@ -176,11 +192,11 @@ fun StatTile(
         Column {
             Textview(
                 text = value,
-                size = font_20,
+                size = font_18,
                 color = appColors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
-            Textview(text = label, size = font_11, color = appColors.textSecondary, maxLines = 2)
+            Textview(text = label, size = font_10, color = appColors.textSecondary, maxLines = 2)
         }
     }
 }
@@ -199,7 +215,7 @@ fun MetricCard(
     GlassCard(
         modifier = modifier,
         shape = RoundedCornerShape(dimen_16),
-        contentPadding = dimen_14,
+        contentPadding = dimen_12,
         onClick = onClick
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -207,20 +223,20 @@ fun MetricCard(
             Spacer(modifier = Modifier.width(dimen_8))
             Textview(
                 text = title,
-                size = font_12,
+                size = font_11,
                 color = appColors.textSecondary,
                 fontWeight = FontWeight.Medium
             )
         }
-        Spacer(modifier = Modifier.height(dimen_12))
+        Spacer(modifier = Modifier.height(dimen_14))
         Textview(
             text = value,
-            size = font_24,
+            size = font_22,
             color = appColors.textPrimary,
             fontWeight = FontWeight.Bold,
             maxLines = 1
         )
-        Textview(text = caption, size = font_11, color = appColors.textSecondary)
+        Textview(text = caption, size = font_10, color = appColors.textSecondary)
     }
 }
 
@@ -237,25 +253,26 @@ fun QuickActionTile(
     Row(
         modifier = modifier
             .glassEffect(
-                shape = RoundedCornerShape(dimen_14),
-                backgroundColor = if (highlighted) AmberPrimary.copy(alpha = 0.10f) else Color.Unspecified,
-                borderColor = if (highlighted) AmberPrimary else Color.Unspecified
+                shape = RoundedCornerShape(dimen_12),
+                backgroundColor = if (highlighted) AmberPrimary.copy(alpha = 0.12f) else Color.Unspecified,
+                borderColor = if (highlighted) AmberPrimary else Color.Unspecified,
+                inset = !highlighted
             )
             .clickable { onClick() }
-            .padding(dimen_12),
+            .padding(horizontal = dimen_10, vertical = dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconBadge(icon = icon, accent = accent, size = dimen_40)
+        IconBadge(icon = icon, accent = accent, size = dimen_36, filled = highlighted)
         Spacer(modifier = Modifier.width(dimen_10))
         Column {
             Textview(
                 text = title,
-                size = font_14,
+                size = font_13,
                 color = appColors.textPrimary,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1
             )
-            Textview(text = subtitle, size = font_11, color = appColors.textSecondary, maxLines = 2)
+            Textview(text = subtitle, size = font_10, color = appColors.textSecondary, maxLines = 2)
         }
     }
 }

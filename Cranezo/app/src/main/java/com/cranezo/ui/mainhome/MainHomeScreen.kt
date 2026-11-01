@@ -41,6 +41,13 @@ import com.cranezo.ui.components.ScreenBackground
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.glassEffect
 import com.cranezo.ui.mainhome.model.Dest
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import com.cranezo.ui.cranes.CranesActivity
+import com.cranezo.ui.cranes.MyCranesScreen
+import com.cranezo.ui.mainhome.model.MyCranesState
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeTabs
 import com.cranezo.ui.mainhome.model.MainHomeUiState
@@ -60,6 +67,14 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
     val currentRoute = navBackStackEntry?.destination?.route
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: MainHomeUiState()
     val onIntent: (MainHomeIntent) -> Unit = { vm?.onIntent(it) }
+    val cranes = vm?.cranesState?.collectAsStateWithLifecycle()?.value ?: MyCranesState()
+
+    // Add Crane and Crane Details open in their own screen; reload the list if something changed there
+    val context = LocalContext.current
+    val cranesLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) onIntent(MainHomeIntent.RefreshCranes)
+    }
+    val addCrane: () -> Unit = { cranesLauncher.launch(CranesActivity.addIntent(context)) }
 
     // The bottom bar (and the screens behind it) depend on the user's role
     val tabs = MainHomeTabs.forRole(state.role)
@@ -95,7 +110,16 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
                 tabs.forEach { tab ->
                     composable(tab.dest.route) {
                         when (tab.dest) {
-                            Dest.Home -> RoleHomeScreen(state, navigateTo, onIntent)
+                            Dest.Home -> RoleHomeScreen(state, navigateTo, onIntent, addCrane)
+                            Dest.MyCranes -> MyCranesScreen(
+                                state = cranes,
+                                onAddCrane = addCrane,
+                                onOpenCrane = { crane ->
+                                    crane.id?.let { cranesLauncher.launch(CranesActivity.detailsIntent(context, it)) }
+                                },
+                                onRefresh = { onIntent(MainHomeIntent.RefreshCranes) },
+                                onLoadMore = { onIntent(MainHomeIntent.LoadMoreCranes) }
+                            )
                             Dest.Profile -> HomeProfileScreen(state, onIntent)
                             else -> TabPlaceholderScreen(stringResource(tab.titleRes), tab.icon)
                         }
@@ -110,10 +134,11 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
 private fun RoleHomeScreen(
     state: MainHomeUiState,
     onNavigate: (String) -> Unit,
-    onIntent: (MainHomeIntent) -> Unit
+    onIntent: (MainHomeIntent) -> Unit,
+    onAddCrane: () -> Unit
 ) {
     when (state.role) {
-        UserRole.CRANE_OWNER -> OwnerHomeScreen(state, onNavigate)
+        UserRole.CRANE_OWNER -> OwnerHomeScreen(state, onNavigate, onAddCrane)
         UserRole.CUSTOMER -> CustomerHomeScreen(state, onNavigate)
         UserRole.OPERATOR -> OperatorHomeScreen(state, onNavigate, onIntent)
     }
@@ -139,7 +164,7 @@ fun CustomBottomBar(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .glassEffect(RoundedCornerShape(dimen_26))
+                .glassEffect(RoundedCornerShape(dimen_26), inset = true)
         )
         Row(
             modifier = Modifier

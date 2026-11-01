@@ -40,7 +40,8 @@ import com.cranezo.ui.theme.*
 @Composable
 fun OwnerHomeScreen(
     state: MainHomeUiState,
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onAddCrane: () -> Unit = {}
 ) {
     val fleet = state.owner.fleet
 
@@ -56,7 +57,7 @@ fun OwnerHomeScreen(
             subtitle = stringResource(R.string.home_owner_subtitle)
         )
 
-        GlassCard(contentPadding = dimen_14) {
+        GlassCard(contentPadding = dimen_14, backgroundColor = DarkBluish, isGlassy = false) {
             SectionTitle(text = stringResource(R.string.home_fleet_overview), icon = Icons.Default.PrecisionManufacturing)
             Spacer(modifier = Modifier.height(dimen_12))
             Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
@@ -119,7 +120,7 @@ fun OwnerHomeScreen(
                         accent = AmberPrimary,
                         highlighted = true,
                         modifier = it,
-                        onClick = { onNavigate(Dest.MyCranes.route) }
+                        onClick = onAddCrane
                     )
                 },
                 right = {

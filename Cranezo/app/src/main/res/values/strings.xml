@@ -247,4 +247,157 @@
     <string name="net_no_internet">No Internet</string>
     <string name="net_check_internet">Please check your internet connection and try again.</string>
     <string name="session_logged_out_elsewhere">You have logged in from another device. For security reasons, you have been logged out of this session.</string>
+
+    <!-- Owner cranes: My Cranes -->
+    <string name="crane_my_subtitle">View and manage your registered cranes.</string>
+    <string name="crane_empty_title">No cranes yet</string>
+    <string name="crane_empty_message">Add your first crane to start getting bookings.</string>
+    <string name="crane_list_failed">Couldn\'t load your cranes</string>
+
+    <!-- Owner cranes: status -->
+    <string name="crane_status_verified">Verified</string>
+    <string name="crane_status_under_review">Under Review</string>
+    <string name="crane_status_rejected">Rejected</string>
+    <string name="crane_banner_review_title">Under review</string>
+    <string name="crane_banner_review_default">Your crane is under review. Approval usually takes 24 to 48 hours.</string>
+    <string name="crane_banner_rejected_title">Crane rejected</string>
+    <string name="crane_banner_rejected_default">Your crane was rejected. Fix the details and save it again to resubmit.</string>
+    <string name="crane_rejection_reason">Reason for rejection</string>
+    <string name="crane_banner_not_bookable">Only verified cranes can be booked.</string>
+
+    <!-- Owner cranes: Add / Edit form -->
+    <string name="crane_add_title">Add Crane</string>
+    <string name="crane_add_subtitle">Register your crane with complete details.</string>
+    <string name="crane_edit_title">Edit Crane</string>
+    <string name="crane_edit_subtitle">Update your crane details.</string>
+    <string name="crane_section_info">Crane Information</string>
+    <string name="crane_section_photos">Photos</string>
+    <string name="crane_section_photos_subtitle">Upload clear photos of your crane. The first one is the cover.</string>
+    <string name="crane_section_documents">Documents</string>
+    <string name="crane_section_documents_subtitle">Upload the required documents.</string>
+    <string name="crane_section_documents_edit">Add or replace the verification documents.</string>
+    <string name="crane_section_location">Location</string>
+    <string name="crane_section_rate">Rate</string>
+    <string name="crane_section_operator">Operator</string>
+    <string name="crane_section_availability">Availability</string>
+    <string name="crane_field_type">Crane Type</string>
+    <string name="crane_field_type_hint">Select crane type</string>
+    <string name="crane_field_capacity">Capacity (Class)</string>
+    <string name="crane_field_capacity_hint">Select capacity</string>
+    <string name="crane_field_fuel">Fuel Type</string>
+    <string name="crane_field_fuel_hint">Select fuel type</string>
+    <string name="crane_field_model">Model</string>
+    <string name="crane_field_model_hint">e.g. Liebherr LTM 1050</string>
+    <string name="crane_field_registration">Registration / ID</string>
+    <string name="crane_field_registration_hint">Enter registration number</string>
+    <string name="crane_field_location">Current Location</string>
+    <string name="crane_field_location_hint">Enter location (City, State)</string>
+    <string name="crane_field_rate">Hourly Rate (₹)</string>
+    <string name="crane_field_rate_hint">Enter hourly rate</string>
+    <string name="crane_field_min_hours">Minimum Hours</string>
+    <string name="crane_field_min_hours_hint">Enter minimum hours</string>
+    <string name="crane_field_operator">Assign Operator</string>
+    <string name="crane_field_operator_hint">Select operator</string>
+    <string name="crane_field_availability">Initial Availability Status</string>
+    <string name="crane_available">Available</string>
+    <string name="crane_not_available">Not Available</string>
+    <string name="crane_use_gps">Use my current location</string>
+    <string name="crane_upload_photos">Upload Photos</string>
+    <string name="crane_add_photo">Add photo</string>
+    <string name="crane_cover">Cover</string>
+    <string name="crane_remove">Remove</string>
+    <string name="crane_picker_photo_title">Crane Photo</string>
+    <string name="crane_picker_photo_subtitle">Choose where to get the photo from.</string>
+    <string name="crane_doc_upload_file">Upload file</string>
+    <string name="crane_doc_uploading">Uploading…</string>
+    <string name="crane_doc_uploaded">Uploaded</string>
+    <string name="crane_doc_failed">Upload failed. Tap to retry</string>
+    <string name="crane_doc_set_expiry">Set expiry date (optional)</string>
+    <string name="crane_doc_expires">Expires %1$s</string>
+    <string name="crane_doc_expired">Expired %1$s</string>
+    <string name="crane_documents_unavailable">The document list could not be loaded.</string>
+    <string name="crane_manage_documents">Manage documents</string>
+    <string name="crane_submit">Submit Crane</string>
+    <string name="crane_save_changes">Save Changes</string>
+    <string name="crane_reverify_title">Send for re-verification?</string>
+    <string name="crane_reverify_message">Saving these changes will send your crane for re-verification. It cannot be booked until it is verified again.</string>
+    <string name="crane_reverify_confirm">Save and resubmit</string>
+
+    <!-- Owner cranes: validation and errors -->
+    <string name="crane_msg_generic_error">Something went wrong. Please try again.</string>
+    <string name="crane_msg_select_type">Please select the crane type</string>
+    <string name="crane_msg_select_capacity">Please select the capacity</string>
+    <string name="crane_msg_enter_registration">Please enter the registration number</string>
+    <string name="crane_msg_enter_location">Please enter the crane location</string>
+    <string name="crane_msg_add_photo">Please add at least one photo</string>
+    <string name="crane_msg_upload_documents">Please upload all the required documents</string>
+    <string name="crane_msg_rate_invalid">Hourly rate must be greater than 0</string>
+    <string name="crane_msg_min_hours_invalid">Minimum hours must be a whole number of at least 1</string>
+    <string name="crane_msg_fix_uploads">Retry or remove the files that failed to upload</string>
+    <string name="crane_msg_no_changes">There are no changes to save</string>
+    <string name="crane_msg_choose_document">Choose a file to replace first</string>
+    <string name="crane_msg_file_too_large">The file is too large. The limit is 50 MB.</string>
+    <string name="crane_msg_location_unavailable">Couldn\'t get your location. Check that location is turned on.</string>
+    <string name="crane_msg_location_denied">Location permission is needed to use your current location</string>
+    <string name="crane_msg_no_file">There is no file to open</string>
+    <string name="crane_msg_no_file_app">No app found to open this file</string>
+    <string name="crane_msg_operator_name">Please enter the operator\'s name</string>
+    <string name="crane_msg_operator_mobile">Mobile number must be 6 to 15 digits</string>
+
+    <!-- Owner cranes: Crane Submitted -->
+    <string name="crane_submitted_title">Crane Submitted!</string>
+    <string name="crane_submitted_default_message">Your crane is under review. Approval usually takes 24 to 48 hours.</string>
+    <string name="crane_view_details">View Details</string>
+    <string name="crane_back_to_list">Back to My Cranes</string>
+
+    <!-- Owner cranes: Crane Details -->
+    <string name="crane_details_title">Crane Details</string>
+    <string name="crane_price">₹%1$s</string>
+    <string name="crane_per_hour">/ hour</string>
+    <string name="crane_tile_capacity">Capacity</string>
+    <string name="crane_tile_location">Location</string>
+    <string name="crane_tile_availability">Availability</string>
+    <string name="crane_tile_status">Status</string>
+    <string name="crane_specifications">Specifications</string>
+    <string name="crane_spec_type">Crane Type</string>
+    <string name="crane_spec_capacity">Capacity</string>
+    <string name="crane_spec_min_hours">Minimum Hours</string>
+    <string name="crane_spec_registration">Registration / ID</string>
+    <string name="crane_spec_fuel">Fuel Type</string>
+    <string name="crane_spec_rate">Rate (Hourly)</string>
+    <string name="crane_hours_value">%1$d Hours</string>
+    <string name="crane_not_set">Not set</string>
+    <string name="crane_documents">Documents</string>
+    <string name="crane_no_documents">No documents uploaded.</string>
+    <string name="crane_operator_not_assigned">Not assigned</string>
+    <string name="crane_operator_assign_hint">Edit the crane to assign an operator.</string>
+
+    <!-- Owner cranes: Upload Document -->
+    <string name="crane_docs_title">Upload Document</string>
+    <string name="crane_docs_subtitle">Add or update your crane verification files.</string>
+    <string name="crane_docs_review_note">Saving a document sends the crane for re-verification again.</string>
+    <string name="crane_save_document">Save Document</string>
+    <string name="crane_view">View</string>
+    <string name="crane_replace">Replace</string>
+    <string name="crane_upload">Upload</string>
+    <string name="crane_doc_ready_to_save">New file ready to save</string>
+    <string name="crane_doc_not_uploaded">Not uploaded yet</string>
+    <string name="crane_doc_no_expiry">No expiry date</string>
+
+    <!-- Owner cranes: operator picker -->
+    <string name="crane_operator_sheet_title">Select Operator</string>
+    <string name="crane_operator_search_label">Search</string>
+    <string name="crane_operator_search_hint">Name, mobile number or ID</string>
+    <string name="crane_operator_none">No operator</string>
+    <string name="crane_operators_empty">No operators found.</string>
+    <string name="crane_operator_add_new">Add new operator</string>
+    <string name="crane_operator_add_title">Add Operator</string>
+    <string name="crane_operator_add_subtitle">The operator can log in later with this mobile number.</string>
+    <string name="crane_operator_mobile">Mobile Number</string>
+    <string name="crane_operator_mobile_hint">Enter mobile number</string>
+    <string name="crane_operator_email">Email (optional)</string>
+    <string name="crane_operator_email_hint">Enter email address</string>
+    <string name="crane_operator_save">Add Operator</string>
+    <string name="crane_operator_owner_added">Added by you</string>
+    <string name="crane_operator_registered">Registered</string>
 </resources>

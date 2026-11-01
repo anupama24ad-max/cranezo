@@ -14,6 +14,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import com.cranezo.api.TokenAuthenticator
+import okhttp3.Authenticator
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 
@@ -51,13 +53,13 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideRetrofit(gson: Gson): Retrofit = Retrofit.Builder()
+    fun provideRetrofit(gson: Gson, sm: SessionManager): Retrofit = Retrofit.Builder()
         .baseUrl(BuildConfig.SERVER_URL)
         .addConverterFactory(GsonConverterFactory.create(gson))
-        .client(http())
+        .client(http(TokenAuthenticator(sm, http())))
         .build()
 
-    fun http(): OkHttpClient {
+    fun http(authenticator: Authenticator? = null): OkHttpClient {
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
             @Throws(CertificateException::class)
             override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
@@ -77,7 +79,7 @@ object AppModule {
         val sslSocketFactory = sslContext.socketFactory
         val loggingInterceptor = HttpLoggingInterceptor()
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
-        return OkHttpClient.Builder().addInterceptor(loggingInterceptor)
+        val builder = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
             .addInterceptor(object : Interceptor {
                 override fun intercept(chain: Interceptor.Chain): Response {
                     val requestBuilder: Request.Builder = chain.request().newBuilder()
@@ -87,7 +89,9 @@ object AppModule {
             }).connectTimeout(3, TimeUnit.MINUTES).writeTimeout(3, TimeUnit.MINUTES)
             .readTimeout(3, TimeUnit.MINUTES)
             .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-            .hostnameVerifier { hostname, session -> true }.build()
+            .hostnameVerifier { hostname, session -> true }
+        authenticator?.let { builder.authenticator(it) }
+        return builder.build()
     }
 
     private fun httpAuthKey(): OkHttpClient? {
