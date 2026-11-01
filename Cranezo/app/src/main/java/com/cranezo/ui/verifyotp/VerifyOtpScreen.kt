@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.R
 import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
@@ -32,19 +33,20 @@ import com.cranezo.ui.components.GlassResendOtpTimer
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.theme.*
+import com.cranezo.ui.verifyotp.model.VerifyOtpIntent
+import com.cranezo.ui.verifyotp.model.VerifyOtpUiState
 
 @Composable
 fun VerifyOtpScreen(
     vm: VerifyOtpViewModel? = null,
     onBackClick: () -> Unit = {},
     onEditPhoneClick: () -> Unit = {},
-    onVerifyClick: (String) -> Unit = {},
     onEmergencyCallClick: () -> Unit = {}
 ) {
-    val otp by vm?.otp
-        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
-    val phoneNumber by vm?.phoneNumber
-        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("+91 98765 43210") }
+    val uiState = vm?.uiState?.collectAsStateWithLifecycle()?.value
+        ?: VerifyOtpUiState(phoneNumber = "+91 98765 43210")
+    val otp = uiState.otp
+    val phoneNumber = uiState.phoneNumber
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -81,8 +83,7 @@ fun VerifyOtpScreen(
                 .navigationBarsPadding()
         ) {
             CommonBackButton(
-                onClick = {
-                },
+                onClick = onBackClick,
             )
 
             Spacer(modifier = Modifier.height(dimen_30))
@@ -125,9 +126,7 @@ fun VerifyOtpScreen(
                 text = "Edit",
                 size = font_14,
                 fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.clickable {
-
-                }
+                modifier = Modifier.clickable { onEditPhoneClick() }
             )
 
 
@@ -146,15 +145,13 @@ fun VerifyOtpScreen(
                 ) {
                     GlassOtpField(
                         value = otp,
-                        onValueChange = { vm?.onOtpChange(it) },
+                        onValueChange = { vm?.onIntent(VerifyOtpIntent.OtpChanged(it)) },
                         cells = 6,
                         cellWidth = dimen_45,
                         cellHeight = dimen_66,
                         cornerRadius = dimen_8,
                         gap = dimen_8,
-                        onDone = {
-
-                        }
+                        onDone = { vm?.onIntent(VerifyOtpIntent.VerifyOtp) }
                     )
                 }
 
@@ -162,7 +159,7 @@ fun VerifyOtpScreen(
 
                 // Resend OTP in 00:45 Timer
                 GlassResendOtpTimer(
-                    onResendOtp = { vm?.resendOtp() },
+                    onResendOtp = { vm?.onIntent(VerifyOtpIntent.ResendOtp) },
                     totalSeconds = 45,
                     text = "Resend OTP in "
                 )
@@ -177,7 +174,7 @@ fun VerifyOtpScreen(
                     rightImage = R.drawable.ic_arrow_right,
                     rightIconTint = Black,
                     iconSize = dimen_16,
-                    onClick = { }
+                    onClick = { vm?.onIntent(VerifyOtpIntent.VerifyOtp) }
                 )
 
                 Spacer(modifier = Modifier.height(dimen_20))
@@ -194,7 +191,7 @@ fun VerifyOtpScreen(
                     leftImage = R.drawable.ambulance_ic,
                     leftIconTint = White,
                     iconSpacing = dimen_16,
-                    onClick = { }
+                    onClick = onEmergencyCallClick
                 )
             }
         }

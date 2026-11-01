@@ -17,6 +17,11 @@ class AppStrings {
             var accountStatus = "accountStatus"
             var Id = "Id"
             var city = "city"
+            var languageId = "languageId"
+            var countryCode = "countryCode"
+            var memberId = "memberId"
+            var roleId = "roleId"
+            var companyName = "companyName"
 
         }
     }
@@ -30,6 +35,9 @@ class AppStrings {
             val android = "1"
 
             val memberType = 2
+            val platformAndroid = "ANDROID"
+            val defaultCountryCode = "+91"
+            val defaultLanguageId = 1
             val deviceId = "dNDZvU4NQSi2w2sNXPgrEt:APA91bFEnTSViQCaK5y9UyrShyQ4p8-oB_LiKPzGfL-yRAVhvouPHgtCpelZ424SiGVBhrSn71qOebj82BhPLzjG6EQl-jfNkwb_5c_gBhGx1Mrm5mUMTYo"
 
 
@@ -102,6 +110,11 @@ class AppStrings {
             var razorpay_payment_id = "razorpay_payment_id"
             var razorpay_order_id = "razorpay_order_id"
             var razorpay_signature = "razorpay_signature"
+            var country_code = "country_code"
+            var language_id = "language_id"
+            var otp_number = "otp_number"
+            var role_id = "role_id"
+            var company_name = "company_name"
         }
     }
     class AccountStatus{

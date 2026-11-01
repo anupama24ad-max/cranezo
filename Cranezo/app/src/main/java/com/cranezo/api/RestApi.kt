@@ -1,6 +1,9 @@
 package com.cranezo.api
 
 import com.cranezo.ui.chooselanguage.model.ChooseLanguageApiResponse
+import com.cranezo.ui.login.model.RegisterOrLoginApiResponse
+import com.cranezo.ui.profile.model.UpdateProfileApiResponse
+import com.cranezo.ui.verifyotp.model.VerifyOtpApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -33,6 +36,22 @@ interface RestApi {
         @Body jsonObject: RequestBody?=null
     ): Response<ApiResult<Any>>
 
+    @POST(RESTURLS.registerOrLogin)
+    suspend fun registerOrLoginApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody?=null
+    ): Response<ApiResult<RegisterOrLoginApiResponse>>
 
+    @POST(RESTURLS.verifyOtp)
+    suspend fun verifyOtpApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody?=null
+    ): Response<ApiResult<VerifyOtpApiResponse>>
+
+    @POST(RESTURLS.updateProfile)
+    suspend fun updateProfileApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody?=null
+    ): Response<ApiResult<UpdateProfileApiResponse>>
 
 }

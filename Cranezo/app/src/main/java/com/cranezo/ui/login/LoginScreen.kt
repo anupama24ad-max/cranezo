@@ -34,23 +34,26 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.LoginViewModel
 import com.cranezo.R
 import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.LabelTextField
 import com.cranezo.ui.components.Textview
+import com.cranezo.ui.login.model.LoginIntent
+import com.cranezo.ui.login.model.LoginUiState
 import com.cranezo.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    vm: LoginViewModel? = null) {
-    val mobileNumber by vm?.mobileNumber
-        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("") }
-    val countryCode by vm?.countryCode
-        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("+91") }
-    val countryFlag by vm?.countryFlag
-        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("🇮🇳") }
+    vm: LoginViewModel? = null
+) {
+    val uiState = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: LoginUiState()
+
+    val mobileNumber = uiState.mobileNumber
+    val countryCode = uiState.countryCode
+    val countryFlag = uiState.countryFlag
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -143,7 +146,7 @@ fun LoginScreen(
                     // Mobile Number Glass Field using LabelTextField
                     LabelTextField(
                         value = mobileNumber,
-                        onValueChange = { vm?.onMobileChange(it) },
+                        onValueChange = { vm?.onIntent(LoginIntent.MobileNumberChanged(it)) },
                         labelText = "Mobile Number",
                         subLabel = "We'll send you an OTP",
                         placeholder = "Enter your mobile number",
@@ -163,7 +166,7 @@ fun LoginScreen(
                         rightImage = R.drawable.ic_arrow_right,
                         rightIconTint = Black,
                         iconSize = dimen_16,
-                        onClick = { }
+                        onClick = { vm?.onIntent(LoginIntent.GetOtp) }
                     )
 
                     Spacer(modifier = Modifier.height(dimen_20))

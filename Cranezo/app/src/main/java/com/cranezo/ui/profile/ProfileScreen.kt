@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.R
 import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
@@ -31,20 +32,23 @@ import com.cranezo.ui.components.LabelTextField
 import com.cranezo.ui.components.ProfileAvatarPicker
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.VerifiedBadge
+import com.cranezo.ui.profile.model.ProfileIntent
+import com.cranezo.ui.profile.model.ProfileUiState
 import com.cranezo.ui.theme.*
 
 @Composable
 fun ProfileScreen(
     vm: ProfileViewModel? = null,
     onBackClick: () -> Unit = {},
-    onAddPhotoClick: () -> Unit = {},
-    onContinueClick: () -> Unit = {}
+    onAddPhotoClick: () -> Unit = {}
 ) {
-    val fullName by vm?.fullName ?: remember { androidx.compose.runtime.mutableStateOf("") }
-    val mobileNumber by vm?.mobileNumber ?: remember { androidx.compose.runtime.mutableStateOf("+91 98765 43210") }
-    val companyName by vm?.companyName ?: remember { androidx.compose.runtime.mutableStateOf("") }
-    val roleName by vm?.roleName ?: remember { androidx.compose.runtime.mutableStateOf("crane owner") }
-    val photoRes by vm?.photoRes ?: remember { androidx.compose.runtime.mutableStateOf<Int?>(null) }
+    val uiState = vm?.uiState?.collectAsStateWithLifecycle()?.value
+        ?: ProfileUiState(mobileNumber = "+91 98765 43210")
+    val fullName = uiState.fullName
+    val mobileNumber = uiState.mobileNumber
+    val companyName = uiState.companyName
+    val roleName = uiState.roleName
+    val photoRes = uiState.photoRes
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -155,7 +159,7 @@ fun ProfileScreen(
                     // Full Name
                     LabelTextField(
                         value = fullName,
-                        onValueChange = { vm?.onFullNameChange(it) },
+                        onValueChange = { vm?.onIntent(ProfileIntent.FullNameChanged(it)) },
                         labelText = "Full Name",
                         placeholder = "Enter your full name",
                         leftImage = R.drawable.ic_person,
@@ -183,7 +187,7 @@ fun ProfileScreen(
                     // Company Name
                     LabelTextField(
                         value = companyName,
-                        onValueChange = { vm?.onCompanyNameChange(it) },
+                        onValueChange = { vm?.onIntent(ProfileIntent.CompanyNameChanged(it)) },
                         labelText = "Company Name",
                         placeholder = "Enter your company name",
                         leftImage = R.drawable.ic_building,
@@ -208,7 +212,7 @@ fun ProfileScreen(
                     textColor = Color.Black,
                     rightImage = R.drawable.ic_arrow_right,
                     rightIconTint = Color.Black,
-                    onClick = onContinueClick
+                    onClick = { vm?.onIntent(ProfileIntent.SaveProfile) }
                 )
             }
         }

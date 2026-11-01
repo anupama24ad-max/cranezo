@@ -41,44 +41,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.R
 import com.cranezo.ui.components.ContinueButton
 import com.cranezo.ui.components.GlassBox
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.TextviewWithGradient
+import com.cranezo.ui.chooselanguage.model.ChooseLanguageIntent
+import com.cranezo.ui.chooselanguage.model.ChooseLanguageUiState
+import com.cranezo.ui.chooselanguage.model.LanguageItem
 import com.cranezo.ui.theme.*
 
+@Preview(showBackground = true)
 @Composable
 fun ChooseLanguageScreen(
     vm: ChooseLanguageViewModel? = null,
 ) {
+    val uiState = vm?.uiState?.collectAsStateWithLifecycle()?.value
+        ?: ChooseLanguageUiState(languages = previewLanguages, selectedLanguageId = 1)
+
     LaunchedEffect(Unit) {
-        vm?.dropDownApi()
+        vm?.onIntent(ChooseLanguageIntent.LoadLanguages)
     }
 
-    val selectedLang by vm?.selectedLanguage
-        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf("en") }
-
-    val languages = vm?.languageList ?: listOf(
-        LanguageItem(
-            code = "en",
-            badge = "Aa",
-            name = "English",
-            subtitle = "Continue in English"
-        ),
-        LanguageItem(
-            code = "te",
-            badge = "ఆ",
-            name = "తెలుగు",
-            subtitle = "తెలుగులో కొనసాగించండి"
-        ),
-        LanguageItem(
-            code = "hi",
-            badge = "आ",
-            name = "हिन्दी",
-            subtitle = "हिंदी में जारी रखें"
-        )
-    )
+    val selectedLanguageId = uiState.selectedLanguageId
+    val languages = uiState.languages
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -150,13 +137,13 @@ fun ChooseLanguageScreen(
                     verticalArrangement = Arrangement.spacedBy(dimen_16)
                 ) {
                     languages.forEach { item ->
-                        val isSelected = selectedLang == item.code
+                        val isSelected = selectedLanguageId == item.id
 
                         GlassBox(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    vm?.onLanguageSelected(item.code)
+                                    vm?.onIntent(ChooseLanguageIntent.SelectLanguage(item.id))
                                 },
                             shape = RoundedCornerShape(dimen_16),
                             backgroundColor = if (isSelected) LightYellow.copy(alpha = 0.10f) else White.copy(
@@ -256,7 +243,7 @@ fun ChooseLanguageScreen(
                 ContinueButton(
                     text = "Continue",
                     onClick = {
-
+                        vm?.onIntent(ChooseLanguageIntent.Continue)
                     }
                 )
             }
@@ -271,3 +258,9 @@ fun ChooseLanguageScreenPreview() {
         ChooseLanguageScreen()
     }
 }
+
+private val previewLanguages = listOf(
+    LanguageItem(1, "Aa", "English", "Continue in English"),
+    LanguageItem(2, "ఆ", "తెలుగు", "తెలుగులో కొనసాగించండి"),
+    LanguageItem(3, "आ", "हिन्दी", "हिंदी में जारी रखें")
+)

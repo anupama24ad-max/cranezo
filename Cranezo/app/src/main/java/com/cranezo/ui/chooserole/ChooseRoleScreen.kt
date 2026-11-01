@@ -84,8 +84,7 @@ fun ChooseRoleScreen(
         ) {
             // Common Circular Back Button
             CommonBackButton(
-                onClick = {
-                },
+                onClick = onBackClick,
             )
 
             Spacer(modifier = Modifier.height(dimen_30))
@@ -156,7 +155,7 @@ fun ChooseRoleScreen(
                 rightImage = R.drawable.ic_arrow_right,
                 rightIconTint = Black,
                 iconSize = dimen_16,
-                onClick = { }
+                onClick = { onContinueClick(selectedRole) }
             )
         }
     }
