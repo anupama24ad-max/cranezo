@@ -28,6 +28,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import com.cranezo.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -92,7 +94,7 @@ fun ProfileThemeScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = "Back",
+                                contentDescription = stringResource(R.string.common_back),
                                 tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.size(26.dp)
                             )
@@ -105,7 +107,7 @@ fun ProfileThemeScreen(
 
                 // Large Title: "Theme"
                 Text(
-                    text = "Theme",
+                    text = stringResource(R.string.theme_title),
                     style = TextStyle(
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
@@ -142,7 +144,7 @@ fun ProfileThemeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = mode.title,
+                            text = stringResource(mode.titleRes),
                             style = TextStyle(
                                 fontSize = 17.sp,
                                 fontWeight = FontWeight.Normal
@@ -164,7 +166,7 @@ fun ProfileThemeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
-                                    contentDescription = "Selected",
+                                    contentDescription = stringResource(R.string.common_selected),
                                     tint = Color.White,
                                     modifier = Modifier.size(15.dp)
                                 )
@@ -217,7 +219,7 @@ fun ProfileThemeScreen(
                 )
             ) {
                 Text(
-                    text = "Continue",
+                    text = stringResource(R.string.common_continue),
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,

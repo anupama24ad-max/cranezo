@@ -78,6 +78,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Red
@@ -126,6 +129,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
+import coil.compose.AsyncImage
 import com.cranezo.R
 import com.cranezo.ui.theme.*
 import kotlinx.coroutines.delay
@@ -304,7 +308,7 @@ fun LabeledField(
                         bold = labelBold,
                         medium = labelMedium,
                         semiBold = labelSemiBold || isGlassy,
-                        color = if (isGlassy) White else labelColor
+                        color = if (isGlassy) appColors.textPrimary else labelColor
                     )
                 } else {
                     Spacer(modifier = Modifier.width(dimen_0))
@@ -327,9 +331,7 @@ fun LabeledField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(height)
-                    .clip(fieldShape)
-                    .background(Color(0x331B2028))
-                    .border(dimen_1, Color.White.copy(alpha = 0.15f), fieldShape)
+                    .glassEffect(fieldShape)
                     .padding(horizontal = dimen_12),
                 contentAlignment = Alignment.CenterStart
             ) {
@@ -353,14 +355,14 @@ fun LabeledField(
                             Icon(
                                 imageVector = Icons.Default.KeyboardArrowDown,
                                 contentDescription = null,
-                                tint = Color.White.copy(alpha = 0.7f),
+                                tint = appColors.textSecondary,
                                 modifier = Modifier.size(dimen_16)
                             )
                             Spacer(modifier = Modifier.width(dimen_6))
                             Textview(
                                 text = countryCode,
                                 size = font_14,
-                                color = White,
+                                color = appColors.textPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -372,7 +374,7 @@ fun LabeledField(
                             modifier = Modifier
                                 .width(dimen_1)
                                 .height(dimen_24)
-                                .background(Color.White.copy(alpha = 0.15f))
+                                .background(appColors.subtleBorder)
                         )
 
                         Spacer(modifier = Modifier.width(dimen_12))
@@ -415,7 +417,7 @@ fun LabeledField(
                             onNext = { onImeAction() }),
                         textStyle = TextStyle(
                             fontSize = font_15,
-                            color = White,
+                            color = appColors.textPrimary,
                             fontWeight = FontWeight.Medium
                         ),
                         cursorBrush = SolidColor(AmberPrimary),
@@ -424,7 +426,7 @@ fun LabeledField(
                                 Textview(
                                     text = resolvedPlaceholder,
                                     size = font_14,
-                                    color = Color(0xFF64748B)
+                                    color = appColors.textHint
                                 )
                             }
                             innerTextField()
@@ -904,7 +906,7 @@ fun PasswordData(
 @Composable
 fun VerifiedBadge(
     modifier: Modifier = Modifier,
-    text: String = "Verified"
+    text: String? = null
 ) {
     Row(
         modifier = modifier
@@ -921,7 +923,7 @@ fun VerifiedBadge(
         )
         Spacer(modifier = Modifier.width(dimen_4))
         Textview(
-            text = text,
+            text = text ?: stringResource(R.string.common_verified),
             size = font_11,
             color = White,
             fontWeight = FontWeight.Bold
@@ -936,8 +938,10 @@ fun VerifiedBadge(
 fun ProfileAvatarPicker(
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
-    photoRes: Int? = null
+    photoUri: String? = null,
+    isUploading: Boolean = false
 ) {
+    val dashColor = appColors.textSecondary.copy(alpha = 0.6f)
     Box(
         modifier = modifier.size(dimen_100),
         contentAlignment = Alignment.Center
@@ -945,7 +949,7 @@ fun ProfileAvatarPicker(
         // Dashed circle border
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawCircle(
-                color = Color.White.copy(alpha = 0.25f),
+                color = dashColor,
                 style = androidx.compose.ui.graphics.drawscope.Stroke(
                     width = 2.5f,
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
@@ -957,15 +961,14 @@ fun ProfileAvatarPicker(
         Box(
             modifier = Modifier
                 .size(dimen_88)
-                .clip(CircleShape)
-                .background(Color(0x331B2028))
+                .glassEffect(CircleShape)
                 .clickable { onAddPhotoClick() },
             contentAlignment = Alignment.Center
         ) {
-            if (photoRes != null) {
-                Image(
-                    painter = painterResource(id = photoRes),
-                    contentDescription = "Profile Photo",
+            if (photoUri != null) {
+                AsyncImage(
+                    model = photoUri,
+                    contentDescription = stringResource(R.string.profile_photo),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -976,18 +979,35 @@ fun ProfileAvatarPicker(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_camera),
-                        contentDescription = "Add Photo",
-                        tint = Color.White.copy(alpha = 0.9f),
+                        contentDescription = stringResource(R.string.profile_add_photo),
+                        tint = appColors.textPrimary,
                         modifier = Modifier.size(dimen_28)
                     )
                     Spacer(modifier = Modifier.height(dimen_4))
                     Textview(
-                        text = "Add Photo",
+                        text = stringResource(R.string.profile_add_photo),
                         size = font_11,
                         color = SubtitleGrey,
                         fontWeight = FontWeight.Medium
                     )
                 }
+            }
+        }
+
+        // Upload progress over the photo
+        if (isUploading) {
+            Box(
+                modifier = Modifier
+                    .size(dimen_88)
+                    .clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.45f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = AmberPrimary,
+                    strokeWidth = dimen_2,
+                    modifier = Modifier.size(dimen_28)
+                )
             }
         }
 
@@ -1003,7 +1023,7 @@ fun ProfileAvatarPicker(
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Add",
+                contentDescription = stringResource(R.string.profile_add_photo),
                 tint = Color.Black,
                 modifier = Modifier.size(dimen_18)
             )
@@ -1023,20 +1043,17 @@ fun GlassRoleCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     activeBorderColor: Color = LightYellow,
-    inactiveBorderColor: Color = White.copy(alpha = 0.10f),
-    inActiveBackgroundColor: Color = White.copy(alpha = 0.10f),
     activeBackgroundColor: Color = LightYellow.copy(alpha = 0.10f),
     shape: Shape = RoundedCornerShape(dimen_12)
 ) {
-    val borderColor = if (isSelected) activeBorderColor else inactiveBorderColor
-    val backgroundColor = if (isSelected) activeBackgroundColor else inActiveBackgroundColor
-
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(shape)
-            .background(backgroundColor)
-            .border(dimen_1, borderColor, shape)
+            .glassEffect(
+                shape = shape,
+                backgroundColor = if (isSelected) activeBackgroundColor else Color.Unspecified,
+                borderColor = if (isSelected) activeBorderColor else Color.Unspecified
+            )
             .clickable { onClick() }
             .padding(dimen_12)
     ) {
@@ -1063,14 +1080,14 @@ fun GlassRoleCard(
                 Textview(
                     text = title,
                     size = font_16,
-                    color = White,
+                    color = appColors.textPrimary,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(dimen_4))
                 Textview(
                     text = subtitle,
                     size = font_12,
-                    color = LightGreyish,
+                    color = appColors.textSecondary,
                     fontWeight = FontWeight.Normal,
                     maxLines = 2
                 )
@@ -1095,7 +1112,7 @@ fun GlassRoleCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Selected",
+                        contentDescription = stringResource(R.string.common_selected),
                         tint = Black,
                         modifier = Modifier.size(dimen_14)
                     )
@@ -1106,7 +1123,7 @@ fun GlassRoleCard(
                         .size(dimen_24)
                         .border(
                             width = dimen_1,
-                            color = DarkBlackish,
+                            color = appColors.textHint,
                             shape = CircleShape
                         )
                 )
@@ -1124,23 +1141,21 @@ fun CommonBackButton(
     modifier: Modifier = Modifier,
     size: Dp = dimen_40,
     iconSize: Dp = dimen_24,
-    backgroundColor: Color = White.copy(0.20f),
-    borderColor: Color = LightWhitish.copy(alpha = 0.12f),
-    iconColor: Color = White
+    backgroundColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
+    iconColor: Color = Color.Unspecified
 ) {
     Box(
         modifier = modifier
             .size(size)
-            .clip(CircleShape)
-            .background(backgroundColor)
-            .border(dimen_1, borderColor, CircleShape)
+            .glassEffect(CircleShape, backgroundColor, borderColor)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-            contentDescription = "Back",
-            tint = iconColor,
+            contentDescription = stringResource(R.string.common_back),
+            tint = if (iconColor.isSpecified) iconColor else appColors.textPrimary,
             modifier = Modifier.size(iconSize)
         )
     }
@@ -1160,14 +1175,15 @@ fun GlassOtpField(
     cornerRadius: Dp = dimen_12,
     gap: Dp = dimen_8,
     activeBorderColor: Color = LightYellow,
-    inactiveBorderColor: Color = White.copy(alpha = 0.18f),
-    glassBgColor: Color = White.copy(alpha = 0.18f),
-    textColor: Color = White,
+    inactiveBorderColor: Color = Color.Unspecified,
+    glassBgColor: Color = Color.Unspecified,
+    textColor: Color = Color.Unspecified,
     cursorColor: Color = LightYellow,
     onDone: () -> Unit = {}
 ) {
     val focusRequester = remember { FocusRequester() }
     val shape = RoundedCornerShape(cornerRadius)
+    val resolvedTextColor = if (textColor.isSpecified) textColor else appColors.textPrimary
 
     val infiniteTransition = rememberInfiniteTransition(label = "otpCursor")
     val cursorAlpha by infiniteTransition.animateFloat(
@@ -1224,12 +1240,10 @@ fun GlassOtpField(
                         Box(
                             modifier = Modifier
                                 .size(cellWidth, cellHeight)
-                                .clip(shape)
-                                .background(glassBgColor)
-                                .border(
-                                    width = dimen_1,
-                                    color = borderColor,
-                                    shape = shape
+                                .glassEffect(
+                                    shape = shape,
+                                    backgroundColor = glassBgColor,
+                                    borderColor = borderColor
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -1237,7 +1251,7 @@ fun GlassOtpField(
                                 Textview(
                                     text = charAtCell,
                                     size = font_22,
-                                    color = textColor,
+                                    color = resolvedTextColor,
                                     fontWeight = FontWeight.Bold
                                 )
                             } else if (isActive) {
@@ -1331,7 +1345,7 @@ fun GlassResendOtpTimer(
             Textview(
                 text = text,
                 size = font_14,
-                color = White,
+                color = appColors.textPrimary,
                 fontWeight = FontWeight.Normal
             )
             Spacer(modifier = Modifier.width(dimen_4))
@@ -1343,7 +1357,7 @@ fun GlassResendOtpTimer(
             )
         } else {
             Textview(
-                text = "Resend OTP",
+                text = stringResource(R.string.otp_resend),
                 size = font_14,
                 color = LightYellow,
                 fontWeight = FontWeight.SemiBold,
@@ -2308,32 +2322,75 @@ fun <T : Any> LazyGridListViewMinMax(
 }
 
 /**
- * Reusable frosted glass / glassmorphic effect for any Composable.
+ * Reusable frosted glass (glassmorphism) surface for any Composable. Follows light / dark mode.
  *
- * @param shape Shape of the glass container (default rounded corners).
- * @param backgroundColor Translucent tint for the glass background.
- * @param borderColor Color of the frosted outline.
- * @param borderWidth Width of the outline stroke.
+ * The glass is built from layers so it still reads as glass over any background:
+ * 1. a soft shadow (light mode only) that lifts the surface off the screen,
+ * 2. a translucent top-to-bottom gradient fill,
+ * 3. an optional [backgroundColor] tint on top (selected / highlighted states),
+ * 4. a sheen that catches light in the top-left corner,
+ * 5. a gradient edge: bright at the top-left, fading out at the bottom-right.
+ *
+ * Usage:
+ * ```
+ * Column(Modifier.glassEffect(RoundedCornerShape(dimen_20)).padding(dimen_16)) { ... }
+ *
+ * // Highlighted state
+ * Modifier.glassEffect(backgroundColor = AmberPrimary.copy(0.12f), borderColor = AmberPrimary)
+ * ```
+ *
+ * @param shape Shape of the glass container.
+ * @param backgroundColor Optional tint drawn over the glass fill. Unspecified = plain glass.
+ * @param borderColor Optional solid edge color. Unspecified = theme gradient edge.
+ * @param borderWidth Width of the edge stroke.
  */
 fun Modifier.glassEffect(
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_16),
-    backgroundColor: Color = Color(0x331B2028),
-    borderColor: Color = Color.White.copy(alpha = 0.12f),
+    shape: Shape = RoundedCornerShape(dimen_16),
+    backgroundColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
     borderWidth: Dp = dimen_1
-): Modifier = this
-    .clip(shape)
-    .background(backgroundColor)
-    .border(borderWidth, borderColor, shape)
+): Modifier = composed {
+    val colors = appColors
+    val borderBrush = if (borderColor.isSpecified) {
+        SolidColor(borderColor)
+    } else {
+        Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
+    }
+
+    this
+        .then(
+            if (colors.isDark) Modifier else Modifier.shadow(
+                elevation = dimen_8,
+                shape = shape,
+                clip = false,
+                ambientColor = colors.glassShadow,
+                spotColor = colors.glassShadow
+            )
+        )
+        .clip(shape)
+        .background(Brush.verticalGradient(listOf(colors.glassTop, colors.glassBottom)))
+        .then(if (backgroundColor.isSpecified) Modifier.background(backgroundColor) else Modifier)
+        .drawBehind {
+            drawRect(
+                brush = Brush.radialGradient(
+                    colors = listOf(colors.glassSheen, Color.Transparent),
+                    center = Offset.Zero,
+                    radius = size.maxDimension * 0.8f
+                )
+            )
+        }
+        .border(borderWidth, borderBrush, shape)
+}
 
 /**
- * Reusable Glassmorphic Box container.
+ * Reusable Glassmorphic Box container. See [glassEffect].
  */
 @Composable
 fun GlassBox(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(dimen_16),
-    backgroundColor: Color = Color(0x331B2028),
-    borderColor: Color = Color.White.copy(alpha = 0.12f),
+    backgroundColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
     borderWidth: Dp = dimen_1,
     content: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit
 ) {
@@ -2346,6 +2403,92 @@ fun GlassBox(
         ),
         content = content
     )
+}
+
+/**
+ * Glass card with inner padding, for grouping content.
+ */
+@Composable
+fun GlassCard(
+    modifier: Modifier = Modifier,
+    shape: Shape = RoundedCornerShape(dimen_20),
+    contentPadding: Dp = dimen_16,
+    backgroundColor: Color = Color.Unspecified,
+    borderColor: Color = Color.Unspecified,
+    onClick: (() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = modifier
+            .glassEffect(shape, backgroundColor, borderColor)
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .padding(contentPadding),
+        content = content
+    )
+}
+
+/**
+ * Screen background that follows light / dark mode.
+ *
+ * - Dark: [darkImageRes] under a dark top scrim, or a navy gradient with an amber glow when null.
+ * - Light: [lightImageRes] if provided, otherwise the dark image under a white veil, otherwise a soft light gradient.
+ *
+ * Drop dedicated light artwork in by passing [lightImageRes]; nothing else needs to change.
+ */
+@Composable
+fun ScreenBackground(
+    modifier: Modifier = Modifier,
+    @androidx.annotation.DrawableRes darkImageRes: Int? = null,
+    @androidx.annotation.DrawableRes lightImageRes: Int? = null,
+    content: @Composable BoxScope.() -> Unit
+) {
+    val colors = appColors
+    val imageRes = if (colors.isDark) darkImageRes else (lightImageRes ?: darkImageRes)
+
+    Box(modifier = modifier.fillMaxSize()) {
+        if (imageRes != null) {
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            val scrim = when {
+                colors.isDark -> Brush.verticalGradient(
+                    listOf(Black.copy(alpha = 0.60f), Transparent, Transparent)
+                )
+
+                lightImageRes == null -> Brush.verticalGradient(
+                    listOf(
+                        colors.imageVeil.copy(alpha = 0.92f),
+                        colors.imageVeil.copy(alpha = 0.60f),
+                        colors.imageVeil.copy(alpha = 0.82f)
+                    )
+                )
+
+                else -> null
+            }
+            if (scrim != null) {
+                Box(modifier = Modifier.fillMaxSize().background(scrim))
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.verticalGradient(listOf(colors.screenTop, colors.screenBottom)))
+                    .drawBehind {
+                        drawRect(
+                            brush = Brush.radialGradient(
+                                colors = listOf(colors.screenGlow, Color.Transparent),
+                                center = Offset(0f, size.height),
+                                radius = size.maxDimension * 0.6f
+                            )
+                        )
+                    }
+            )
+        }
+        content()
+    }
 }
 
 /**

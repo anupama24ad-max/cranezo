@@ -7,6 +7,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.cranezo.core.composecore.BaseVMComposeActivity
 import com.cranezo.ui.chooselanguage.ChooseLanguageActivity
 import com.cranezo.ui.chooselanguage.ChooseLanguageViewModel
+import com.cranezo.ui.mainhome.MainHomeActivity
 
 import com.cranezo.utils.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +39,10 @@ class SplashActivity : BaseVMComposeActivity<SplashViewModel>(SplashViewModel::c
     }
 
     fun navigations() {
-        startActivity(Intent(this, ChooseLanguageActivity::class.java))
+        // A signed-in user goes straight to the home, everyone else starts the onboarding flow
+        val next = if (sm.isUserLoggedIn()) MainHomeActivity::class.java
+        else ChooseLanguageActivity::class.java
+        startActivity(Intent(this, next))
         finish()
     }
 

@@ -1,5 +1,6 @@
 package com.cranezo.core.composecore
 
+import androidx.compose.ui.res.stringResource
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -200,13 +201,18 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                                     snoozed = true
                                     viewModel.cancelNetworkRequest = true   // stop checking
                                 },
-                                title = { Text(if (netState is NetworkState.NoConnection) "Network disconnected" else "Slow connection") },
+                                title = { Text(
+                                    stringResource(
+                                        if (netState is NetworkState.NoConnection) R.string.net_disconnected_title
+                                        else R.string.net_slow_title
+                                    )
+                                ) },
                                 text = {
                                     Text(
-                                        if (netState is NetworkState.NoConnection)
-                                            "Please check your connection and retry."
-                                        else
-                                            "Your internet seems slow. You can retry or cancel."
+                                        stringResource(
+                                            if (netState is NetworkState.NoConnection) R.string.net_disconnected_message
+                                            else R.string.net_slow_message
+                                        )
                                     )
                                 },
                                 confirmButton = {
@@ -215,14 +221,14 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                                         snoozed = true
                                         viewModel.cancelNetworkRequest = false
                                         viewModel.validateNetwork(onNetworkConnected = null)
-                                    }) { Text("Retry") }
+                                    }) { Text(stringResource(R.string.common_retry)) }
                                 },
                                 dismissButton = {
                                     TextButton(onClick = {
                                         // Cancel: close now and stop checks (dialog won’t re-open)
                                         snoozed = true
                                         viewModel.cancelNetworkRequest = true
-                                    }) { Text("Cancel") }
+                                    }) { Text(stringResource(R.string.common_cancel)) }
                                 }
                             )
                         }
@@ -252,7 +258,7 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
 
             SessionExpiredDialog(
                 showDialog = showSessionDialog,
-                message = "You have logged in from another device. For security reasons, you have been logged out of this session.",
+                message = stringResource(R.string.session_logged_out_elsewhere),
                 onConfirm = {
                     SessionManager(applicationContext).clearSession()
                 /*    startActivity(

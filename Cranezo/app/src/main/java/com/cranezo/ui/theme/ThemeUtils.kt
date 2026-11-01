@@ -2,6 +2,8 @@ package com.cranezo.ui.theme
 
 import android.content.Context
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import com.cranezo.R
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -17,10 +19,10 @@ import com.cranezo.utils.SessionManager
 /**
  * Theme selection modes.
  */
-enum class AppThemeMode(val key: String, val title: String) {
-    LIGHT("light", "Always Light"),
-    DARK("dark", "Always Dark"),
-    SYSTEM("system", "System");
+enum class AppThemeMode(val key: String, @StringRes val titleRes: Int) {
+    LIGHT("light", R.string.theme_light),
+    DARK("dark", R.string.theme_dark),
+    SYSTEM("system", R.string.theme_system);
 
     companion object {
         fun fromKey(key: String?): AppThemeMode {

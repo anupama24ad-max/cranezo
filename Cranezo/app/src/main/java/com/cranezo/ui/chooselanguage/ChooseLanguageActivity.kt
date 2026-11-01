@@ -22,6 +22,8 @@ class ChooseLanguageActivity : BaseVMComposeActivity<ChooseLanguageViewModel>(Ch
         LaunchedEffect(Unit) {
             vm.effect.collect { effect ->
                 when (effect) {
+                    ChooseLanguageEffect.ApplyLanguage -> recreate()
+
                     ChooseLanguageEffect.NavigateToLogin ->
                         startActivity(Intent(this@ChooseLanguageActivity, LoginActivity::class.java))
                 }

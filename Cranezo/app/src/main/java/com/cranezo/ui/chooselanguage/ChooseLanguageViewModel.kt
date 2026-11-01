@@ -54,7 +54,11 @@ class ChooseLanguageViewModel @Inject constructor(
             }
 
             is ChooseLanguageIntent.SelectLanguage -> {
+                val changed = _uiState.value.selectedLanguageId != intent.languageId
                 _uiState.update { it.copy(selectedLanguageId = intent.languageId) }
+                // Save it right away: the whole app, starting with this screen, switches language
+                sm.setData(AppStrings.SessionValues.languageId, intent.languageId)
+                if (changed) viewModelScope.launch { _effect.send(ChooseLanguageEffect.ApplyLanguage) }
             }
 
             ChooseLanguageIntent.Continue -> {

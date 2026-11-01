@@ -18,6 +18,7 @@ class AppStrings {
             var Id = "Id"
             var city = "city"
             var languageId = "languageId"
+            var profileImage = "profileImage"
             var countryCode = "countryCode"
             var memberId = "memberId"
             var roleId = "roleId"
@@ -114,7 +115,33 @@ class AppStrings {
             var language_id = "language_id"
             var otp_number = "otp_number"
             var role_id = "role_id"
+            var file = "file"
+            var profile_image = "profile_image"
+            var customer_type = "customer_type"
+            var constitution = "constitution"
+            var nature_of_business = "nature_of_business"
+            var company_date_establishment = "company_date_establishment"
+            var gst_number = "gst_number"
+            var directors_details = "directors_details"
+            var finance_head_details = "finance_head_details"
+            var branch_offices_details = "branch_offices_details"
+            var aadhar_number = "aadhar_number"
+            var pan_number = "pan_number"
+            var state_id = "state_id"
+            var operator_license_number = "operator_license_number"
+            var license_expiry_date = "license_expiry_date"
+            var operator_type = "operator_type"
+            var owner_id = "owner_id"
+            var owner_type = "owner_type"
+            var number_of_business_partners = "number_of_business_partners"
+            var pincode = "pincode"
+            var business_category = "business_category"
             var company_name = "company_name"
+            var business_address = "business_address"
+            var business_ownership_type = "business_ownership_type"
+            var years_of_experience = "years_of_experience"
+            var city = "city"
+            var state = "state"
         }
     }
     class AccountStatus{
@@ -156,6 +183,9 @@ class AppStrings {
         companion object{
             var language = 1
             var owner = 2
+            var yearsOfExperience = 3
+            var partners = 4
+            var ownership = 5
         }
     }
     class FromAcivity{

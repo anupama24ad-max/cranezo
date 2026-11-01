@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,11 @@ import com.cranezo.R
 import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.LabelTextField
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.verticalScroll
+import com.cranezo.ui.components.ScreenBackground
+import com.cranezo.ui.components.rememberImeScrollState
+import com.cranezo.ui.components.glassEffect
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.login.model.LoginIntent
 import com.cranezo.ui.login.model.LoginUiState
@@ -55,32 +61,7 @@ fun LoginScreen(
     val countryCode = uiState.countryCode
     val countryFlag = uiState.countryFlag
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // --- 1. Background Crane Image ---
-        Image(
-            painter = painterResource(id = R.drawable.login_bg),
-            contentDescription = "Crane Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // --- 2. Cinematic Gradient Overlay ---
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Black.copy(alpha = 0.60f),
-                            Transparent,
-                            Transparent
-                        )
-                    )
-                )
-        )
-
+    ScreenBackground(darkImageRes = R.drawable.login_bg) {
         // --- 3. Screen Layout ---
         Column(
             modifier = Modifier
@@ -88,6 +69,8 @@ fun LoginScreen(
                 .padding(horizontal = dimen_24, vertical = dimen_20)
                 .statusBarsPadding()
                 .navigationBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberImeScrollState())
         ) {
             // Common Circular Back Button
             CommonBackButton(
@@ -99,23 +82,23 @@ fun LoginScreen(
 
             // Header Texts
             Textview(
-                text = "W E L C O M E   T O",
+                text = stringResource(R.string.login_welcome),
                 size = font_12,
-                color = Grey,
+                color = appColors.textSecondary,
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(dimen_4))
             Textview(
-                text = "Cranezo",
+                text = stringResource(R.string.app_name),
                 size = font_32,
-                color = White,
+                color = appColors.textPrimary,
                 fontWeight = FontWeight.ExtraBold
             )
             Spacer(modifier = Modifier.height(dimen_6))
             Textview(
-                text = "Book the right crane.\nGet the job moving.",
+                text = stringResource(R.string.login_tagline),
                 size = font_16,
-                color = Grey,
+                color = appColors.textSecondary,
                 fontWeight = FontWeight.Normal
             )
 
@@ -126,17 +109,7 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(dimen_26))
-                    .background(Black.copy(0.50f))
-                    .border(
-                        BorderStroke(
-                            dimen_1,
-                            Brush.verticalGradient(
-                                listOf(White.copy(alpha = 0.2f), Transparent)
-                            )
-                        ),
-                        shape = RoundedCornerShape(dimen_26)
-                    )
+                    .glassEffect(RoundedCornerShape(dimen_26))
                     .padding(horizontal = dimen_20, vertical = dimen_24)
                     .navigationBarsPadding()
             ) {
@@ -147,9 +120,9 @@ fun LoginScreen(
                     LabelTextField(
                         value = mobileNumber,
                         onValueChange = { vm?.onIntent(LoginIntent.MobileNumberChanged(it)) },
-                        labelText = "Mobile Number",
-                        subLabel = "We'll send you an OTP",
-                        placeholder = "Enter your mobile number",
+                        labelText = stringResource(R.string.login_mobile_label),
+                        subLabel = stringResource(R.string.login_otp_hint),
+                        placeholder = stringResource(R.string.login_mobile_placeholder),
                         isGlassy = true,
                         isPhoneWithCountry = true,
                         countryCode = countryCode,
@@ -160,7 +133,7 @@ fun LoginScreen(
 
                     // Get OTP Gradient Button
                     CommonGradientButton(
-                        text = "Get OTP",
+                        text = stringResource(R.string.login_get_otp),
                         gradientColors = listOf(LightYellow, DarkYellow),
                         textColor = Black,
                         rightImage = R.drawable.ic_arrow_right,
@@ -173,7 +146,7 @@ fun LoginScreen(
 
                     // Call for Emergency Red Gradient Button
                     CommonGradientButton(
-                        text = "Call for Emergency",
+                        text = stringResource(R.string.common_call_emergency),
                         gradientColors = listOf(
                             Red,
                             DarkRed,

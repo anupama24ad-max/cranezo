@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Photos taken with the camera are written here (see AppMethods.createTempImageUri) -->
+    <cache-path
+        name="images"
+        path="images/" />
+</paths>

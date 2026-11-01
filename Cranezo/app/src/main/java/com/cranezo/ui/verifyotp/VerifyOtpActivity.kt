@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.cranezo.core.composecore.BaseVMComposeActivity
 import com.cranezo.ui.chooserole.ChooseRoleActivity
+import com.cranezo.ui.mainhome.MainHomeActivity
 import com.cranezo.ui.profile.ProfileActivity
 import com.cranezo.ui.verifyotp.model.VerifyOtpEffect
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,9 +27,10 @@ class VerifyOtpActivity :
                     VerifyOtpEffect.NavigateToProfile ->
                         startActivity(Intent(this@VerifyOtpActivity, ProfileActivity::class.java))
 
-                    VerifyOtpEffect.NavigateToHome -> {
-                        // TODO: open the home screen once it exists
-                    }
+                    VerifyOtpEffect.NavigateToHome -> startActivity(
+                        Intent(this@VerifyOtpActivity, MainHomeActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    )
                 }
             }
         }

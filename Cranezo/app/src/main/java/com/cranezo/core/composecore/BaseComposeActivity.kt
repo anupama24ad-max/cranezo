@@ -1,10 +1,12 @@
 package com.cranezo.core.composecore
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.ColorInt
+import com.cranezo.utils.LocaleHelper
 
 abstract class BaseComposeActivity : ComponentActivity() {
 
@@ -25,6 +27,11 @@ abstract class BaseComposeActivity : ComponentActivity() {
     @ColorInt
     protected open val statusBarColor: Int = android.graphics.Color.TRANSPARENT
     @ColorInt protected open val navBarColor: Int = android.graphics.Color.TRANSPARENT
+
+    // Every screen shows the language the user picked on the Choose Language screen
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

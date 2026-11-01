@@ -1,5 +1,7 @@
 package com.cranezo.utils.networkCheck
 
+import com.cranezo.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
@@ -84,7 +86,7 @@ fun NetNoticeHost(
                     )
                     if (n.sticky) { // Back online banner is not sticky, so no Dismiss button
                         Text(
-                            "Dismiss",
+                            stringResource(R.string.common_dismiss),
                             color = Color.White,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))

@@ -6,6 +6,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import androidx.annotation.RequiresPermission
+import androidx.annotation.StringRes
+import com.cranezo.R
+import com.cranezo.utils.LocaleHelper
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -49,12 +52,19 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         this._isLoading.postValue(isLoading)
     }
 
+    /**
+     * Text of a string resource in the language the user chose. ViewModels use this because the
+     * application context itself doesn't carry the chosen language.
+     */
+    protected fun string(@StringRes id: Int, vararg args: Any): String =
+        LocaleHelper.wrap(getApplication()).getString(id, *args)
+
     protected fun showNetNoticeOffline() {
         _netNoticeEvents.tryEmit(
             NetNoticeEvent.Show(
                 NetNotice(
                     NetNoticeType.Offline,
-                    "No Internet. Auto-retry when online…"
+                    string(R.string.net_offline_banner)
                 )
             )
         )

@@ -19,5 +19,7 @@ sealed interface ChooseLanguageIntent {
 }
 
 sealed interface ChooseLanguageEffect {
+    // The chosen language is saved: the screen restarts so it is shown in that language
+    data object ApplyLanguage : ChooseLanguageEffect
     data object NavigateToLogin : ChooseLanguageEffect
 }

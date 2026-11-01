@@ -1,9 +1,11 @@
 package com.cranezo.ui.profile
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.cranezo.core.composecore.BaseVMComposeActivity
+import com.cranezo.ui.mainhome.MainHomeActivity
 import com.cranezo.ui.profile.model.ProfileEffect
 import com.cranezo.utils.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,19 +24,17 @@ class ProfileActivity : BaseVMComposeActivity<ProfileViewModel>(
         LaunchedEffect(Unit) {
             vm.effect.collect { effect ->
                 when (effect) {
-                    ProfileEffect.NavigateToHome -> {
-                        // TODO: open the home screen once it exists
-                    }
+                    ProfileEffect.NavigateToHome -> startActivity(
+                        Intent(this@ProfileActivity, MainHomeActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    )
                 }
             }
         }
 
         ProfileScreen(
             vm = vm,
-            onBackClick = { finish() },
-            onAddPhotoClick = {
-                // Handle Add / Change photo action
-            }
+            onBackClick = { finish() }
         )
     }
 

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cranezo</string>
+
+    <!-- Common -->
+    <string name="common_continue">जारी रखें</string>
+    <string name="common_cancel">रद्द करें</string>
+    <string name="common_retry">पुनः प्रयास करें</string>
+    <string name="common_ok">ठीक है</string>
+    <string name="common_edit">संपादित करें</string>
+    <string name="common_back">वापस</string>
+    <string name="common_selected">चयनित</string>
+    <string name="common_dismiss">बंद करें</string>
+    <string name="common_verified">सत्यापित</string>
+    <string name="common_verify">सत्यापित करें</string>
+    <string name="common_call_emergency">आपातकालीन कॉल करें</string>
+    <string name="common_view_all">सभी देखें</string>
+    <string name="common_no_options">कोई विकल्प उपलब्ध नहीं</string>
+    <string name="common_notifications">सूचनाएं</string>
+
+    <!-- Choose language -->
+    <string name="language_heading_1">अपनी भाषा</string>
+    <string name="language_heading_2">चुनें</string>
+    <string name="language_subtitle">आगे बढ़ने के लिए अपनी पसंदीदा\nभाषा चुनें।</string>
+
+    <!-- Login -->
+    <string name="login_welcome">स्वागत है</string>
+    <string name="login_tagline">सही क्रेन बुक करें।\nअपना काम आगे बढ़ाएं।</string>
+    <string name="login_mobile_label">मोबाइल नंबर</string>
+    <string name="login_otp_hint">हम आपको OTP भेजेंगे</string>
+    <string name="login_mobile_placeholder">अपना मोबाइल नंबर दर्ज करें</string>
+    <string name="login_get_otp">OTP पाएं</string>
+    <string name="login_error_mobile">कृपया 10 अंकों का वैध मोबाइल नंबर दर्ज करें</string>
+
+    <!-- Verify OTP -->
+    <string name="otp_heading_1">अपना नंबर</string>
+    <string name="otp_heading_2">सत्यापित करें</string>
+    <string name="otp_sent_to">हमने 6 अंकों का OTP भेजा है:</string>
+    <string name="otp_resend_in">OTP दोबारा भेजने में </string>
+    <string name="otp_resend">OTP दोबारा भेजें</string>
+    <string name="otp_verify_continue">सत्यापित करें और आगे बढ़ें</string>
+    <string name="otp_error_enter">कृपया 6 अंकों का OTP दर्ज करें</string>
+
+    <!-- Choose role -->
+    <string name="role_heading_1">अपनी भूमिका</string>
+    <string name="role_heading_2">चुनें</string>
+    <string name="role_subtitle">चुनें कि आप %1$s ऐप का उपयोग\nकैसे करना चाहते हैं।</string>
+    <string name="role_customer">ग्राहक</string>
+    <string name="role_customer_subtitle">अपने प्रोजेक्ट के लिए क्रेन\nआसानी से बुक करें।</string>
+    <string name="role_owner">क्रेन मालिक</string>
+    <string name="role_owner_subtitle">अपनी क्रेन सूचीबद्ध करें और\nअधिक व्यवसाय पाएं</string>
+    <string name="role_operator">ऑपरेटर/कैप्टन</string>
+    <string name="role_operator_subtitle">काम पाएं और\nकमाई शुरू करें।</string>
+
+    <!-- Profile -->
+    <string name="profile_heading_1">अपनी प्रोफ़ाइल</string>
+    <string name="profile_heading_2">पूरी करें</string>
+    <string name="profile_subtitle_owner">क्रेन मालिक के रूप में शुरू करने के लिए\nकुछ बुनियादी जानकारी दें।</string>
+    <string name="profile_subtitle_default">शुरू करने के लिए बस कुछ जानकारी दें।</string>
+    <string name="profile_photo_optional">प्रोफ़ाइल फ़ोटो (वैकल्पिक)</string>
+    <string name="profile_add_photo">फ़ोटो जोड़ें</string>
+    <string name="profile_photo">प्रोफ़ाइल फ़ोटो</string>
+    <string name="field_full_name">पूरा नाम</string>
+    <string name="field_full_name_hint">अपना पूरा नाम दर्ज करें</string>
+    <string name="field_mobile_hint">मोबाइल नंबर दर्ज करें</string>
+    <string name="field_company_name">कंपनी का नाम</string>
+    <string name="field_company_name_hint">अपनी कंपनी का नाम दर्ज करें</string>
+    <string name="field_owner_type">मालिक का प्रकार</string>
+    <string name="field_owner_type_hint">मालिक का प्रकार चुनें</string>
+    <string name="field_experience">अनुभव के वर्ष</string>
+    <string name="field_experience_hint">अनुभव चुनें</string>
+    <string name="field_partners">व्यावसायिक भागीदारों की संख्या</string>
+    <string name="field_partners_hint">भागीदारों की संख्या चुनें</string>
+    <string name="field_ownership_type">व्यवसाय स्वामित्व का प्रकार</string>
+    <string name="field_ownership_type_hint">स्वामित्व का प्रकार चुनें</string>
+    <string name="field_business_category">व्यवसाय श्रेणी</string>
+    <string name="field_business_category_hint">अपनी व्यवसाय श्रेणी दर्ज करें</string>
+    <string name="field_established_on">स्थापना की तिथि</string>
+    <string name="field_established_on_hint">तिथि चुनें</string>
+    <string name="field_business_address">व्यवसाय का पता</string>
+    <string name="field_business_address_hint">अपने व्यवसाय का पता दर्ज करें</string>
+    <string name="field_city">शहर</string>
+    <string name="field_city_hint">अपना शहर दर्ज करें</string>
+    <string name="field_state">राज्य</string>
+    <string name="field_state_text_hint">अपना राज्य दर्ज करें</string>
+    <string name="field_state_select_hint">राज्य चुनें</string>
+    <string name="field_pincode">पिनकोड</string>
+    <string name="field_pincode_hint">6 अंकों का पिनकोड दर्ज करें</string>
+    <string name="field_email">ईमेल</string>
+    <string name="field_email_hint">अपना ईमेल पता दर्ज करें</string>
+    <string name="field_company_address">कंपनी का पता</string>
+    <string name="field_company_address_hint">अपनी कंपनी का पता दर्ज करें</string>
+    <string name="field_constitution">संस्था का स्वरूप</string>
+    <string name="field_constitution_hint">संस्था का स्वरूप चुनें</string>
+    <string name="field_gst">GST पंजीकरण सं.</string>
+    <string name="field_gst_hint">GST पंजीकरण संख्या दर्ज करें</string>
+    <string name="field_nature_of_business">व्यवसाय की प्रकृति</string>
+    <string name="field_nature_of_business_hint">व्यवसाय की प्रकृति चुनें</string>
+    <string name="field_directors">निदेशकों / भागीदारों का नाम और पता</string>
+    <string name="field_directors_hint">नाम, मोबाइल नं., फ़ोन नं., ईमेल आईडी और पता दर्ज करें</string>
+    <string name="field_accounts_head">लेखा / वित्त प्रमुख का विवरण</string>
+    <string name="field_accounts_head_hint">नाम, मोबाइल नं. और ईमेल आईडी दर्ज करें</string>
+    <string name="field_branch_offices">शाखा कार्यालयों का विवरण</string>
+    <string name="field_branch_offices_hint">शाखा कार्यालय का विवरण दर्ज करें (स्थान, पता, संपर्क जानकारी)</string>
+    <string name="field_aadhar">आधार सं.</string>
+    <string name="field_aadhar_hint">आधार संख्या दर्ज करें</string>
+    <string name="field_pan">पैन सं.</string>
+    <string name="field_pan_hint">पैन संख्या दर्ज करें</string>
+    <string name="field_user_type">उपयोगकर्ता का प्रकार</string>
+    <string name="section_license">लाइसेंस और अनुभव विवरण</string>
+    <string name="field_license_number">ऑपरेटर लाइसेंस नंबर</string>
+    <string name="field_license_number_hint">लाइसेंस नंबर दर्ज करें</string>
+    <string name="field_license_expiry">लाइसेंस की समाप्ति तिथि</string>
+    <string name="field_license_expiry_hint">समाप्ति तिथि चुनें</string>
+    <string name="section_documents">दस्तावेज़ अपलोड करें</string>
+    <string name="section_documents_subtitle">कृपया आवश्यक दस्तावेज़ों की स्पष्ट प्रतियां अपलोड करें।</string>
+    <string name="field_owner_id">मालिक ID</string>
+    <string name="field_owner_id_hint">मालिक ID दर्ज करें (जैसे ONR659897)</string>
+    <string name="doc_license_front">लाइसेंस आगे का भाग</string>
+    <string name="doc_license_back">लाइसेंस पीछे का भाग</string>
+    <string name="doc_aadhaar">आधार कार्ड</string>
+    <string name="doc_pan">पैन कार्ड</string>
+    <string name="doc_other">अन्य दस्तावेज़</string>
+    <string name="doc_required">अनिवार्य</string>
+    <string name="doc_optional">वैकल्पिक</string>
+    <string name="user_type_individual_user">व्यक्तिगत उपयोगकर्ता</string>
+    <string name="user_type_business_user">व्यावसायिक उपयोगकर्ता</string>
+    <string name="user_type_individual_operator">व्यक्तिगत ऑपरेटर</string>
+    <string name="user_type_owner_based">मालिक आधारित</string>
+
+    <!-- Profile messages -->
+    <string name="msg_files_uploading">कृपया प्रतीक्षा करें, आपकी फ़ाइलें अपलोड हो रही हैं</string>
+    <string name="msg_fill_required">कृपया सभी आवश्यक जानकारी भरें</string>
+    <string name="msg_invalid_gst">कृपया वैध GST पंजीकरण संख्या दर्ज करें</string>
+    <string name="msg_establishment_future">स्थापना की तिथि भविष्य में नहीं हो सकती</string>
+    <string name="msg_invalid_aadhar">आधार संख्या 12 अंकों की होनी चाहिए</string>
+    <string name="msg_invalid_pan">कृपया वैध पैन दर्ज करें (जैसे ABCDE1234F)</string>
+    <string name="msg_license_expired">ऑपरेटर लाइसेंस की अवधि समाप्त हो गई है। कृपया वैध लाइसेंस दें।</string>
+    <string name="msg_invalid_email">कृपया वैध ईमेल पता दर्ज करें</string>
+    <string name="msg_invalid_pincode">पिनकोड 6 अंकों का होना चाहिए</string>
+    <string name="msg_file_unreadable">चुनी गई फ़ाइल पढ़ी नहीं जा सकी</string>
+    <string name="msg_upload_failed">अपलोड विफल रहा</string>
+
+    <!-- Image picker -->
+    <string name="picker_photo_title">प्रोफ़ाइल फ़ोटो</string>
+    <string name="picker_photo_subtitle">चुनें कि अपनी फ़ोटो कहां से लेनी है।</string>
+    <string name="picker_document_title">दस्तावेज़ अपलोड करें</string>
+    <string name="picker_document_subtitle">चुनें कि दस्तावेज़ कहां से लेना है।</string>
+    <string name="picker_camera">कैमरा</string>
+    <string name="picker_gallery">गैलरी</string>
+    <string name="picker_files">फ़ाइलें</string>
+    <string name="picker_no_camera">कोई कैमरा ऐप नहीं मिला</string>
+
+    <!-- Main home: tabs -->
+    <string name="tab_home">होम</string>
+    <string name="tab_my_cranes">मेरी क्रेन</string>
+    <string name="tab_jobs">काम</string>
+    <string name="tab_my_jobs">मेरे काम</string>
+    <string name="tab_earnings">कमाई</string>
+    <string name="tab_book_crane">क्रेन बुक</string>
+    <string name="tab_hire">हायर</string>
+    <string name="tab_help">सहायता</string>
+    <string name="tab_profile">प्रोफ़ाइल</string>
+    <string name="tab_coming_soon">यह सेक्शन जल्द आ रहा है।</string>
+
+    <!-- Main home: greeting -->
+    <string name="greeting_morning">सुप्रभात,</string>
+    <string name="greeting_afternoon">शुभ दोपहर,</string>
+    <string name="greeting_evening">शुभ संध्या,</string>
+
+    <!-- Main home: owner -->
+    <string name="home_owner_default_name">क्रेन मालिक</string>
+    <string name="home_owner_subtitle">अपनी क्रेन प्रबंधित करें और व्यवसाय बढ़ाएं।</string>
+    <string name="home_fleet_overview">फ़्लीट अवलोकन</string>
+    <string name="home_total_cranes">कुल क्रेन</string>
+    <string name="home_available_cranes">उपलब्ध क्रेन</string>
+    <string name="home_busy_cranes">व्यस्त क्रेन</string>
+    <string name="home_pending_verification">सत्यापन लंबित</string>
+    <string name="home_todays_jobs">आज के काम</string>
+    <string name="home_jobs_scheduled">आज निर्धारित काम</string>
+    <string name="home_earnings">कमाई</string>
+    <string name="home_todays_earnings_caption">आज की कमाई</string>
+    <string name="home_quick_actions">त्वरित कार्य</string>
+    <string name="home_quick_actions_subtitle">अपना व्यवसाय संभालने के लिए त्वरित कार्य करें।</string>
+    <string name="home_add_crane">क्रेन जोड़ें</string>
+    <string name="home_add_crane_subtitle">नई क्रेन पंजीकृत करें</string>
+    <string name="home_my_cranes_subtitle">देखें और प्रबंधित करें</string>
+    <string name="home_jobs_subtitle">बुकिंग अनुरोध देखें</string>
+    <string name="home_earnings_subtitle">कमाई का विवरण देखें</string>
+
+    <!-- Main home: customer -->
+    <string name="home_customer_default_name">ग्राहक</string>
+    <string name="home_customer_subtitle">आइए आपका अगला लिफ्ट शुरू करें।</string>
+    <string name="home_hero_1">क्रेन</string>
+    <string name="home_hero_2">बुक करें</string>
+    <string name="home_hero_subtitle">आपकी निर्माण ज़रूरतों के लिए\nप्रमाणित क्रेन।</string>
+    <string name="home_hero_button">क्रेन बुक करें</string>
+    <string name="home_promo_get_up_to">पाएं</string>
+    <string name="home_promo_off">20% तक की छूट</string>
+    <string name="home_promo_subtitle">आपकी पहली बुकिंग पर</string>
+    <string name="home_promo_button">अभी बुक करें</string>
+    <string name="home_quick_access">त्वरित पहुंच</string>
+    <string name="home_track_crane">मेरी क्रेन ट्रैक करें</string>
+    <string name="home_track_crane_subtitle">लाइव लोकेशन और ETA</string>
+    <string name="home_my_jobs_subtitle">सभी बुकिंग देखें</string>
+    <string name="home_need_help">मदद चाहिए?</string>
+    <string name="home_need_help_subtitle">24/7 सहायता</string>
+    <string name="home_recent_booking">हाल की बुकिंग</string>
+
+    <!-- Main home: operator -->
+    <string name="home_operator_default_name">ऑपरेटर</string>
+    <string name="home_operator_subtitle">अगले काम के लिए तैयार हैं?</string>
+    <string name="home_online">ऑनलाइन</string>
+    <string name="home_offline">ऑफ़लाइन</string>
+    <string name="home_online_subtitle">आप नए कामों के लिए दिखाई दे रहे हैं</string>
+    <string name="home_offline_subtitle">आप अभी ऑफ़लाइन हैं</string>
+    <string name="home_go_online">ऑनलाइन जाएं</string>
+    <string name="home_go_offline">ऑफ़लाइन जाएं</string>
+    <string name="home_assigned_crane">आवंटित क्रेन</string>
+    <string name="home_view_details">विवरण देखें</string>
+    <string name="home_assigned_owner">आवंटित मालिक</string>
+    <string name="home_view_job">काम देखें</string>
+    <string name="home_todays_earnings">आज की कमाई</string>
+    <string name="home_view_earnings">कमाई देखें</string>
+    <string name="home_document_status">दस्तावेज़ की स्थिति</string>
+    <string name="home_view_documents">दस्तावेज़ देखें</string>
+
+    <!-- Main home: profile tab -->
+    <string name="home_profile_default_name">Cranezo उपयोगकर्ता</string>
+    <string name="home_profile_id">ID: %1$s</string>
+    <string name="home_appearance">दिखावट</string>
+    <string name="home_appearance_subtitle">चुनें कि आपके डिवाइस पर Cranezo कैसा दिखे।</string>
+    <string name="home_logout">लॉग आउट</string>
+
+    <!-- Theme -->
+    <string name="theme_title">थीम</string>
+    <string name="theme_light">हमेशा लाइट</string>
+    <string name="theme_dark">हमेशा डार्क</string>
+    <string name="theme_system">सिस्टम</string>
+
+    <!-- Network and session -->
+    <string name="net_disconnected_title">नेटवर्क डिस्कनेक्ट हो गया</string>
+    <string name="net_slow_title">धीमा कनेक्शन</string>
+    <string name="net_disconnected_message">कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।</string>
+    <string name="net_slow_message">आपका इंटरनेट धीमा लग रहा है। आप पुनः प्रयास कर सकते हैं या रद्द कर सकते हैं।</string>
+    <string name="net_offline_banner">इंटरनेट नहीं है। ऑनलाइन होते ही अपने आप पुनः प्रयास होगा…</string>
+    <string name="net_no_internet">इंटरनेट नहीं है</string>
+    <string name="net_check_internet">कृपया अपना इंटरनेट कनेक्शन जांचें और पुनः प्रयास करें।</string>
+    <string name="session_logged_out_elsewhere">आपने किसी अन्य डिवाइस से लॉगिन किया है। सुरक्षा कारणों से आपको इस सत्र से लॉग आउट कर दिया गया है।</string>
+</resources>

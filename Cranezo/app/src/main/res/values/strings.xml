@@ -1,3 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Cranezo</string>
+
+    <!-- Common -->
+    <string name="common_continue">Continue</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_retry">Retry</string>
+    <string name="common_ok">Ok</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_back">Back</string>
+    <string name="common_selected">Selected</string>
+    <string name="common_dismiss">Dismiss</string>
+    <string name="common_verified">Verified</string>
+    <string name="common_verify">Verify</string>
+    <string name="common_call_emergency">Call for Emergency</string>
+    <string name="common_view_all">View All</string>
+    <string name="common_no_options">No options available</string>
+    <string name="common_notifications">Notifications</string>
+
+    <!-- Choose language -->
+    <string name="language_heading_1">Choose Your</string>
+    <string name="language_heading_2">Language</string>
+    <string name="language_subtitle">Select your preferred language\nto continue.</string>
+
+    <!-- Login -->
+    <string name="login_welcome">WELCOME TO</string>
+    <string name="login_tagline">Book the right crane.\nGet the job moving.</string>
+    <string name="login_mobile_label">Mobile Number</string>
+    <string name="login_otp_hint">We\'ll send you an OTP</string>
+    <string name="login_mobile_placeholder">Enter your mobile number</string>
+    <string name="login_get_otp">Get OTP</string>
+    <string name="login_error_mobile">Please enter a valid 10-digit mobile number</string>
+
+    <!-- Verify OTP -->
+    <string name="otp_heading_1">Verify</string>
+    <string name="otp_heading_2">Your Number</string>
+    <string name="otp_sent_to">We\'ve sent a 6-digit OTP to</string>
+    <string name="otp_resend_in">Resend OTP in </string>
+    <string name="otp_resend">Resend OTP</string>
+    <string name="otp_verify_continue">Verify &amp; Continue</string>
+    <string name="otp_error_enter">Please enter the 6-digit OTP</string>
+
+    <!-- Choose role -->
+    <string name="role_heading_1">Choose Your</string>
+    <string name="role_heading_2">Role</string>
+    <string name="role_subtitle">Select how you want to use\n%1$s app to continue.</string>
+    <string name="role_customer">Customer</string>
+    <string name="role_customer_subtitle">Book cranes for your\nprojects easily.</string>
+    <string name="role_owner">Crane Owner</string>
+    <string name="role_owner_subtitle">List your cranes and\nget more business</string>
+    <string name="role_operator">Operation/Captain</string>
+    <string name="role_operator_subtitle">Get jobs and start\nearning.</string>
+
+    <!-- Profile -->
+    <string name="profile_heading_1">Complete</string>
+    <string name="profile_heading_2">Your Profile</string>
+    <string name="profile_subtitle_owner">Share a few basic details to get started\nas a crane owner.</string>
+    <string name="profile_subtitle_default">Just a few details to get you started.</string>
+    <string name="profile_photo_optional">Profile Photo (Optional)</string>
+    <string name="profile_add_photo">Add Photo</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="field_full_name">Full Name</string>
+    <string name="field_full_name_hint">Enter your full name</string>
+    <string name="field_mobile_hint">Enter mobile number</string>
+    <string name="field_company_name">Company Name</string>
+    <string name="field_company_name_hint">Enter your company name</string>
+    <string name="field_owner_type">Owner Type</string>
+    <string name="field_owner_type_hint">Select owner type</string>
+    <string name="field_experience">Years of Experience</string>
+    <string name="field_experience_hint">Select experience</string>
+    <string name="field_partners">Number of Business Partners</string>
+    <string name="field_partners_hint">Select number of partners</string>
+    <string name="field_ownership_type">Business Ownership Type</string>
+    <string name="field_ownership_type_hint">Select ownership type</string>
+    <string name="field_business_category">Business Category</string>
+    <string name="field_business_category_hint">Enter your business category</string>
+    <string name="field_established_on">Date of Establishment</string>
+    <string name="field_established_on_hint">Select date</string>
+    <string name="field_business_address">Business Address</string>
+    <string name="field_business_address_hint">Enter your business address</string>
+    <string name="field_city">City</string>
+    <string name="field_city_hint">Enter your city</string>
+    <string name="field_state">State</string>
+    <string name="field_state_text_hint">Enter your state</string>
+    <string name="field_state_select_hint">Select state</string>
+    <string name="field_pincode">Pincode</string>
+    <string name="field_pincode_hint">Enter 6-digit pincode</string>
+    <string name="field_email">Email</string>
+    <string name="field_email_hint">Enter your email address</string>
+    <string name="field_company_address">Company Address</string>
+    <string name="field_company_address_hint">Enter your company address</string>
+    <string name="field_constitution">Constitution</string>
+    <string name="field_constitution_hint">Select constitution</string>
+    <string name="field_gst">GST Registration No.</string>
+    <string name="field_gst_hint">Enter GST registration number</string>
+    <string name="field_nature_of_business">Nature of Business</string>
+    <string name="field_nature_of_business_hint">Select nature of business</string>
+    <string name="field_directors">Name and Address of Directors / Partners</string>
+    <string name="field_directors_hint">Enter name, mobile no., tel. no., email id &amp; address</string>
+    <string name="field_accounts_head">Accounts / Finance Head Details</string>
+    <string name="field_accounts_head_hint">Enter name, mobile no. and email id</string>
+    <string name="field_branch_offices">Branch Offices Details</string>
+    <string name="field_branch_offices_hint">Enter branch office details (location, address, contact info)</string>
+    <string name="field_aadhar">Aadhar No.</string>
+    <string name="field_aadhar_hint">Enter Aadhar No.</string>
+    <string name="field_pan">PAN No.</string>
+    <string name="field_pan_hint">Enter PAN No.</string>
+    <string name="field_user_type">User Type</string>
+    <string name="section_license">License &amp; Experience Details</string>
+    <string name="field_license_number">Operator License Number</string>
+    <string name="field_license_number_hint">Enter license number</string>
+    <string name="field_license_expiry">License Expiry Date</string>
+    <string name="field_license_expiry_hint">Select expiry date</string>
+    <string name="section_documents">Upload Documents</string>
+    <string name="section_documents_subtitle">Please upload clear copies of the required documents.</string>
+    <string name="field_owner_id">Owner ID</string>
+    <string name="field_owner_id_hint">Enter Owner ID (e.g. ONR659897)</string>
+    <string name="doc_license_front">License Front</string>
+    <string name="doc_license_back">License Back</string>
+    <string name="doc_aadhaar">Aadhaar Card</string>
+    <string name="doc_pan">PAN Card</string>
+    <string name="doc_other">Other Documents</string>
+    <string name="doc_required">Required</string>
+    <string name="doc_optional">Optional</string>
+    <string name="user_type_individual_user">Individual User</string>
+    <string name="user_type_business_user">Business User</string>
+    <string name="user_type_individual_operator">Individual Operator</string>
+    <string name="user_type_owner_based">Owner Based</string>
+
+    <!-- Profile messages -->
+    <string name="msg_files_uploading">Please wait, your files are uploading</string>
+    <string name="msg_fill_required">Please fill all the required details</string>
+    <string name="msg_invalid_gst">Please enter a valid GST registration number</string>
+    <string name="msg_establishment_future">Date of establishment cannot be in the future</string>
+    <string name="msg_invalid_aadhar">Aadhar number must be 12 digits</string>
+    <string name="msg_invalid_pan">Please enter a valid PAN (e.g. ABCDE1234F)</string>
+    <string name="msg_license_expired">Operator license has expired. Please provide a valid license.</string>
+    <string name="msg_invalid_email">Please enter a valid email address</string>
+    <string name="msg_invalid_pincode">Pincode must be 6 digits</string>
+    <string name="msg_file_unreadable">Couldn\'t read the selected file</string>
+    <string name="msg_upload_failed">Upload failed</string>
+
+    <!-- Image picker -->
+    <string name="picker_photo_title">Profile Photo</string>
+    <string name="picker_photo_subtitle">Choose where to get your photo from.</string>
+    <string name="picker_document_title">Upload Document</string>
+    <string name="picker_document_subtitle">Choose where to get the document from.</string>
+    <string name="picker_camera">Camera</string>
+    <string name="picker_gallery">Gallery</string>
+    <string name="picker_files">Files</string>
+    <string name="picker_no_camera">No camera app found</string>
+
+    <!-- Main home: tabs -->
+    <string name="tab_home">Home</string>
+    <string name="tab_my_cranes">My Cranes</string>
+    <string name="tab_jobs">Jobs</string>
+    <string name="tab_my_jobs">My Jobs</string>
+    <string name="tab_earnings">Earnings</string>
+    <string name="tab_book_crane">Book Crane</string>
+    <string name="tab_hire">Hire</string>
+    <string name="tab_help">Help</string>
+    <string name="tab_profile">Profile</string>
+    <string name="tab_coming_soon">This section is coming soon.</string>
+
+    <!-- Main home: greeting -->
+    <string name="greeting_morning">Good morning,</string>
+    <string name="greeting_afternoon">Good afternoon,</string>
+    <string name="greeting_evening">Good evening,</string>
+
+    <!-- Main home: owner -->
+    <string name="home_owner_default_name">Crane Owner</string>
+    <string name="home_owner_subtitle">Manage your cranes and grow your business.</string>
+    <string name="home_fleet_overview">Fleet Overview</string>
+    <string name="home_total_cranes">Total Cranes</string>
+    <string name="home_available_cranes">Available Cranes</string>
+    <string name="home_busy_cranes">Busy Cranes</string>
+    <string name="home_pending_verification">Pending Verification</string>
+    <string name="home_todays_jobs">Today\'s Jobs</string>
+    <string name="home_jobs_scheduled">Jobs scheduled today</string>
+    <string name="home_earnings">Earnings</string>
+    <string name="home_todays_earnings_caption">Today\'s earnings</string>
+    <string name="home_quick_actions">Quick Actions</string>
+    <string name="home_quick_actions_subtitle">Take quick actions to manage your business.</string>
+    <string name="home_add_crane">Add Crane</string>
+    <string name="home_add_crane_subtitle">Register a new crane</string>
+    <string name="home_my_cranes_subtitle">View and manage</string>
+    <string name="home_jobs_subtitle">View booking requests</string>
+    <string name="home_earnings_subtitle">View earnings details</string>
+
+    <!-- Main home: customer -->
+    <string name="home_customer_default_name">Customer</string>
+    <string name="home_customer_subtitle">Let\'s get your next lift moving.</string>
+    <string name="home_hero_1">BOOK</string>
+    <string name="home_hero_2">A CRANE</string>
+    <string name="home_hero_subtitle">Certified cranes for your\nconstruction needs.</string>
+    <string name="home_hero_button">Book a Crane</string>
+    <string name="home_promo_get_up_to">GET UP TO</string>
+    <string name="home_promo_off">20% OFF</string>
+    <string name="home_promo_subtitle">on your first booking</string>
+    <string name="home_promo_button">BOOK NOW</string>
+    <string name="home_quick_access">Quick Access</string>
+    <string name="home_track_crane">Track My Crane</string>
+    <string name="home_track_crane_subtitle">Live location &amp; ETA</string>
+    <string name="home_my_jobs_subtitle">View all bookings</string>
+    <string name="home_need_help">Need Help?</string>
+    <string name="home_need_help_subtitle">24/7 support</string>
+    <string name="home_recent_booking">Recent Booking</string>
+
+    <!-- Main home: operator -->
+    <string name="home_operator_default_name">Operator</string>
+    <string name="home_operator_subtitle">Ready for your next job?</string>
+    <string name="home_online">Online</string>
+    <string name="home_offline">Offline</string>
+    <string name="home_online_subtitle">You are visible for new jobs</string>
+    <string name="home_offline_subtitle">You are currently offline</string>
+    <string name="home_go_online">Go Online</string>
+    <string name="home_go_offline">Go Offline</string>
+    <string name="home_assigned_crane">Assigned Crane</string>
+    <string name="home_view_details">View Details</string>
+    <string name="home_assigned_owner">Assigned Owner</string>
+    <string name="home_view_job">View Job</string>
+    <string name="home_todays_earnings">Today\'s Earnings</string>
+    <string name="home_view_earnings">View Earnings</string>
+    <string name="home_document_status">Document Status</string>
+    <string name="home_view_documents">View Documents</string>
+
+    <!-- Main home: profile tab -->
+    <string name="home_profile_default_name">Cranezo User</string>
+    <string name="home_profile_id">ID: %1$s</string>
+    <string name="home_appearance">Appearance</string>
+    <string name="home_appearance_subtitle">Choose how Cranezo looks on your device.</string>
+    <string name="home_logout">Log out</string>
+
+    <!-- Theme -->
+    <string name="theme_title">Theme</string>
+    <string name="theme_light">Always Light</string>
+    <string name="theme_dark">Always Dark</string>
+    <string name="theme_system">System</string>
+
+    <!-- Network and session -->
+    <string name="net_disconnected_title">Network disconnected</string>
+    <string name="net_slow_title">Slow connection</string>
+    <string name="net_disconnected_message">Please check your connection and retry.</string>
+    <string name="net_slow_message">Your internet seems slow. You can retry or cancel.</string>
+    <string name="net_offline_banner">No Internet. Auto-retry when online…</string>
+    <string name="net_no_internet">No Internet</string>
+    <string name="net_check_internet">Please check your internet connection and try again.</string>
+    <string name="session_logged_out_elsewhere">You have logged in from another device. For security reasons, you have been logged out of this session.</string>
 </resources>

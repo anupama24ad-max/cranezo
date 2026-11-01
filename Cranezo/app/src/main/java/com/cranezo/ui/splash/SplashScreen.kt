@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.cranezo.R
 import com.cranezo.ui.theme.CranezoTheme
@@ -33,7 +34,7 @@ fun SplashScreen(vm: SplashViewModel? = null) {
                 lightResId = R.drawable.cranezo_light_logo,
                 darkResId = R.drawable.cranezo_logo
             ),
-            contentDescription = "Cranezo Splash",
+            contentDescription = stringResource(R.string.app_name),
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )

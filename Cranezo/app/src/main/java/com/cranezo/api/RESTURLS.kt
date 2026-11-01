@@ -8,6 +8,7 @@ class RESTURLS {
         const val registerOrLogin = "auth/registerOrLogin"
         const val verifyOtp = "auth/verifyOtp"
         const val updateProfile = "auth/updateProfile"
+        const val upload = "upload"
      }
 
 }

@@ -27,6 +27,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -45,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.R
 import com.cranezo.ui.components.ContinueButton
 import com.cranezo.ui.components.GlassBox
+import com.cranezo.ui.components.ScreenBackground
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.chooselanguage.model.ChooseLanguageIntent
@@ -67,32 +69,7 @@ fun ChooseLanguageScreen(
     val selectedLanguageId = uiState.selectedLanguageId
     val languages = uiState.languages
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // --- 1. Background Crane Image ---
-        Image(
-            painter = painterResource(id = R.drawable.login_bg),
-            contentDescription = "Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // --- 2. Dark Cinematic Overlay Gradient ---
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Black.copy(alpha = 0.60f),
-                            Transparent,
-                            Transparent
-                        )
-                    )
-                )
-        )
-
+    ScreenBackground(darkImageRes = R.drawable.login_bg) {
         // --- 3. Screen Content Layout ---
         Column(
             modifier = Modifier
@@ -108,21 +85,21 @@ fun ChooseLanguageScreen(
             )
             {
                 Textview(
-                    text = "Choose Your",
+                    text = stringResource(R.string.language_heading_1),
                     size = font_32,
-                    color = White,
+                    color = appColors.textPrimary,
                     fontWeight = FontWeight.ExtraBold
                 )
                 TextviewWithGradient(
-                    text = "Language",
+                    text = stringResource(R.string.language_heading_2),
                     size = font_30,
                     fontWeight = FontWeight.ExtraBold
                 )
                 Spacer(modifier = Modifier.height(dimen_8))
                 Textview(
-                    text = "Select your preferred language\nto continue.",
+                    text = stringResource(R.string.language_subtitle),
                     size = font_16,
-                    color = Grey,
+                    color = appColors.textSecondary,
                     fontWeight = FontWeight.Normal
                 )
 
@@ -146,10 +123,8 @@ fun ChooseLanguageScreen(
                                     vm?.onIntent(ChooseLanguageIntent.SelectLanguage(item.id))
                                 },
                             shape = RoundedCornerShape(dimen_16),
-                            backgroundColor = if (isSelected) LightYellow.copy(alpha = 0.10f) else White.copy(
-                                alpha = 0.10f
-                            ),
-                            borderColor = if (isSelected) LightYellow else White.copy(alpha = 0.10f),
+                            backgroundColor = if (isSelected) LightYellow.copy(alpha = 0.10f) else Color.Unspecified,
+                            borderColor = if (isSelected) LightYellow else Color.Unspecified,
                             borderWidth = if (isSelected) dimen_1 * 1.5f else dimen_1
                         ) {
                             Row(
@@ -163,10 +138,10 @@ fun ChooseLanguageScreen(
                                     modifier = Modifier
                                         .size(dimen_44)
                                         .clip(RoundedCornerShape(dimen_12))
-                                        .background(White.copy(alpha = 0.10f))
+                                        .background(appColors.subtleFill)
                                         .border(
                                             width = dimen_1,
-                                            color = White.copy(alpha = 0.10f),
+                                            color = appColors.subtleBorder,
                                             shape = RoundedCornerShape(dimen_12)
                                         ),
                                     contentAlignment = Alignment.Center
@@ -174,7 +149,7 @@ fun ChooseLanguageScreen(
                                     Textview(
                                         text = item.badge,
                                         size = font_18,
-                                        color = if (isSelected) LightYellow else White,
+                                        color = if (isSelected) LightYellow else appColors.textPrimary,
                                         fontWeight = FontWeight.Bold
                                     )
                                 }
@@ -188,14 +163,14 @@ fun ChooseLanguageScreen(
                                     Textview(
                                         text = item.name,
                                         size = font_16,
-                                        color = White,
+                                        color = appColors.textPrimary,
                                         fontWeight = FontWeight.SemiBold
                                     )
                                     Spacer(modifier = Modifier.height(dimen_2))
                                     Textview(
                                         text = item.subtitle,
                                         size = font_12,
-                                        color = LightGreyish
+                                        color = appColors.textSecondary
                                     )
                                 }
 
@@ -216,7 +191,7 @@ fun ChooseLanguageScreen(
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Check,
-                                            contentDescription = "Selected",
+                                            contentDescription = stringResource(R.string.common_selected),
                                             tint = Black,
                                             modifier = Modifier.size(dimen_14)
                                         )
@@ -227,7 +202,7 @@ fun ChooseLanguageScreen(
                                             .size(dimen_24)
                                             .border(
                                                 width = dimen_1,
-                                                color = DarkBlackish,
+                                                color = appColors.textHint,
                                                 shape = CircleShape
                                             )
                                     )
@@ -241,7 +216,7 @@ fun ChooseLanguageScreen(
 
                 // Bottom Continue Button
                 ContinueButton(
-                    text = "Continue",
+                    text = stringResource(R.string.common_continue),
                     onClick = {
                         vm?.onIntent(ChooseLanguageIntent.Continue)
                     }

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.cranezo.api.isRequestCallSuspendSuccess
 import com.cranezo.core.BaseViewModel
+import com.cranezo.R
 import com.cranezo.repository.Repository
 import com.cranezo.ui.chooserole.UserRole
 import com.cranezo.ui.verifyotp.model.VerifyOtpApiResponse
@@ -57,7 +58,7 @@ class VerifyOtpViewModel @Inject constructor(
 
             VerifyOtpIntent.VerifyOtp -> {
                 if (_uiState.value.otp.length != OTP_LENGTH) {
-                    showError("Please enter the 6-digit OTP")
+                    showError(string(R.string.otp_error_enter))
                     return
                 }
                 verifyOtpApi()

@@ -1,5 +1,6 @@
 package com.cranezo.ui.components.dialogUtils
 
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -104,7 +105,7 @@ fun SessionExpiredDialog(
 
                         ) {
                             Textview(
-                                text = "Ok",
+                                text = stringResource(R.string.common_ok),
                                 bold = true,
                                 size = font_16,
                                 color = Color.White
@@ -152,7 +153,7 @@ fun NoInternetDialog(
                     Spacer(Modifier.height(dimen_20))*/
 
                     Textview(
-                        text = "No Internet",
+                        text = stringResource(R.string.net_no_internet),
                         size = font_22,
                         fontWeight = FontWeight.Bold
                     )
@@ -160,7 +161,7 @@ fun NoInternetDialog(
                     Spacer(Modifier.height(dimen_10))
 
                     Textview(
-                        text = "Please check your internet connection and try again.",
+                        text = stringResource(R.string.net_check_internet),
                         textAlign = TextAlign.Center,
                         color = Greyish
                     )
@@ -168,7 +169,7 @@ fun NoInternetDialog(
                     Spacer(Modifier.height(dimen_24))
 
                     GradientButton(
-                        text = "Retry",
+                        text = stringResource(R.string.common_retry),
                         color1 = Green,
                         color2 = Green,
                         isCircle = false
@@ -179,7 +180,7 @@ fun NoInternetDialog(
                     Spacer(Modifier.height(dimen_12))
 
                     TextButton(onClick = onDismiss) {
-                        Textview("Cancel")
+                        Textview(stringResource(R.string.common_cancel))
                     }
                 }
             }

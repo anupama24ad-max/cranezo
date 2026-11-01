@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,10 @@ import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassOtpField
 import com.cranezo.ui.components.GlassResendOtpTimer
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.verticalScroll
+import com.cranezo.ui.components.ScreenBackground
+import com.cranezo.ui.components.rememberImeScrollState
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.theme.*
@@ -48,32 +53,7 @@ fun VerifyOtpScreen(
     val otp = uiState.otp
     val phoneNumber = uiState.phoneNumber
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // --- 1. Background Image ---
-        Image(
-            painter = painterResource(id = R.drawable.otp_bg),
-            contentDescription = "OTP Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // --- 2. Cinematic Gradient Overlay ---
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Black.copy(alpha = 0.60f),
-                            Transparent,
-                            Transparent
-                        )
-                    )
-                )
-        )
-
+    ScreenBackground(darkImageRes = R.drawable.otp_bg) {
         // --- 3. Screen Layout ---
         Column(
             modifier = Modifier
@@ -81,6 +61,8 @@ fun VerifyOtpScreen(
                 .padding(horizontal = dimen_24, vertical = dimen_20)
                 .statusBarsPadding()
                 .navigationBarsPadding()
+                .imePadding()
+                .verticalScroll(rememberImeScrollState())
         ) {
             CommonBackButton(
                 onClick = onBackClick,
@@ -90,14 +72,14 @@ fun VerifyOtpScreen(
 
             // Header Texts
             Textview(
-                text = "Verify",
+                text = stringResource(R.string.otp_heading_1),
                 size = font_32,
-                color = White,
+                color = appColors.textPrimary,
                 fontWeight = FontWeight.ExtraBold
             )
             Spacer(modifier = Modifier.height(dimen_2))
             TextviewWithGradient(
-                text = "Your Number",
+                text = stringResource(R.string.otp_heading_2),
                 size = font_32,
                 fontWeight = FontWeight.ExtraBold
             )
@@ -105,9 +87,9 @@ fun VerifyOtpScreen(
             Spacer(modifier = Modifier.height(dimen_12))
 
             Textview(
-                text = "We've sent a 6- digit OTP to",
+                text = stringResource(R.string.otp_sent_to),
                 size = font_14,
-                color = Grey,
+                color = appColors.textSecondary,
                 fontWeight = FontWeight.Normal
             )
 
@@ -116,14 +98,14 @@ fun VerifyOtpScreen(
             Textview(
                 text = phoneNumber,
                 size = font_16,
-                color = White,
+                color = appColors.textPrimary,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(dimen_8))
 
             TextviewWithGradient(
-                text = "Edit",
+                text = stringResource(R.string.common_edit),
                 size = font_14,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable { onEditPhoneClick() }
@@ -161,14 +143,14 @@ fun VerifyOtpScreen(
                 GlassResendOtpTimer(
                     onResendOtp = { vm?.onIntent(VerifyOtpIntent.ResendOtp) },
                     totalSeconds = 45,
-                    text = "Resend OTP in "
+                    text = stringResource(R.string.otp_resend_in)
                 )
 
                 Spacer(modifier = Modifier.height(dimen_30))
 
                 // Get OTP Gradient Button
                 CommonGradientButton(
-                    text = "Verify & Continue",
+                    text = stringResource(R.string.otp_verify_continue),
                     gradientColors = listOf(LightYellow, DarkYellow),
                     textColor = Black,
                     rightImage = R.drawable.ic_arrow_right,
@@ -181,7 +163,7 @@ fun VerifyOtpScreen(
 
                 // Call for Emergency Red Gradient Button
                 CommonGradientButton(
-                    text = "Call for Emergency",
+                    text = stringResource(R.string.common_call_emergency),
                     gradientColors = listOf(
                         Red,
                         DarkRed,

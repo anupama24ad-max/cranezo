@@ -54,4 +54,13 @@ interface RestApi {
         @Body jsonObject: RequestBody?=null
     ): Response<ApiResult<UpdateProfileApiResponse>>
 
+    // multipart/form-data: type = 1 (single) + file
+    @Multipart
+    @POST(RESTURLS.upload)
+    suspend fun uploadApi(
+        @HeaderMap headers: Map<String, String>,
+        @Part("type") type: RequestBody,
+        @Part file: MultipartBody.Part
+    ): Response<ApiResult<UploadApiResponse>>
+
 }

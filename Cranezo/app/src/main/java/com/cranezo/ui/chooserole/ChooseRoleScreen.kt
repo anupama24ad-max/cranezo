@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import com.cranezo.R
 import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassRoleCard
+import com.cranezo.ui.components.ScreenBackground
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.TextviewWithGradient
 import com.cranezo.ui.theme.*
@@ -48,32 +50,7 @@ fun ChooseRoleScreen(
         )
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // --- 1. Background Image ---
-        Image(
-            painter = painterResource(id = R.drawable.role_bg),
-            contentDescription = "Role Background",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-
-        // --- 2. Cinematic Gradient Overlay ---
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Black.copy(alpha = 0.60f),
-                            Transparent,
-                            Transparent
-                        )
-                    )
-                )
-        )
-
+    ScreenBackground(darkImageRes = R.drawable.role_bg) {
         // --- 3. Screen Layout ---
         Column(
             modifier = Modifier
@@ -91,31 +68,34 @@ fun ChooseRoleScreen(
 
             // Header Texts
             Textview(
-                text = "Choose Your",
+                text = stringResource(R.string.role_heading_1),
                 size = font_32,
-                color = White,
+                color = appColors.textPrimary,
                 fontWeight = FontWeight.ExtraBold
             )
             Spacer(modifier = Modifier.height(dimen_2))
             TextviewWithGradient(
-                text = "Role",
+                text = stringResource(R.string.role_heading_2),
                 size = font_32,
                 fontWeight = FontWeight.ExtraBold
             )
 
             Spacer(modifier = Modifier.height(dimen_10))
 
+            // The brand name is passed into the translated sentence and made bold wherever it lands
+            val brand = stringResource(R.string.app_name)
+            val subtitleText = stringResource(R.string.role_subtitle, brand)
             val subtitle = buildAnnotatedString {
-                append("Select how you want to use\n")
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("Cranezo")
+                append(subtitleText)
+                val start = subtitleText.indexOf(brand)
+                if (start >= 0) {
+                    addStyle(SpanStyle(fontWeight = FontWeight.Bold), start, start + brand.length)
                 }
-                append(" app to continue.")
             }
 
             Text(
                 text = subtitle,
-                color = Grey,
+                color = appColors.textSecondary,
                 fontSize = font_14,
                 lineHeight = font_20
             )
@@ -133,8 +113,8 @@ fun ChooseRoleScreen(
             ) {
                 UserRole.values().forEach { role ->
                     GlassRoleCard(
-                        title = role.title,
-                        subtitle = role.subtitle,
+                        title = stringResource(role.titleRes),
+                        subtitle = stringResource(role.subtitleRes),
                         imageRes = role.imageRes,
                         isSelected = selectedRole == role,
                         onClick = {
@@ -149,7 +129,7 @@ fun ChooseRoleScreen(
             // --- 5. Continue Button ---
 
             CommonGradientButton(
-                text = "Continue",
+                text = stringResource(R.string.common_continue),
                 gradientColors = listOf(LightYellow, DarkYellow),
                 textColor = Black,
                 rightImage = R.drawable.ic_arrow_right,

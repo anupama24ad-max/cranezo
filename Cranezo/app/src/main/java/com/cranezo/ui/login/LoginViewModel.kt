@@ -50,7 +50,7 @@ class LoginViewModel @Inject constructor(
 
             LoginIntent.GetOtp -> {
                 if (_uiState.value.mobileNumber.length != MOBILE_NUMBER_LENGTH) {
-                    showError("Please enter a valid 10-digit mobile number")
+                    showError(string(R.string.login_error_mobile))
                     return
                 }
                 registerOrLoginApi()

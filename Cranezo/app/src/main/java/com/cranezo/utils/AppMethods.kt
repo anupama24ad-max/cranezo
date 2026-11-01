@@ -79,6 +79,11 @@ class AppMethods {
                 headers[AppStrings.Constants.authorization] = if (token.startsWith("Bearer ", ignoreCase = true)) token else "Bearer $token"
             }
             headers["Accept"] = "application/json"
+            // Lets the backend answer in the user's language when it supports it
+            headers["Accept-Language"] = AppLanguage.fromId(
+                sm?.getData(AppStrings.SessionValues.languageId, AppStrings.Constants.defaultLanguageId)
+                    ?: AppStrings.Constants.defaultLanguageId
+            ).tag
             return headers
 
         }
