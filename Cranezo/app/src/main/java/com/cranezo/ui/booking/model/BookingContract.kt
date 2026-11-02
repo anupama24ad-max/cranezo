@@ -41,6 +41,18 @@ data class BookingUiState(
     val bookingsHasMore: Boolean = false,
     val bookingsNextMin: Int = 0,
 
+    // My Jobs
+    val counts: JobCounts? = null,
+    val jobs: List<MyJobItem> = emptyList(),
+    val jobsTab: String = "upcoming",
+    val jobsLoaded: Boolean = false,
+    val jobsHasMore: Boolean = false,
+    val jobsNextMin: Int = 0,
+
+    // Track My Cranes
+    val activeTracks: List<ActiveTrack> = emptyList(),
+    val activeLoaded: Boolean = false,
+
     // "Cancellation and Refunds" text for the review screen
     val policy: String? = null
 )
@@ -79,6 +91,17 @@ sealed interface BookingIntent {
     data object LoadMoreBookings : BookingIntent
     // Back to a clean flow
     data object LoadPolicy : BookingIntent
+
+    // After the booking is confirmed
+    data object ConfirmArrival : BookingIntent
+    data class RequestExtra(val minutes: Int, val message: String) : BookingIntent
+    data object CancelExtra : BookingIntent
+    data class Pay(val method: String) : BookingIntent
+    data class Rate(val stars: Int, val comment: String) : BookingIntent
+    data class LoadJobs(val tab: String) : BookingIntent
+    data object LoadMoreJobs : BookingIntent
+    data object LoadActiveTracking : BookingIntent
+    data object BookAgain : BookingIntent
     data object Reset : BookingIntent
 }
 

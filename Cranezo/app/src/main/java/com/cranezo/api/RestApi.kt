@@ -243,4 +243,111 @@ interface RestApi {
     @POST
     suspend fun plainPostApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<Any>>
 
+    // ---- Operator jobs and earnings (POST with a JSON body; the path is passed in) ----
+
+    @POST
+    suspend fun opHomeApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OperatorHome>>
+
+    @POST
+    suspend fun opJobApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OperatorJob>>
+
+    @POST
+    suspend fun opJobListApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.operator.model.JobListItem>>>
+
+    @POST
+    suspend fun opChecklistApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.Checklist>>
+
+    @POST
+    suspend fun opTimersApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.JobTimers>>
+
+    @POST
+    suspend fun opIssueApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.IssueResult>>
+
+    @POST
+    suspend fun opOtpApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OtpSent>>
+
+    @POST
+    suspend fun opStatusApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OnlineStatus>>
+
+    @POST
+    suspend fun opLocationApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.LocationAck>>
+
+    @POST
+    suspend fun opEarningsSummaryApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.EarningsSummary>>
+
+    @POST
+    suspend fun opEarningsListApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.operator.model.EarningItem>>>
+
+    // ---- Owner jobs and earnings ----
+
+    @POST
+    suspend fun ownerCountsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.ownerjobs.model.OwnerJobCounts>>
+
+    @POST
+    suspend fun ownerJobListApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.ownerjobs.model.OwnerJob>>>
+
+    @POST
+    suspend fun ownerJobApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.ownerjobs.model.OwnerJob>>
+
+    @POST
+    suspend fun ownerEvidenceApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.ownerjobs.model.JobEvidence>>
+
+    @POST
+    suspend fun ownerEarningsSummaryApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.ownerjobs.model.OwnerEarningsSummary>>
+
+    @POST
+    suspend fun ownerTrendApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.ownerjobs.model.EarningsTrend>>
+
+    @POST
+    suspend fun ownerEarningJobsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.ownerjobs.model.OwnerEarningJob>>>
+
+    // ---- Customer: after the booking is confirmed ----
+
+    @POST
+    suspend fun extensionResultApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<ExtensionResult>>
+
+    @POST
+    suspend fun jobCountsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<JobCounts>>
+
+    @POST
+    suspend fun myJobsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<MyJobItem>>>
+
+    @POST
+    suspend fun activeTrackingApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<ActiveTrack>>>
+
+    // ---- Notifications and Help & Support (POST with a JSON body; the path is passed in) ----
+
+    @POST
+    suspend fun supNotificationsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.support.model.SupportNotification>>>
+
+    @POST
+    suspend fun supSummaryApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.NotificationSummary>>
+
+    @POST
+    suspend fun supMarkReadApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.MarkReadResult>>
+
+    @POST
+    suspend fun supHomeApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.SupportHome>>
+
+    @POST
+    suspend fun supFaqCategoriesApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.support.model.FaqCategory>>>
+
+    @POST
+    suspend fun supFaqsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.support.model.Faq>>>
+
+    @POST
+    suspend fun supTicketsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.support.model.TicketItem>>>
+
+    @POST
+    suspend fun supTicketApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.Ticket>>
+
+    @POST
+    suspend fun supMessageApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.TicketMessage>>
+
+    @POST
+    suspend fun supEmergencyApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.EmergencyResult>>
+
+    @POST
+    suspend fun customerHomeApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.customerhome.model.CustomerHome>>
+
 }

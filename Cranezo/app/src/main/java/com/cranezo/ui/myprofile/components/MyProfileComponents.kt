@@ -65,6 +65,7 @@ fun MyProfileScaffold(
     subtitle: String? = null,
     bottom: (@Composable () -> Unit)? = null,
     topContent: (@Composable () -> Unit)? = null,
+    action: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     ScreenBackground(darkImageRes = R.drawable.app_bg) {
@@ -75,7 +76,7 @@ fun MyProfileScaffold(
                 .navigationBarsPadding()
                 .imePadding()
         ) {
-            CraneScreenHeader(title = title, subtitle = subtitle, onBack = onBack)
+            CraneScreenHeader(title = title, subtitle = subtitle, onBack = onBack, action = action)
             topContent?.invoke()
             Column(
                 modifier = Modifier

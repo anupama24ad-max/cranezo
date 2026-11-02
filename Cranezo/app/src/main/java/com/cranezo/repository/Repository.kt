@@ -251,4 +251,133 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun markReadApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<Any>?> =
         safeApiCall(conflictAsError = true) { api.plainPostApi("notifications/mark-read", h, json(body)) }
 
+    // ---- Operator jobs and earnings ----
+
+    private val O = "operator/"
+
+    suspend fun opHome(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.opHomeApi(O + "home", h, json(JSONObject())) }
+
+    /** [path] is e.g. "jobs/get", "jobs/accept", "jobs/start-journey"; every one answers with the job. */
+    suspend fun opJob(h: Map<String, String>, path: String, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opJobApi(O + path, h, json(body)) }
+
+    suspend fun opJobList(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opJobListApi(O + "jobs/list", h, json(body)) }
+
+    /** jobs/checklist and jobs/checklist/save. */
+    suspend fun opChecklist(h: Map<String, String>, path: String, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opChecklistApi(O + path, h, json(body)) }
+
+    suspend fun opWaiting(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opTimersApi(O + "jobs/waiting", h, json(body)) }
+
+    /** jobs/breakdown, jobs/issue or jobs/emergency. */
+    suspend fun opIssue(h: Map<String, String>, path: String, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opIssueApi(O + path, h, json(body)) }
+
+    suspend fun opRequestConfirmation(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opOtpApi(O + "jobs/request-confirmation", h, json(body)) }
+
+    suspend fun opDecline(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.plainPostApi(O + "jobs/decline", h, json(body)) }
+
+    suspend fun opStatus(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opStatusApi(O + "status", h, json(body)) }
+
+    suspend fun opLocation(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opLocationApi(O + "location", h, json(body)) }
+
+    suspend fun opEarningsSummary(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.opEarningsSummaryApi(O + "earnings/summary", h, json(JSONObject())) }
+
+    suspend fun opEarningsList(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.opEarningsListApi(O + "earnings/list", h, json(body)) }
+
+    // ---- Owner jobs and earnings ----
+
+    suspend fun ownerJobCounts(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.ownerCountsApi("owner/jobs/summary", h, json(JSONObject())) }
+
+    suspend fun ownerJobList(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.ownerJobListApi("owner/jobs/list", h, json(body)) }
+
+    suspend fun ownerJobGet(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.ownerJobApi("owner/jobs/get", h, json(body)) }
+
+    suspend fun ownerJobTrack(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.trackApi("owner/jobs/track", h, json(body)) }
+
+    suspend fun ownerJobEvidence(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.ownerEvidenceApi("owner/jobs/evidence", h, json(body)) }
+
+    suspend fun ownerAssignOperator(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.plainPostApi("owner/requests/assign-operator", h, json(body)) }
+
+    suspend fun ownerEarningsSummary(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.ownerEarningsSummaryApi("owner/earnings/summary", h, json(body)) }
+
+    suspend fun ownerEarningsTrend(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.ownerTrendApi("owner/earnings/trend", h, json(body)) }
+
+    suspend fun ownerEarningJobs(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.ownerEarningJobsApi("owner/earnings/jobs", h, json(body)) }
+
+    // ---- Customer: after the booking is confirmed ----
+
+    /** [action] is extension/request or extension/cancel. */
+    suspend fun extensionApi(h: Map<String, String>, action: String, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.extensionResultApi("customer/booking/$action", h, json(body)) }
+
+    suspend fun jobCountsApi(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.jobCountsApi("customer/booking/summary", h, json(JSONObject())) }
+
+    suspend fun myJobsApi(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.myJobsApi("customer/booking/list", h, json(body)) }
+
+    suspend fun activeTrackingApi(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.activeTrackingApi("customer/booking/active-tracking", h, json(JSONObject())) }
+
+    // ---- Notifications and Help & Support ----
+
+    suspend fun supNotifications(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supNotificationsApi("notifications/list", h, json(body)) }
+
+    suspend fun supSummary(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.supSummaryApi("notifications/summary", h, json(JSONObject())) }
+
+    suspend fun supMarkRead(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supMarkReadApi("notifications/mark-read", h, json(body)) }
+
+    suspend fun supHome(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.supHomeApi("support/home", h, json(JSONObject())) }
+
+    suspend fun supFaqCategories(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.supFaqCategoriesApi("support/faq/categories", h, json(JSONObject())) }
+
+    suspend fun supFaqs(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supFaqsApi("support/faq/list", h, json(body)) }
+
+    suspend fun supFaqFeedback(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.plainPostApi("support/faq/feedback", h, json(body)) }
+
+    suspend fun supTickets(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supTicketsApi("support/tickets/list", h, json(body)) }
+
+    /** tickets/create, tickets/get or chat: all answer with the request and its messages. */
+    suspend fun supTicket(h: Map<String, String>, path: String, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supTicketApi("support/$path", h, json(body)) }
+
+    suspend fun supReply(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supMessageApi("support/tickets/reply", h, json(body)) }
+
+    suspend fun supCloseTicket(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.plainPostApi("support/tickets/close", h, json(body)) }
+
+    suspend fun supEmergency(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.supEmergencyApi("support/emergency", h, json(body)) }
+
+    suspend fun customerHome(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.customerHomeApi("home/customer", h, json(JSONObject())) }
+
 }

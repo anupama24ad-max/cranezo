@@ -54,7 +54,9 @@ fun HomeHeader(
     name: String,
     subtitle: String,
     modifier: Modifier = Modifier,
-    showNotification: Boolean = true
+    showNotification: Boolean = true,
+    // Unread notifications: the dot is hidden at 0; null keeps the dot (screens without the number)
+    unread: Int? = null
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -74,10 +76,12 @@ fun HomeHeader(
             Textview(text = subtitle, size = font_11, color = appColors.textSecondary)
         }
         if (showNotification) {
+            val context = androidx.compose.ui.platform.LocalContext.current
             Box(
                 modifier = Modifier
                     .size(dimen_40)
-                    .glassEffect(CircleShape),
+                    .glassEffect(CircleShape)
+                    .clickable { context.startActivity(com.cranezo.ui.support.SupportActivity.intent(context, com.cranezo.ui.support.SupportRoutes.NOTIFICATIONS)) },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -87,7 +91,7 @@ fun HomeHeader(
                     modifier = Modifier.size(dimen_20)
                 )
                 // Unread dot
-                Box(
+                if (unread == null || unread > 0)                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(top = dimen_9, end = dimen_9)

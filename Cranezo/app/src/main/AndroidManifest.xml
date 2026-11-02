@@ -66,6 +66,20 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Cranezo" />
         <activity
+            android:name=".ui.operator.OperatorActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.ownerjobs.OwnerJobActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.support.SupportActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
             android:name=".ui.booking.BookingActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"

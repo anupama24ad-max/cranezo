@@ -119,7 +119,9 @@ data class BookingCrane(
     val rating: Double? = null,
     val reviews_count: Int? = null,
     val verified: Boolean? = null,
-    val operator_included: Boolean? = null
+    val operator_included: Boolean? = null,
+    val capacity_label: String? = null,
+    val registration_number: String? = null
 )
 
 data class BookingOperator(
@@ -158,7 +160,17 @@ data class BookingPayment(
     val advance_percent: Int? = null,
     val advance_amount: Double? = null,
     val remaining_amount: Double? = null,
-    val paid_amount: Double? = null
+    val paid_amount: Double? = null,
+    val status_label: String? = null,
+    val booking_amount: Double? = null,
+    val booking_hours: Double? = null,
+    val extra_minutes: Int? = null,
+    val extra_time_amount: Double? = null,
+    val final_total: Double? = null,
+    val balance_due: Double? = null,
+    val payment_reference: String? = null,
+    val paid_at: String? = null,
+    val payment_methods: List<PaymentMethodOption>? = null
 )
 
 data class Booking(
@@ -182,7 +194,22 @@ data class Booking(
     val seconds_left: Int? = null,
     val decline_reason: String? = null,
     val cancel_reason: String? = null,
-    val created_at: String? = null
+    val created_at: String? = null,
+    val tab: String? = null,
+    val tab_label: String? = null,
+    val stage: String? = null,
+    val job: BookingJobInfo? = null,
+    val timeline: List<com.cranezo.ui.ownerjobs.model.TimelineStep>? = null,
+    val summary_rows: SummaryRows? = null,
+    val timers: com.cranezo.ui.operator.model.JobTimers? = null,
+    val usage: UsageInfo? = null,
+    val extension: ExtensionInfo? = null,
+    val job_summary: JobSummaryInfo? = null,
+    val receipt: ReceiptInfo? = null,
+    val cancellation: CancellationInfo? = null,
+    val rebook: RebookInfo? = null,
+    @com.google.gson.annotations.SerializedName("rating") val rating_info: RatingInfo? = null,
+    val actions: BookingActions? = null
 )
 
 object BookingStatus {
@@ -266,3 +293,170 @@ data class AppNotification(
 )
 
 data class UnreadCount(val unread: Int? = null)
+
+// ---- After the booking is confirmed: the job, extra time, payment, rating ----
+
+data class BookingJobInfo(
+    val stage: String? = null,
+    val stage_label: String? = null,
+    val en_route_at: String? = null,
+    val arrived_at: String? = null,
+    val can_confirm_arrival: Boolean? = null,
+    val arrival_confirmed_at: String? = null,
+    val work_started_at: String? = null,
+    val work_ended_at: String? = null,
+    val completion_otp: String? = null,
+    val completion_otp_expires_at: String? = null,
+    val completed_at: String? = null,
+    val final_amount: Double? = null
+)
+
+data class SummaryRows(
+    val booking_date: String? = null,
+    val location: String? = null,
+    val estimated_duration: String? = null,
+    val estimated_amount: Double? = null,
+    val payment_status: String? = null
+)
+
+data class CurrentEstimate(val amount: Double? = null, val hourly_rate: Double? = null, val note: String? = null)
+
+data class UsageInfo(
+    val started_at: String? = null,
+    val elapsed_seconds: Long? = null,
+    val booked_seconds: Long? = null,
+    val used_seconds: Long? = null,
+    val remaining_seconds: Long? = null,
+    val overtime_seconds: Long? = null,
+    val percent_used: Double? = null,
+    val overtime_warning: Boolean? = null,
+    val current_estimate: CurrentEstimate? = null
+)
+
+data class ExtensionRequest(
+    val id: String? = null,
+    val code: String? = null,
+    val minutes: Int? = null,
+    val label: String? = null,
+    val amount: Double? = null,
+    val hourly_rate: Double? = null,
+    val message: String? = null,
+    val status: Int? = null,
+    val status_label: String? = null,
+    val requested_at: String? = null,
+    val expires_at: String? = null,
+    val seconds_left: Int? = null,
+    val responded_at: String? = null,
+    val reject_reason: String? = null,
+    val current_start_at: String? = null,
+    val current_end_at: String? = null,
+    val new_end_at: String? = null
+)
+
+data class ExtensionInfo(
+    val pending: ExtensionRequest? = null,
+    val approved_minutes: Int? = null,
+    val approved_amount: Double? = null,
+    val history: List<ExtensionRequest>? = null,
+    val can_request: Boolean? = null,
+    val options: List<Int>? = null,
+    val step_minutes: Int? = null,
+    val max_minutes: Int? = null,
+    val hourly_rate: Double? = null,
+    val response_minutes: Int? = null
+)
+
+data class ExtensionResult(val extension: ExtensionRequest? = null, val booking: Booking? = null)
+
+data class JobSummaryInfo(val started_at: String? = null, val completed_at: String? = null, val total_usage_seconds: Long? = null)
+
+data class ReceiptInfo(
+    val payment_id: String? = null,
+    val paid_at: String? = null,
+    val booking_amount: Double? = null,
+    val extra_time_amount: Double? = null,
+    val total_amount: Double? = null,
+    val advance_paid: Double? = null,
+    val final_payment: Double? = null,
+    val total_paid: Double? = null,
+    val method_name: String? = null
+)
+
+data class RefundInfo(val status: String? = null, val status_label: String? = null, val amount: Double? = null)
+
+data class CancellationInfo(
+    val cancelled_by: String? = null,
+    val cancelled_by_label: String? = null,
+    val cancelled_at: String? = null,
+    val reason: String? = null,
+    val refund: RefundInfo? = null
+)
+
+data class RebookDuration(val type: String? = null, val hours: Int? = null, val days: Int? = null)
+
+data class RebookInfo(
+    val crane_id: String? = null,
+    val crane_type: Int? = null,
+    val capacity: Int? = null,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val site_name: String? = null,
+    val site_address: String? = null,
+    val duration: RebookDuration? = null
+)
+
+data class RatingInfo(val rated: Boolean? = null, val rating: Int? = null, val comment: String? = null)
+
+data class BookingActions(
+    val can_cancel: Boolean? = null,
+    val can_modify: Boolean? = null,
+    val can_track: Boolean? = null,
+    val can_confirm_arrival: Boolean? = null,
+    val can_request_extra_time: Boolean? = null,
+    val can_pay: Boolean? = null,
+    val can_rate: Boolean? = null,
+    val can_view_receipt: Boolean? = null
+)
+
+// ---- My Jobs, Track My Cranes ----
+
+data class JobCounts(val upcoming: Int? = null, val active: Int? = null, val completed: Int? = null, val cancelled: Int? = null)
+
+data class MyJobCrane(
+    val id: String? = null,
+    val crane_code: String? = null,
+    val title: String? = null,
+    val capacity_label: String? = null,
+    val primary_photo: String? = null
+)
+
+data class MyJobItem(
+    val booking_id: String? = null,
+    val booking_code: String? = null,
+    val status: Int? = null,
+    val status_label: String? = null,
+    val tab: String? = null,
+    val tab_label: String? = null,
+    val stage: String? = null,
+    val crane: MyJobCrane? = null,
+    val location: String? = null,
+    val start_at: String? = null,
+    val end_at: String? = null,
+    val amount: Double? = null,
+    val payment_status: String? = null,
+    val can_rate: Boolean? = null
+)
+
+data class ActiveOperator(val full_name: String? = null, val rating: Double? = null, val reviews_count: Int? = null)
+
+data class ActiveTrack(
+    val booking_id: String? = null,
+    val booking_code: String? = null,
+    val crane: MyJobCrane? = null,
+    val operator: ActiveOperator? = null,
+    val stage: String? = null,
+    val tag: String? = null,
+    val distance_km: Double? = null,
+    val eta_minutes: Int? = null,
+    val crane_location: CraneLocation? = null
+)

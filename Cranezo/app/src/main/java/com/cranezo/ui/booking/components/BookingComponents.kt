@@ -39,12 +39,16 @@ fun BookingScaffold(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     title: String = stringResource(R.string.bk_title),
+    subtitle: String? = null,
+    action: (@Composable () -> Unit)? = null,
     step: Int? = null,
     bottom: (@Composable () -> Unit)? = null,
     content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit
 ) {
     MyProfileScaffold(
         title = title,
+        subtitle = subtitle,
+        action = action,
         onBack = onBack,
         modifier = modifier,
         bottom = bottom,

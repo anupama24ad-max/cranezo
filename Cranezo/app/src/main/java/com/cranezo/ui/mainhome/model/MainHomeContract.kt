@@ -3,6 +3,7 @@ package com.cranezo.ui.mainhome.model
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.PrecisionManufacturing
@@ -26,6 +27,7 @@ sealed class Dest(val route: String) {
     object Earnings : Dest("earnings")
     object Help : Dest("help")
     object Hire : Dest("hire")
+    object Track : Dest("track")
     object BookCrane : Dest("book_crane")
     object Profile : Dest("profile")
 }
@@ -55,7 +57,7 @@ object MainHomeTabs {
             TabItem(Dest.Home, R.string.tab_home, Icons.Default.Home),
             TabItem(Dest.Jobs, R.string.tab_my_jobs, Icons.Default.Work),
             TabItem(Dest.BookCrane, R.string.tab_book_crane, Icons.Default.PrecisionManufacturing, isCenterAction = true),
-            TabItem(Dest.Hire, R.string.tab_hire, Icons.Default.PersonSearch),
+            TabItem(Dest.Track, R.string.tab_track, Icons.Default.LocationOn),
             TabItem(Dest.Profile, R.string.tab_profile, Icons.Default.Person)
         )
 

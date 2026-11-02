@@ -27,6 +27,12 @@ object BookingRoutes {
     const val CONFIRMED = "confirmed"
     const val TRACK = "track"
     const val BOOKINGS = "bookings"
+    const val DETAILS = "details"
+    const val EXTRA = "extra"
+    const val EXTRA_STATUS = "extra_status"
+    const val PAY = "pay"
+    const val PAID = "paid"
+    const val ACTIVE_TRACKING = "active_tracking"
 }
 
 /**
@@ -40,6 +46,12 @@ class BookingActivity :
     companion object {
         private const val EXTRA_ROUTE = "route"
 
+        private const val EXTRA_BOOKING = "booking_id"
+
+        /** Opens one booking (from a notification). */
+        fun bookingIntent(context: Context, bookingId: String): Intent =
+            intent(context, BookingRoutes.BOOKINGS).putExtra(EXTRA_BOOKING, bookingId)
+
         fun intent(context: Context, route: String = BookingRoutes.TYPE): Intent =
             Intent(context, BookingActivity::class.java).putExtra(EXTRA_ROUTE, route)
     }
@@ -48,6 +60,8 @@ class BookingActivity :
     override fun Content(vm: BookingViewModel) {
         val nav = rememberNavController()
         val start = intent.getStringExtra(EXTRA_ROUTE) ?: BookingRoutes.TYPE
+        // Opened from a notification: that booking's screen, by its stage
+        LaunchedEffect(Unit) { intent.getStringExtra(EXTRA_BOOKING)?.let { vm.onIntent(BookingIntent.OpenBooking(it)) } }
 
         LaunchedEffect(Unit) {
             vm.effect.collect { effect ->
@@ -129,7 +143,23 @@ class BookingActivity :
                 BookingConfirmedScreen(vm, onTrack = { nav.navigate(BookingRoutes.TRACK) }, onClose = leave)
             }
             composable(BookingRoutes.TRACK) { TrackScreen(vm, onBack = leave) }
-            composable(BookingRoutes.BOOKINGS) { BookingListScreen(vm, onBack = leave) }
+            composable(BookingRoutes.BOOKINGS) { MyJobsScreen(vm, onBack = leave) }
+            composable(BookingRoutes.DETAILS) {
+                JobDetailsScreen(
+                    vm,
+                    onBack = leave,
+                    onTrack = { nav.navigate(BookingRoutes.TRACK) },
+                    onExtra = { nav.navigate(BookingRoutes.EXTRA) },
+                    onExtraStatus = { nav.navigate(BookingRoutes.EXTRA_STATUS) },
+                    onPay = { nav.navigate(BookingRoutes.PAY) },
+                    onReceipt = { nav.navigate(BookingRoutes.PAID) }
+                )
+            }
+            composable(BookingRoutes.EXTRA) { ExtraTimeRequestScreen(vm, onBack = leave) }
+            composable(BookingRoutes.EXTRA_STATUS) { ExtraTimeStatusScreen(vm, onBack = leave) }
+            composable(BookingRoutes.PAY) { FinalPaymentScreen(vm, onBack = leave) }
+            composable(BookingRoutes.PAID) { PaymentSuccessfulScreen(vm, onBack = leave) }
+            composable(BookingRoutes.ACTIVE_TRACKING) { TrackMyCranesScreen(vm, onBack = leave) }
         }
     }
 }

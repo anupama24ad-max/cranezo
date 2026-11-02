@@ -88,6 +88,15 @@ class BookingViewModel @Inject constructor(
             BookingIntent.CancelBooking -> cancelBooking()
 
             is BookingIntent.OpenBooking -> openBooking(intent.bookingId)
+            BookingIntent.ConfirmArrival -> confirmArrival()
+            is BookingIntent.RequestExtra -> extensionCall("extension/request", intent.minutes, intent.message)
+            BookingIntent.CancelExtra -> extensionCall("extension/cancel", null, "")
+            is BookingIntent.Pay -> payOrRate("pay", JSONObject().put("payment_method", intent.method), BookingRoutes.PAID)
+            is BookingIntent.Rate -> payOrRate("rate", JSONObject().put("rating", intent.stars).also { if (intent.comment.isNotBlank()) it.put("comment", intent.comment) }, null)
+            is BookingIntent.LoadJobs -> loadJobs(intent.tab, reset = true)
+            BookingIntent.LoadMoreJobs -> loadJobs(_uiState.value.jobsTab, reset = false)
+            BookingIntent.LoadActiveTracking -> loadActiveTracking()
+            BookingIntent.BookAgain -> bookAgain()
             is BookingIntent.LoadBookings -> loadBookings(intent.group, reset = true)
             BookingIntent.LoadMoreBookings -> loadBookings(bookingsGroup, reset = false)
             BookingIntent.LoadPolicy -> loadPolicy()
@@ -338,9 +347,7 @@ class BookingViewModel @Inject constructor(
                         response?.data?.let { b ->
                             _uiState.update { it.copy(booking = b) }
                             _effect.send(
-                                BookingEffect.Go(
-                                    if (b.status == 0) BookingRoutes.WAITING else BookingRoutes.CONFIRMED
-                                )
+                                BookingEffect.Go(BookingRoutes.DETAILS)
                             )
                         }
                     },
@@ -422,5 +429,136 @@ class BookingViewModel @Inject constructor(
                 }
             )
         }
+    }
+    // ---------------------------------------------------------------------------------------
+    // After the booking is confirmed: arrival, extra time, payment, rating, My Jobs
+    // ---------------------------------------------------------------------------------------
+
+    private fun currentId() = _uiState.value.booking?.booking_id
+
+    /** "Start Job": the customer accepts the crane on site. The booking is fetched again afterwards. */
+    private fun confirmArrival() {
+        val id = currentId() ?: return
+        runWhenOnline {
+            setIsLoading(true)
+            repo.bookingActionApi(headers(), "confirm-arrival", JSONObject().put("booking_id", id)).isRequestCallSuspendSuccess(
+                success = { pollBooking(id) },
+                failure = { _, _, m ->
+                    fail(m)
+                    pollBooking(id)
+                }
+            )
+            setIsLoading(false)
+        }
+    }
+
+    /** extension/request (minutes + optional message) or extension/cancel. Both answer with { extension, booking }. */
+    private fun extensionCall(path: String, minutes: Int?, message: String) {
+        val id = currentId() ?: return
+        val body = JSONObject().put("booking_id", id)
+        minutes?.let { body.put("minutes", it) }
+        if (message.isNotBlank()) body.put("message", message)
+        runWhenOnline {
+            setIsLoading(true)
+            repo.extensionApi(headers(), path, body).isRequestCallSuspendSuccess(
+                success = { r ->
+                    r?.data?.booking?.let { b -> _uiState.update { it.copy(booking = b) } }
+                    _effect.send(if (minutes != null) BookingEffect.Go(BookingRoutes.EXTRA_STATUS) else BookingEffect.Go(BookingRoutes.DETAILS, popUpTo = BookingRoutes.EXTRA_STATUS))
+                },
+                failure = { _, _, m ->
+                    fail(m)
+                    pollBooking(id)
+                }
+            )
+            setIsLoading(false)
+        }
+    }
+
+    /** pay (COD) and rate answer with the booking, which replaces the local copy. */
+    private fun payOrRate(action: String, extra: JSONObject, goTo: String?) {
+        val id = currentId() ?: return
+        runWhenOnline {
+            setIsLoading(true)
+            repo.bookingActionApi(headers(), action, extra.put("booking_id", id)).isRequestCallSuspendSuccess(
+                success = { r ->
+                    r?.data?.let { b -> _uiState.update { it.copy(booking = b) } }
+                    if (goTo != null) _effect.send(BookingEffect.Go(goTo, popUpTo = BookingRoutes.PAY))
+                    else showSuccess(string(R.string.bk_msg_rated), autoHideMs = 2000L)
+                },
+                failure = { _, _, m ->
+                    fail(m)
+                    pollBooking(id)
+                }
+            )
+            setIsLoading(false)
+        }
+    }
+
+    private fun loadJobs(tab: String, reset: Boolean) {
+        val s = _uiState.value
+        if (!reset && !s.jobsHasMore) return
+        val min = if (reset) 0 else s.jobsNextMin
+        if (reset) _uiState.update { it.copy(jobsTab = tab, jobs = if (tab != it.jobsTab) emptyList() else it.jobs, jobsLoaded = false) }
+        runWhenOnline {
+            if (reset) {
+                repo.jobCountsApi(headers()).isRequestCallSuspendSuccess(
+                    success = { r -> _uiState.update { it.copy(counts = r?.data) } },
+                    failure = { _, _, m -> fail(m) }
+                )
+            }
+            val body = JSONObject().put("tab", tab).put("min", min).put("max", min + PAGE)
+            repo.myJobsApi(headers(), body).isRequestCallSuspendSuccess(
+                success = { r ->
+                    val page = r?.data.orEmpty()
+                    _uiState.update {
+                        if (it.jobsTab != tab) return@update it
+                        val known = if (reset) emptyList() else it.jobs
+                        it.copy(
+                            jobs = known + page.filter { j -> known.none { k -> k.booking_id == j.booking_id } },
+                            jobsLoaded = true,
+                            jobsHasMore = r?.pagination?.has_more == true,
+                            jobsNextMin = r?.pagination?.max ?: (min + PAGE)
+                        )
+                    }
+                },
+                failure = { _, _, m ->
+                    _uiState.update { it.copy(jobsLoaded = true) }
+                    fail(m)
+                }
+            )
+        }
+    }
+
+    private fun loadActiveTracking() {
+        viewModelScope.launch {
+            repo.activeTrackingApi(headers()).isRequestCallSuspendSuccess(
+                success = { r -> _uiState.update { it.copy(activeTracks = r?.data.orEmpty(), activeLoaded = true) } },
+                failure = { _, _, _ -> _uiState.update { it.copy(activeLoaded = true) } }
+            )
+        }
+    }
+
+    /** Book Again: the steps are pre-filled from the old booking; date and time are chosen again. */
+    private fun bookAgain() {
+        val r = _uiState.value.booking?.rebook ?: return
+        _uiState.update {
+            it.copy(
+                craneType = r.crane_type ?: it.craneType,
+                capacity = r.capacity ?: it.capacity,
+                latitude = r.latitude,
+                longitude = r.longitude,
+                siteName = r.site_name.orEmpty(),
+                siteAddress = r.site_address.orEmpty(),
+                startType = "now",
+                date = "",
+                time = "",
+                durationType = r.duration?.type ?: "hours",
+                hours = r.duration?.hours ?: it.hours,
+                days = r.duration?.days ?: it.days,
+                results = emptyList(),
+                searched = false
+            )
+        }
+        viewModelScope.launch { _effect.send(BookingEffect.Go(BookingRoutes.DATETIME)) }
     }
 }

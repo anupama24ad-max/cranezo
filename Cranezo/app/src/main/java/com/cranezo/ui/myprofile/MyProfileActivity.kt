@@ -82,7 +82,13 @@ class MyProfileActivity :
             composable(ProfileRoutes.NOTIFICATIONS) { NotificationSettingsScreen(vm, leave) }
             composable(ProfileRoutes.TERMS) { TermsScreen(vm, leave) }
             composable(ProfileRoutes.PRIVACY) { PrivacyScreen(vm, leave) }
-            composable(ProfileRoutes.HELP) { HelpSupportScreen(leave) }
+            composable(ProfileRoutes.HELP) {
+                // Help & Support has its own screens now
+                LaunchedEffect(Unit) {
+                    startActivity(com.cranezo.ui.support.SupportActivity.intent(this@MyProfileActivity, com.cranezo.ui.support.SupportRoutes.HELP))
+                    finish()
+                }
+            }
             composable(ProfileRoutes.DOCUMENTS) { OperatorDocumentsScreen(vm, leave) }
             composable(
                 ProfileRoutes.CRANE,

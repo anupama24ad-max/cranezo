@@ -51,6 +51,19 @@ import androidx.compose.ui.platform.LocalContext
 import com.cranezo.ui.cranes.CranesActivity
 import com.cranezo.ui.cranes.MyCranesScreen
 import com.cranezo.ui.myprofile.MyProfileActivity
+import com.cranezo.ui.myprofile.ProfileRoutes
+import com.cranezo.ui.operator.NewJobAlert
+import com.cranezo.ui.operator.OperatorActivity
+import com.cranezo.ui.ownerjobs.OwnerEarningsTab
+import com.cranezo.ui.ownerjobs.OwnerEarningsViewModel
+import com.cranezo.ui.ownerjobs.OwnerJobActivity
+import com.cranezo.ui.ownerjobs.OwnerJobsTab
+import com.cranezo.ui.ownerjobs.OwnerJobsViewModel
+import com.cranezo.ui.operator.OperatorEarningsTab
+import com.cranezo.ui.operator.OperatorHomeTab
+import com.cranezo.ui.operator.OperatorJobsTab
+import com.cranezo.ui.operator.OperatorTabsViewModel
+import com.cranezo.ui.operator.model.OperatorTabsIntent
 import com.cranezo.ui.mainhome.model.MyCranesState
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeTabs
@@ -89,12 +102,43 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
     }
     val openProfile: (String) -> Unit = { route -> profileLauncher.launch(MyProfileActivity.intent(context, route)) }
 
+    // Operator: Home, Jobs and Earnings come from the Operator Jobs APIs; one job opens in its own screen
+    val opVm: OperatorTabsViewModel? = (context as? androidx.activity.ComponentActivity)
+        ?.takeIf { state.role == UserRole.OPERATOR }
+        ?.let { activity -> remember { androidx.lifecycle.ViewModelProvider(activity)[OperatorTabsViewModel::class.java] } }
+    val openJob: (String) -> Unit = { id -> context.startActivity(OperatorActivity.intent(context, id)) }
+
+    // Owner: Jobs and Earnings tabs; a job opens in its own screen (details or live location)
+    val ownerActivity = (context as? androidx.activity.ComponentActivity)?.takeIf { state.role == UserRole.CRANE_OWNER }
+    val ownerJobsVm: OwnerJobsViewModel? = ownerActivity?.let { a -> remember { androidx.lifecycle.ViewModelProvider(a)[OwnerJobsViewModel::class.java] } }
+    val ownerEarningsVm: OwnerEarningsViewModel? = ownerActivity?.let { a -> remember { androidx.lifecycle.ViewModelProvider(a)[OwnerEarningsViewModel::class.java] } }
+    // Customer: Home is driven by POST /home/customer
+    val customerHomeVm: com.cranezo.ui.customerhome.CustomerHomeViewModel? = (context as? androidx.activity.ComponentActivity)
+        ?.takeIf { state.role == UserRole.CUSTOMER }
+        ?.let { a -> remember { androidx.lifecycle.ViewModelProvider(a)[com.cranezo.ui.customerhome.CustomerHomeViewModel::class.java] } }
+    val openOwnerJob: (String) -> Unit = { id -> context.startActivity(OwnerJobActivity.intent(context, id)) }
+    val openOwnerLive: (String) -> Unit = { id -> context.startActivity(OwnerJobActivity.intent(context, id, live = true)) }
+    val incomingJob = opVm?.uiState?.collectAsStateWithLifecycle()?.value?.incomingJob
+    if (opVm != null && incomingJob != null) {
+        NewJobAlert(
+            onView = {
+                opVm.onIntent(OperatorTabsIntent.DismissIncoming)
+                openJob(incomingJob)
+            },
+            onLater = { opVm.onIntent(OperatorTabsIntent.DismissIncoming) }
+        )
+    }
+
     // The bottom bar (and the screens behind it) depend on the user's role
     val tabs = MainHomeTabs.forRole(state.role)
 
     val navigateTo: (String) -> Unit = { route ->
         if (state.role == UserRole.CUSTOMER && route == Dest.BookCrane.route) {
             context.startActivity(BookingActivity.intent(context))
+        } else if (route == Dest.Help.route) {
+            context.startActivity(com.cranezo.ui.support.SupportActivity.intent(context, com.cranezo.ui.support.SupportRoutes.HELP))
+        } else if (state.role == UserRole.CUSTOMER && route == Dest.Track.route) {
+            context.startActivity(BookingActivity.intent(context, BookingRoutes.ACTIVE_TRACKING))
         } else if (state.role == UserRole.CUSTOMER && route == Dest.Jobs.route) {
             context.startActivity(BookingActivity.intent(context, BookingRoutes.BOOKINGS))
         } else if (tabs.any { it.dest.route == route }) {
@@ -136,7 +180,21 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
                 tabs.forEach { tab ->
                     composable(tab.dest.route) {
                         when (tab.dest) {
-                            Dest.Home -> RoleHomeScreen(state, navigateTo, onIntent, addCrane)
+                            Dest.Home -> if (opVm != null) OperatorHomeTab(
+                                vm = opVm,
+                                onOpenJob = openJob,
+                                onOpenJobs = { navigateTo(Dest.Jobs.route) },
+                                onOpenEarnings = { navigateTo(Dest.Earnings.route) },
+                                onOpenDocuments = { openProfile(ProfileRoutes.DOCUMENTS) },
+                                onOpenCrane = { id -> openProfile(ProfileRoutes.crane(id)) }
+                            ) else if (customerHomeVm != null) com.cranezo.ui.customerhome.CustomerHomeTab(customerHomeVm, onProfile = { navigateTo(Dest.Profile.route) })
+                            else RoleHomeScreen(state, navigateTo, onIntent, addCrane)
+                            Dest.Jobs -> if (opVm != null) OperatorJobsTab(opVm, openJob)
+                            else if (ownerJobsVm != null) OwnerJobsTab(ownerJobsVm, state.userName, openOwnerJob, openOwnerLive)
+                            else TabPlaceholderScreen(stringResource(tab.titleRes), tab.icon)
+                            Dest.Earnings -> if (opVm != null) OperatorEarningsTab(opVm, openJob)
+                            else if (ownerEarningsVm != null) OwnerEarningsTab(ownerEarningsVm, state.userName, openOwnerJob)
+                            else TabPlaceholderScreen(stringResource(tab.titleRes), tab.icon)
                             Dest.MyCranes -> MyCranesScreen(
                                 state = cranes,
                                 onAddCrane = addCrane,
