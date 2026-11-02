@@ -23,6 +23,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import javax.inject.Inject
+import com.cranezo.ui.booking.model.*
 
 class Repository @Inject constructor(val api: RestApi) {
 
@@ -215,5 +216,39 @@ class Repository @Inject constructor(val api: RestApi) {
         headers: Map<String, String>, jsonObj: JSONObject = JSONObject(),
     ): Resource<ApiResult<Any>?> =
         safeApiCall(conflictAsError = true) { api.logoutApi(headers, json(jsonObj)) }
+
+    // ---- Booking, Crane Requests, Notifications ----
+
+    suspend fun bookingOptionsApi(h: Map<String, String>): Resource<ApiResult<BookingOptions>?> =
+        safeApiCall(conflictAsError = true) { api.bookingOptionsApi("customer/booking/options", h, json(JSONObject())) }
+
+    suspend fun searchCranesApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<List<AvailableCrane>>?> =
+        safeApiCall(conflictAsError = true) { api.availableCranesApi("customer/booking/search", h, json(body)) }
+
+    suspend fun craneForBookingApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<AvailableCrane>?> =
+        safeApiCall(conflictAsError = true) { api.craneForBookingApi("customer/booking/crane-details", h, json(body)) }
+
+    /** [action] is create, get or cancel. */
+    suspend fun bookingActionApi(h: Map<String, String>, action: String, body: JSONObject): Resource<ApiResult<Booking>?> =
+        safeApiCall(conflictAsError = true) { api.bookingApi("customer/booking/$action", h, json(body)) }
+
+    suspend fun bookingListApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<List<Booking>>?> =
+        safeApiCall(conflictAsError = true) { api.bookingListApi("customer/booking/list", h, json(body)) }
+
+    suspend fun trackApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<TrackInfo>?> =
+        safeApiCall(conflictAsError = true) { api.trackApi("customer/booking/track", h, json(body)) }
+
+    /** [action] is get, accept or decline. */
+    suspend fun ownerRequestApi(h: Map<String, String>, action: String, body: JSONObject): Resource<ApiResult<OwnerRequest>?> =
+        safeApiCall(conflictAsError = true) { api.ownerRequestApi("owner/requests/$action", h, json(body)) }
+
+    suspend fun notificationsApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<List<AppNotification>>?> =
+        safeApiCall(conflictAsError = true) { api.notificationsApi("notifications/list", h, json(body)) }
+
+    suspend fun unreadCountApi(h: Map<String, String>): Resource<ApiResult<UnreadCount>?> =
+        safeApiCall(conflictAsError = true) { api.unreadCountApi("notifications/unread-count", h, json(JSONObject())) }
+
+    suspend fun markReadApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<Any>?> =
+        safeApiCall(conflictAsError = true) { api.plainPostApi("notifications/mark-read", h, json(body)) }
 
 }

@@ -37,6 +37,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cranezo.ui.chooserole.UserRole
+import com.cranezo.ui.booking.BookingActivity
+import com.cranezo.ui.mainhome.components.OwnerRequestHost
+import com.cranezo.ui.booking.BookingRoutes
 import com.cranezo.ui.components.ScreenBackground
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.glassEffect
@@ -90,7 +93,11 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
     val tabs = MainHomeTabs.forRole(state.role)
 
     val navigateTo: (String) -> Unit = { route ->
-        if (tabs.any { it.dest.route == route }) {
+        if (state.role == UserRole.CUSTOMER && route == Dest.BookCrane.route) {
+            context.startActivity(BookingActivity.intent(context))
+        } else if (state.role == UserRole.CUSTOMER && route == Dest.Jobs.route) {
+            context.startActivity(BookingActivity.intent(context, BookingRoutes.BOOKINGS))
+        } else if (tabs.any { it.dest.route == route }) {
             nav.navigate(route) {
                 popUpTo(nav.graph.startDestinationId) {
                     saveState = true
@@ -100,6 +107,15 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
             }
         }
     }
+
+    // Owner: "New Crane Request" popup and "Booking Accepted"
+    OwnerRequestHost(
+        request = state.request,
+        accepted = state.requestAccepted,
+        onAccept = { onIntent(MainHomeIntent.AcceptRequest) },
+        onDecline = { onIntent(MainHomeIntent.DeclineRequest) },
+        onDismiss = { onIntent(MainHomeIntent.DismissRequest) }
+    )
 
     ScreenBackground {
         Scaffold(

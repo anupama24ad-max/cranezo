@@ -187,7 +187,7 @@ fun StatTile(
             .padding(horizontal = dimen_10, vertical = dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconBadge(icon = icon, accent = accent)
+        IconBadge(icon = icon, accent = accent,modifier = Modifier.size(dimen_50))
         Spacer(modifier = Modifier.width(dimen_10))
         Column {
             Textview(

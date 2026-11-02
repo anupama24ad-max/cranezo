@@ -136,7 +136,10 @@ data class MainHomeUiState(
     val isOnline: Boolean = false,
     val owner: OwnerHomeData = OwnerHomeData(),
     val customer: CustomerHomeData = CustomerHomeData(),
-    val operator: OperatorHomeData = OperatorHomeData()
+    val operator: OperatorHomeData = OperatorHomeData(),
+    // Owner: the "New Crane Request" popup, and its "Booking Accepted" state
+    val request: com.cranezo.ui.booking.model.OwnerRequest? = null,
+    val requestAccepted: Boolean = false
 )
 
 /** The owner's My Cranes list, loaded page by page from POST /owner/getCranes. */
@@ -154,6 +157,9 @@ data class MyCranesState(
 sealed interface MainHomeIntent {
     data object RefreshCranes : MainHomeIntent
     data object RefreshProfile : MainHomeIntent
+    data object AcceptRequest : MainHomeIntent
+    data object DeclineRequest : MainHomeIntent
+    data object DismissRequest : MainHomeIntent
     data object LoadMoreCranes : MainHomeIntent
     data object ToggleOnline : MainHomeIntent
     data class ThemeSelected(val mode: AppThemeMode) : MainHomeIntent

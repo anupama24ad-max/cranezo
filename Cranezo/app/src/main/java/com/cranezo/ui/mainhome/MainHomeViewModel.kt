@@ -7,6 +7,9 @@ import com.cranezo.R
 import com.cranezo.api.isRequestCallSuspendSuccess
 import com.cranezo.repository.Repository
 import com.cranezo.ui.chooserole.UserRole
+import com.cranezo.ui.booking.model.AppNotification
+import com.cranezo.ui.booking.model.OwnerRequest
+import kotlinx.coroutines.delay
 import com.cranezo.ui.mainhome.model.MainHomeEffect
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeUiState
@@ -76,6 +79,14 @@ class MainHomeViewModel @Inject constructor(
             fetchProfile()
             if (loadCranes) fetchCranes(min = 0, reset = true)
         }
+        if (role == UserRole.CRANE_OWNER) {
+            viewModelScope.launch {
+                while (true) {
+                    runCatching { pollRequests() }
+                    delay(10_000)
+                }
+            }
+        }
     }
 
     fun onIntent(intent: MainHomeIntent) {
@@ -85,6 +96,12 @@ class MainHomeViewModel @Inject constructor(
             MainHomeIntent.LoadMoreCranes -> loadCranes(reset = false)
 
             MainHomeIntent.RefreshProfile -> runWhenOnline { fetchProfile() }
+
+            MainHomeIntent.AcceptRequest -> respondToRequest(accept = true)
+
+            MainHomeIntent.DeclineRequest -> respondToRequest(accept = false)
+
+            MainHomeIntent.DismissRequest -> _uiState.update { it.copy(request = null, requestAccepted = false) }
 
             MainHomeIntent.ToggleOnline -> _uiState.update { it.copy(isOnline = !it.isOnline) }
 
@@ -172,6 +189,65 @@ class MainHomeViewModel @Inject constructor(
             sm.setData(AppStrings.SessionValues.languageId, languageId)
             store.clear()
             _effect.send(MainHomeEffect.NavigateToLogin)
+        }
+    }
+    // ---------------------------------------------------------------------------------------
+    // Owner: the buzzer. Push needs Firebase (not set up yet), so the app asks every 10 seconds.
+    // ---------------------------------------------------------------------------------------
+
+    private var lastUnread = -1
+    private val seenRequests = mutableSetOf<String>()
+
+    private suspend fun pollRequests() {
+        if (_uiState.value.request != null) return // a popup is open
+        val headers = AppMethods.getToken(sm)
+
+        var unread = -1
+        repo.unreadCountApi(headers).isRequestCallSuspendSuccess(success = { unread = it?.data?.unread ?: -1 })
+        if (unread < 0) return
+        if (unread == lastUnread) return
+        lastUnread = unread
+        if (unread == 0) return
+
+        var items = emptyList<AppNotification>()
+        repo.notificationsApi(headers, JSONObject().put("unread_only", true).put("min", 0).put("max", 20))
+            .isRequestCallSuspendSuccess(success = { items = it?.data.orEmpty() })
+
+        for (item in items) {
+            val id = item.id ?: continue
+            val bookingId = item.data?.get("booking_id") as? String ?: continue
+            if (item.type != "booking_request" || !seenRequests.add(id)) continue
+
+            var request: OwnerRequest? = null
+            repo.ownerRequestApi(headers, "get", JSONObject().put("booking_id", bookingId))
+                .isRequestCallSuspendSuccess(success = { request = it?.data })
+            // Whatever the answer, this notification has been dealt with
+            repo.markReadApi(headers, JSONObject().put("ids", org.json.JSONArray().put(id)))
+
+            val open = request
+            if (open != null && open.can_respond == true) {
+                _uiState.update { it.copy(request = open, requestAccepted = false) }
+                return
+            }
+        }
+    }
+
+    private fun respondToRequest(accept: Boolean) {
+        val bookingId = _uiState.value.request?.booking_id ?: return
+        viewModelScope.launch {
+            val headers = AppMethods.getToken(sm)
+            repo.ownerRequestApi(headers, if (accept) "accept" else "decline", JSONObject().put("booking_id", bookingId))
+                .isRequestCallSuspendSuccess(
+                    success = { response ->
+                        if (accept) _uiState.update { it.copy(request = response?.data ?: it.request, requestAccepted = true) }
+                        else _uiState.update { it.copy(request = null, requestAccepted = false) }
+                    },
+                    // Already answered, expired or the crane is busy: show the reason and close the popup
+                    failure = { _, _, message ->
+                        showError(message?.takeIf { m -> m.isNotBlank() } ?: string(R.string.crane_msg_generic_error), autoHideMs = 2500L)
+                        _uiState.update { it.copy(request = null, requestAccepted = false) }
+                    }
+                )
         }
     }
 }

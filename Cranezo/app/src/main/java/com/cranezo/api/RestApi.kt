@@ -23,6 +23,8 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Part
+import retrofit2.http.Url
+import com.cranezo.ui.booking.model.*
 
 
 interface RestApi {
@@ -206,5 +208,39 @@ interface RestApi {
         @HeaderMap headers: Map<String, String>,
         @Body jsonObject: RequestBody? = null
     ): Response<ApiResult<Any>>
+
+
+
+    // ---- Booking, Crane Requests, Notifications (all POST with a JSON body; the path is passed in) ----
+
+    @POST
+    suspend fun bookingOptionsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<BookingOptions>>
+
+    @POST
+    suspend fun availableCranesApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<AvailableCrane>>>
+
+    @POST
+    suspend fun craneForBookingApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<AvailableCrane>>
+
+    @POST
+    suspend fun bookingApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<Booking>>
+
+    @POST
+    suspend fun bookingListApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<Booking>>>
+
+    @POST
+    suspend fun trackApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<TrackInfo>>
+
+    @POST
+    suspend fun ownerRequestApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<OwnerRequest>>
+
+    @POST
+    suspend fun notificationsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<AppNotification>>>
+
+    @POST
+    suspend fun unreadCountApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<UnreadCount>>
+
+    @POST
+    suspend fun plainPostApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<Any>>
 
 }

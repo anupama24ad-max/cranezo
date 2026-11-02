@@ -64,6 +64,7 @@ fun MyProfileScaffold(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     bottom: (@Composable () -> Unit)? = null,
+    topContent: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     ScreenBackground(darkImageRes = R.drawable.app_bg) {
@@ -75,6 +76,7 @@ fun MyProfileScaffold(
                 .imePadding()
         ) {
             CraneScreenHeader(title = title, subtitle = subtitle, onBack = onBack)
+            topContent?.invoke()
             Column(
                 modifier = Modifier
                     .weight(1f)
