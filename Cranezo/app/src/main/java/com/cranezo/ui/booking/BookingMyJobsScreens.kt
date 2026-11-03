@@ -425,11 +425,11 @@ fun TrackMyCranesScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                 Spacer(modifier = Modifier.height(dimen_8))
                 Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
                     Column(modifier = Modifier.weight(1f).clip(RoundedCornerShape(dimen_10)).background(appColors.subtleFill).padding(dimen_8)) {
-                        Textview(stringResource(R.string.bk_distance).uppercase(), size = font_8, color = appColors.textSecondary)
+                        Textview(stringResource(R.string.bk_distance).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(if (t.distance_km != null) stringResource(R.string.cj_km, String.format(Locale.US, "%.1f", t.distance_km)) else "–", size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     }
                     Column(modifier = Modifier.weight(1f).clip(RoundedCornerShape(dimen_10)).background(appColors.subtleFill).padding(dimen_8)) {
-                        Textview(stringResource(R.string.bk_eta).uppercase(), size = font_8, color = appColors.textSecondary)
+                        Textview(stringResource(R.string.bk_eta).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(if (t.eta_minutes != null) stringResource(R.string.bk_eta_min, t.eta_minutes) else "–", size = font_13, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     }
                 }

@@ -72,6 +72,8 @@ class MainHomeViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
+        // Keep this phone's push token on the server (job requests, arrivals, payments arrive as push)
+        com.cranezo.push.CranezoMessagingService.syncToken(viewModelScope, repo, sm)
         // One network check for both calls: calls started in parallel would cancel each other's
         val loadCranes = role == UserRole.CRANE_OWNER
         if (loadCranes) _cranes.update { it.copy(isLoading = true, error = null) }

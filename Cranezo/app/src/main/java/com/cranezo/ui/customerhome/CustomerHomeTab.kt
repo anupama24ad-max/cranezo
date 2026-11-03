@@ -161,25 +161,20 @@ fun CustomerHomeTab(
 
         BannerCarousel(home?.banners.orEmpty().sortedBy { it.sort_order ?: 0 }) { runBannerAction(context, it, onProfile) }
 
-        val quick = home?.quick_access.orEmpty()
-        if (quick.isNotEmpty()) {
-            Textview(stringResource(R.string.home_quick_access), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Row(modifier = Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
-                quick.forEach { item ->
-                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = dimen_120), contentPadding = dimen_14, onClick = { openScreen(context, item.screen, onProfile) }) {
-                        Box {
-                            IconBadge(icon = quickIcon(item.icon), accent = if (item.icon == "jobs") InfoBlue else AmberPrimary, size = dimen_36)
-                            if ((item.badge ?: 0) > 0) {
-                                Box(
-                                    modifier = Modifier.align(Alignment.TopEnd).size(dimen_16).clip(CircleShape).background(Red),
-                                    contentAlignment = Alignment.Center
-                                ) { Textview(item.badge.toString(), size = font_8, color = Color.White, fontWeight = FontWeight.Bold) }
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(dimen_10))
-                        Textview(item.title.orEmpty(), size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 2)
-                        Textview(item.subtitle.orEmpty(), size = font_10, color = appColors.textSecondary, maxLines = 2)
+        // Quick links, minus the ones the bottom bar already has (Track, My Jobs). One full-width row each,
+        // so long titles in Hindi or Telugu never squeeze into narrow columns.
+        val quick = home?.quick_access.orEmpty().filterNot { it.screen == "track" || it.screen == "my_jobs" }
+        quick.forEach { item ->
+            GlassCard(contentPadding = dimen_14, minHeight = dimen_56, onClick = { openScreen(context, item.screen, onProfile) }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBadge(icon = quickIcon(item.icon), accent = AmberPrimary, size = dimen_36)
+                    Spacer(modifier = Modifier.width(dimen_12))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(item.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                        Textview(item.subtitle.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
                     }
+                    if ((item.badge ?: 0) > 0) BookingTag(item.badge.toString(), Red)
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
                 }
             }
         }

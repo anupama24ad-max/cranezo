@@ -277,8 +277,8 @@ private fun DateBlock(startAt: String?) {
         verticalArrangement = Arrangement.Center
     ) {
         Textview(serverDay(startAt), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-        Textview(serverMonth(startAt), size = font_8, color = appColors.textSecondary)
-        Textview(serverYear(startAt), size = font_8, color = appColors.textHint)
+        Textview(serverMonth(startAt), size = font_10, color = appColors.textSecondary)
+        Textview(serverYear(startAt), size = font_10, color = appColors.textHint)
     }
 }
 

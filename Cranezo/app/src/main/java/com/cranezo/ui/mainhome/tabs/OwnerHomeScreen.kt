@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import com.cranezo.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.ScreenBackground
 import com.cranezo.ui.mainhome.components.HomeHeader
@@ -105,58 +106,12 @@ fun OwnerHomeScreen(
             }
         )
 
-        SectionTitle(
-            text = stringResource(R.string.home_quick_actions),
-            subtitle = stringResource(R.string.home_quick_actions_subtitle)
+        // One action. My Cranes, Jobs and Earnings are already in the bottom bar and the cards above.
+        CommonGradientButton(
+            text = stringResource(R.string.home_add_crane),
+            leftIcon = Icons.Default.Add,
+            onClick = onAddCrane
         )
-
-        Column(verticalArrangement = Arrangement.spacedBy(dimen_12)) {
-            TwoColumnRow(
-                left = {
-                    QuickActionTile(
-                        title = stringResource(R.string.home_add_crane),
-                        subtitle = stringResource(R.string.home_add_crane_subtitle),
-                        icon = Icons.Default.Add,
-                        accent = AmberPrimary,
-                        highlighted = true,
-                        modifier = it,
-                        onClick = onAddCrane
-                    )
-                },
-                right = {
-                    QuickActionTile(
-                        title = stringResource(R.string.tab_my_cranes),
-                        subtitle = stringResource(R.string.home_my_cranes_subtitle),
-                        icon = Icons.Default.PrecisionManufacturing,
-                        accent = InfoBlue,
-                        modifier = it,
-                        onClick = { onNavigate(Dest.MyCranes.route) }
-                    )
-                }
-            )
-            TwoColumnRow(
-                left = {
-                    QuickActionTile(
-                        title = stringResource(R.string.tab_jobs),
-                        subtitle = stringResource(R.string.home_jobs_subtitle),
-                        icon = Icons.Default.Work,
-                        accent = InfoBlue,
-                        modifier = it,
-                        onClick = { onNavigate(Dest.Jobs.route) }
-                    )
-                },
-                right = {
-                    QuickActionTile(
-                        title = stringResource(R.string.home_earnings),
-                        subtitle = stringResource(R.string.home_earnings_subtitle),
-                        icon = Icons.Default.BarChart,
-                        accent = InfoBlue,
-                        modifier = it,
-                        onClick = { onNavigate(Dest.Earnings.route) }
-                    )
-                }
-            )
-        }
     }
 }
 

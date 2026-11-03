@@ -78,7 +78,8 @@ object AppModule {
         sslContext.init(null, trustAllCerts, SecureRandom())
         val sslSocketFactory = sslContext.socketFactory
         val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        // Full request logs only in debug builds: release builds must not print tokens or personal data
+        loggingInterceptor.setLevel(if (com.cranezo.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE)
         val builder = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
             .addInterceptor(object : Interceptor {
                 override fun intercept(chain: Interceptor.Chain): Response {

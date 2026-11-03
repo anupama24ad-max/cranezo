@@ -8,6 +8,7 @@ import com.cranezo.core.composecore.BaseVMComposeActivity
 import com.cranezo.ui.chooselanguage.ChooseLanguageActivity
 import com.cranezo.ui.chooselanguage.ChooseLanguageViewModel
 import com.cranezo.ui.mainhome.MainHomeActivity
+import com.cranezo.push.PushNotifications
 
 import com.cranezo.utils.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,9 +41,15 @@ class SplashActivity : BaseVMComposeActivity<SplashViewModel>(SplashViewModel::c
 
     fun navigations() {
         // A signed-in user goes straight to the home, everyone else starts the onboarding flow
-        val next = if (sm.isUserLoggedIn()) MainHomeActivity::class.java
-        else ChooseLanguageActivity::class.java
-        startActivity(Intent(this, next))
+        if (!sm.isUserLoggedIn()) {
+            startActivity(Intent(this, ChooseLanguageActivity::class.java))
+            finish()
+            return
+        }
+        // Opened by tapping a push while the app was closed: Home, then the push's own screen
+        val target = intent?.extras?.let { PushNotifications.targetIntent(this, it, sm.getUserRole()) }
+        if (target != null) startActivities(arrayOf(Intent(this, MainHomeActivity::class.java), target))
+        else startActivity(Intent(this, MainHomeActivity::class.java))
         finish()
     }
 

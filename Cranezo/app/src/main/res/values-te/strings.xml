@@ -837,4 +837,46 @@
     <string name="sp_msg_closed">అభ్యర్థన ముగిసింది</string>
     <string name="ch_welcome">స్వాగతం</string>
     <string name="ch_no_recent">ఇంకా బుకింగ్‌లు లేవు. మీ మొదటి క్రేన్ బుక్ చేయండి</string>
+
+    <!-- Simplified operator flow, customer timer, push channels -->
+    <string name="op_step_of">దశ %1$d / %2$d</string>
+    <string name="op_step_accept">పని అంగీకరించండి</string>
+    <string name="op_step_accept_hint">వివరాలు చూసి అంగీకరించండి నొక్కండి.</string>
+    <string name="op_step_go">సైట్‌కు వెళ్ళండి</string>
+    <string name="op_step_go_hint">Google Maps చూసి వెళ్ళండి. సైట్ వద్ద పసుపు బటన్ నొక్కండి.</string>
+    <string name="op_step_safety">ఫోటో మరియు భద్రతా తనిఖీ</string>
+    <string name="op_step_safety_hint">సైట్ ఫోటో తీయండి, తర్వాత ప్రతి భద్రతా అంశాన్ని టిక్ చేయండి.</string>
+    <string name="op_step_work">పని జరుగుతోంది</string>
+    <string name="op_step_work_hint">చూపిన సమయం వరకు పని చేయండి. పూర్తయ్యాక పని ముగించండి నొక్కండి.</string>
+    <string name="op_step_finish">పని ముగించి కస్టమర్ కోడ్ తీసుకోండి</string>
+    <string name="op_step_finish_hint">కస్టమర్ యాప్‌లోని 6 అంకెల కోడ్ అడగండి.</string>
+    <string name="op_you_earn">మీ సంపాదన</string>
+    <string name="op_when">తేదీ మరియు సమయం</string>
+    <string name="op_map">మ్యాప్</string>
+    <string name="op_time_worked">పని చేసిన సమయం</string>
+    <string name="op_status_working">పని జరుగుతోంది</string>
+    <string name="op_status_waiting">ఆపబడింది, వేచి ఉంది</string>
+    <string name="op_started_at">%1$s కి ప్రారంభమైంది</string>
+    <string name="op_waited_for">వేచి ఉన్న సమయం %1$s</string>
+    <string name="op_pause_waiting">ఆపండి: నేను వేచి ఉన్నాను</string>
+    <string name="op_resume_work">పని మళ్ళీ ప్రారంభించండి</string>
+    <string name="op_problem_at_site">సైట్‌లో సమస్య ఉందా?</string>
+    <string name="op_open_google_maps">Google Maps తెరవండి</string>
+    <string name="op_reached_button">నేను సైట్‌కు చేరుకున్నాను</string>
+    <string name="op_code_sent">కోడ్ కస్టమర్ యాప్‌లో ఉంది.</string>
+    <string name="cj_time_used">వాడిన సమయం</string>
+    <string name="cj_of_booked">బుక్ చేసిన %2$s లో %1$s</string>
+    <string name="cj_time_left">%1$s మిగిలింది</string>
+    <string name="cj_paused_waiting">ఆపరేటర్ వేచి ఉన్నారు, టైమర్ ఆగింది</string>
+    <string name="cj_confirm_arrival">క్రేన్ వచ్చిందని నిర్ధారించండి</string>
+    <string name="push_channel_urgent">పని హెచ్చరికలు</string>
+    <string name="push_channel_urgent_desc">కొత్త పనులు, క్రేన్ రాక, కస్టమర్ కోడ్ మరియు అత్యవసరాలు</string>
+    <string name="push_channel_updates">అప్‌డేట్‌లు</string>
+    <string name="push_channel_updates_desc">చెల్లింపులు, రసీదులు, ప్రకటనలు మరియు సహాయం</string>
+    <!-- Fixed booked hours (no running clock) -->
+    <string name="fh_booked_hours">బుక్ చేసిన గంటలు</string>
+    <string name="fh_n_hours">%1$d గంటలు</string>
+    <string name="fh_time_over">బుక్ చేసిన సమయం ముగిసింది</string>
+    <string name="fh_total_price">మొత్తం ధర</string>
+    <string name="fh_until">%1$s · %2$s వరకు</string>
 </resources>

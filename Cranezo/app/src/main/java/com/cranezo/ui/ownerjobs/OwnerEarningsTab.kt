@@ -162,9 +162,9 @@ fun OwnerEarningsTab(
             listOf("today" to R.string.oe_today, "week" to R.string.oe_this_week, "month" to R.string.oe_this_month, "all" to R.string.oe_total).forEach { (key, label) ->
                 val card = summary?.cards?.get(key)
                 GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_8, onClick = { onIntent(OwnerEarningsIntent.SelectPeriod(key)) }) {
-                    Textview(stringResource(label), size = font_8, color = appColors.textSecondary, maxLines = 1)
+                    Textview(stringResource(label), size = font_10, color = appColors.textSecondary, maxLines = 1)
                     Textview(rupees(card?.net ?: 0.0), size = font_11, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
-                    Textview(stringResource(R.string.oe_n_jobs, card?.jobs ?: 0), size = font_8, color = appColors.textSecondary)
+                    Textview(stringResource(R.string.oe_n_jobs, card?.jobs ?: 0), size = font_10, color = appColors.textSecondary)
                 }
             }
         }
@@ -192,7 +192,7 @@ fun OwnerEarningsTab(
                     Textview(stringResource(R.string.op_settled), size = font_12, color = SuccessGreen, fontWeight = FontWeight.Bold)
                 }
                 Textview(rupees(settled?.amount ?: 0.0), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                if (settled?.last_settled_at != null) Textview(stringResource(R.string.oe_last_settled, formatServerDate(settled.last_settled_at)), size = font_8, color = appColors.textSecondary)
+                if (settled?.last_settled_at != null) Textview(stringResource(R.string.oe_last_settled, formatServerDate(settled.last_settled_at)), size = font_10, color = appColors.textSecondary)
             }
             GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_12, borderColor = AmberPrimary) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -204,7 +204,7 @@ fun OwnerEarningsTab(
                 if (pending?.expected_by != null) {
                     Textview(
                         if ((pending.expected_in_days ?: 0) <= 0) stringResource(R.string.oe_settlement_due) else stringResource(R.string.oe_settled_in_days, pending.expected_in_days ?: 0),
-                        size = font_8, color = appColors.textSecondary
+                        size = font_10, color = appColors.textSecondary
                     )
                 }
             }
@@ -309,7 +309,7 @@ private fun TrendCard(state: OwnerEarningsState, onIntent: (OwnerEarningsIntent)
         // Every few labels, so they stay readable
         val step = ((points.size + 5) / 6).coerceAtLeast(1)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            points.filterIndexed { i, _ -> i % step == 0 }.forEach { Textview(it.label.orEmpty(), size = font_8, color = appColors.textSecondary) }
+            points.filterIndexed { i, _ -> i % step == 0 }.forEach { Textview(it.label.orEmpty(), size = font_10, color = appColors.textSecondary) }
         }
     }
 }

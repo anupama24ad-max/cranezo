@@ -129,11 +129,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
 import coil.compose.AsyncImage
 import com.cranezo.R
 import com.cranezo.ui.theme.*
@@ -1767,12 +1762,7 @@ fun <T : Any> LazyColumnListViewMinMax(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            /*   LottiePlayer(
-                   lottieRes = R.raw.app_loader,
-                   modifier = Modifier.size(150.dp),
-                   loop = true,
-                   speed = 1f
-               )*/
+            CircularProgressIndicator(color = AmberPrimary, strokeWidth = 3.dp, modifier = Modifier.size(50.dp))
         }
     } else {
         LazyColumn(
@@ -1801,12 +1791,7 @@ fun <T : Any> LazyColumnListViewMinMax(
                             .clickable(false) {},
                         contentAlignment = Alignment.Center
                     ) {
-                        /*LottiePlayer(
-                            lottieRes = R.raw.app_loader,
-                            modifier = Modifier.size(80.dp),
-                            loop = true,
-                            speed = 1f
-                        )*/
+                        CircularProgressIndicator(color = AmberPrimary, strokeWidth = 3.dp, modifier = Modifier.size(27.dp))
                     }
                 }
             }
@@ -2214,29 +2199,6 @@ fun LogoutBottomSheet(
 
 }
 
-@Composable
-fun LottiePlayer(
-    lottieRes: Int, modifier: Modifier = Modifier, loop: Boolean = true, speed: Float = 1f
-) {
-    // Load the Lottie composition
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(lottieRes))
-
-    // Animate the composition
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = if (loop) LottieConstants.IterateForever else 1,
-        isPlaying = true,
-        speed = speed
-    )
-
-    // Display Lottie animation
-    LottieAnimation(
-        composition = composition,
-        progress = progress,
-        modifier = modifier,
-        contentScale = ContentScale.FillBounds // This removes extra padding
-    )
-}
 
 @Composable
 fun <T : Any> LazyGridListViewMinMax(
@@ -2282,12 +2244,7 @@ fun <T : Any> LazyGridListViewMinMax(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            /*LottiePlayer(
-                lottieRes = R.raw.app_loader,
-                modifier = Modifier.size(150.dp),
-                loop = true,
-                speed = 1f
-            )*/
+            CircularProgressIndicator(color = AmberPrimary, strokeWidth = 3.dp, modifier = Modifier.size(50.dp))
         }
     } else {
         LazyVerticalGrid(
@@ -2313,12 +2270,7 @@ fun <T : Any> LazyGridListViewMinMax(
                             .clickable(false) {},
                         contentAlignment = Alignment.Center
                     ) {
-                        /*LottiePlayer(
-                            lottieRes = R.raw.app_loader,
-                            modifier = Modifier.size(80.dp),
-                            loop = true,
-                            speed = 1f
-                        )*/
+                        CircularProgressIndicator(color = AmberPrimary, strokeWidth = 3.dp, modifier = Modifier.size(27.dp))
                     }
                 }
             }

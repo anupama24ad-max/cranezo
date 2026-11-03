@@ -284,7 +284,10 @@ class OperatorJobViewModel @Inject constructor(
     private fun finish(notes: String) {
         val b = body().put("final_photos", photosJson(_uiState.value.finalPhotos))
         if (notes.isNotBlank()) b.put("notes", notes)
-        act("jobs/finish", b)
+        // One step less for the operator: the customer code is sent right after finishing,
+        // so the app goes straight to "Enter customer code". If that call fails, the summary screen
+        // (next_action = request_customer_confirmation) still offers the button.
+        act("jobs/finish", b) { requestConfirmation() }
     }
 
     // ---------------------------------------------------------------------------------------

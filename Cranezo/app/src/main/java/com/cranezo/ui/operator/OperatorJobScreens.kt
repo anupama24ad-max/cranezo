@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.SystemClock
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -24,6 +23,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
@@ -39,7 +41,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -55,11 +56,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.cranezo.R
 import com.cranezo.ui.booking.components.BookingScaffold
 import com.cranezo.ui.booking.components.BookingTag
+import com.cranezo.ui.booking.components.FixedHoursCard
 import com.cranezo.ui.booking.components.PriceLine
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
@@ -77,16 +80,13 @@ import com.cranezo.ui.operator.model.JobCrane
 import com.cranezo.ui.operator.model.JobCustomer
 import com.cranezo.ui.operator.model.JobSite
 import com.cranezo.ui.operator.model.JobSummary
-import com.cranezo.ui.operator.model.JobTimers
 import com.cranezo.ui.operator.model.NextAction
 import com.cranezo.ui.operator.model.OperatorJob
 import com.cranezo.ui.operator.model.OperatorJobIntent
 import com.cranezo.ui.operator.model.OperatorJobState
-import com.cranezo.ui.operator.model.ProgressStep
 import com.cranezo.ui.operator.model.StartCheck
 import com.cranezo.ui.theme.*
 import com.cranezo.utils.fileUrl
-import com.cranezo.utils.formatClock
 import com.cranezo.utils.formatSeconds
 import com.cranezo.utils.formatServerDate
 import com.cranezo.utils.formatServerDateTime
@@ -231,6 +231,69 @@ private fun CameraBox(onClick: () -> Unit, uploading: Boolean, label: String) {
     }
 }
 
+/**
+ * The operator's whole job is five steps. Every job screen opens with the same header: a five-part bar,
+ * "Step 2 of 5", the step's name in large type and one short line saying what to do.
+ */
+private const val OPERATOR_STEPS = 5
+
+private fun stepOf(nextAction: String?): Int = when (nextAction) {
+    NextAction.ACCEPT_JOB -> 1
+    NextAction.START_JOURNEY, NextAction.MARK_ARRIVED -> 2
+    NextAction.SITE_PHOTOS, NextAction.CHECKLIST, NextAction.WAIT_CUSTOMER, NextAction.START_JOB -> 3
+    NextAction.MONITOR -> 4
+    NextAction.REQUEST_CONFIRMATION, NextAction.ENTER_OTP -> 5
+    else -> 0
+}
+
+@Composable
+private fun OperatorStepHeader(nextAction: String?) {
+    val step = stepOf(nextAction)
+    if (step == 0) return
+    val (title, hint) = when (step) {
+        1 -> R.string.op_step_accept to R.string.op_step_accept_hint
+        2 -> R.string.op_step_go to R.string.op_step_go_hint
+        3 -> R.string.op_step_safety to R.string.op_step_safety_hint
+        4 -> R.string.op_step_work to R.string.op_step_work_hint
+        else -> R.string.op_step_finish to R.string.op_step_finish_hint
+    }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(dimen_6), modifier = Modifier.fillMaxWidth()) {
+            repeat(OPERATOR_STEPS) { i ->
+                Box(
+                    modifier = Modifier.weight(1f).height(dimen_6).clip(CircleShape)
+                        .background(if (i < step) AmberPrimary else appColors.subtleFill)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(dimen_10))
+        Textview(stringResource(R.string.op_step_of, step, OPERATOR_STEPS).uppercase(), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
+        Textview(stringResource(title), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        Textview(stringResource(hint), size = font_13, color = appColors.textSecondary)
+    }
+}
+
+/** One line of the job card: icon on the left, small label over a bold value, optional action on the right. */
+@Composable
+private fun InfoRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    value: String,
+    sub: String? = null,
+    trailing: (@Composable () -> Unit)? = null
+) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = dimen_6)) {
+        IconBadge(icon = icon, accent = AmberPrimary, size = dimen_36)
+        Spacer(modifier = Modifier.width(dimen_12))
+        Column(modifier = Modifier.weight(1f)) {
+            Textview(label, size = font_11, color = appColors.textSecondary)
+            Textview(value, size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+            if (!sub.isNullOrBlank()) Textview(sub, size = font_12, color = appColors.textSecondary)
+        }
+        trailing?.invoke()
+    }
+}
+
 // ---------------------------------------------------------------------------------------------
 // New Job Request / Start Navigation
 // ---------------------------------------------------------------------------------------------
@@ -276,43 +339,43 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
             }
         }
     ) {
-        GlassCard(contentPadding = dimen_10) {
+        OperatorStepHeader(job.next_action)
+        // Everything about the job in one card, one line per fact
+        GlassCard(contentPadding = dimen_14) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                CraneImage(path = job.requested_crane?.primary_photo, modifier = Modifier.size(dimen_70))
+                CraneImage(path = job.assigned_crane?.primary_photo ?: job.requested_crane?.primary_photo, modifier = Modifier.size(dimen_64))
                 Spacer(modifier = Modifier.width(dimen_12))
-                Column {
-                    BookingTag(stringResource(R.string.bk_requested_crane), AmberPrimary)
-                    Textview(job.requested_crane?.title.orEmpty(), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Textview(job.requested_crane?.crane_type_name.orEmpty(), size = font_12, color = appColors.textSecondary)
-                }
-            }
-        }
-        LabelValueCard(stringResource(R.string.op_customer), job.customer?.name.orEmpty())
-        GlassCard(contentPadding = dimen_12) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.op_job_site).uppercase(), size = font_10, color = appColors.textSecondary)
-                    Textview(job.job_site?.name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Textview(job.job_site?.address.orEmpty(), size = font_11, color = appColors.textSecondary)
-                }
-                if (job.job_site?.latitude != null) {
-                    CommonGradientButton(
-                        text = stringResource(R.string.op_view_location), onClick = { openMaps(context, job.job_site, false) },
-                        height = dimen_40, textSize = font_11, modifier = Modifier.width(dimen_120),
-                        gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
+                    Textview(job.requested_crane?.title.orEmpty(), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(
+                        listOfNotNull(job.assigned_crane?.model_name, job.assigned_crane?.registration_number).joinToString("  •  "),
+                        size = font_12, color = appColors.textSecondary, maxLines = 1
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(dimen_8))
+            InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
+            InfoRow(
+                Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address,
+                trailing = if (job.job_site?.latitude != null) {
+                    {
+                        CommonGradientButton(
+                            text = stringResource(R.string.op_map), onClick = { openMaps(context, job.job_site, false) },
+                            height = dimen_36, textSize = font_12, modifier = Modifier.width(dimen_80),
+                            gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
+                        )
+                    }
+                } else null
+            )
+            InfoRow(Icons.Default.Schedule, stringResource(R.string.op_when), formatServerDateTime(job.schedule?.start_at), sub = job.duration?.label)
         }
-        LabelValueCard(
-            stringResource(R.string.op_assigned_crane), job.assigned_crane?.model_name.orEmpty(),
-            sub = job.assigned_crane?.registration_number
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
-            LabelValueCard(stringResource(R.string.bk_required_date_time), formatServerDateTime(job.schedule?.start_at), Modifier.weight(1f))
-            LabelValueCard(stringResource(R.string.bk_duration), job.duration?.label.orEmpty(), Modifier.weight(1f))
+        // The one number the operator cares about most, large
+        GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Textview(stringResource(R.string.op_you_earn), size = font_14, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+                Textview(rupees(job.estimated_earnings), size = font_24, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+            }
         }
-        LabelValueCard(stringResource(R.string.op_estimated_earnings), rupees(job.estimated_earnings))
         if (!job.special_requirements.isNullOrBlank()) {
             GlassCard(contentPadding = dimen_12) {
                 Textview(stringResource(R.string.op_special_requirements), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
@@ -345,30 +408,26 @@ private fun JourneyScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Uni
     BookingScaffold(
         onBack = onClose,
         title = stringResource(R.string.op_on_the_way),
-        bottom = { CommonGradientButton(text = stringResource(R.string.op_arrived), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
+        bottom = { CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
     ) {
+        OperatorStepHeader(job.next_action)
         GlassCard(contentPadding = dimen_14) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(job.customer?.name.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_14))
-                        Textview(job.job_site?.address.orEmpty(), size = font_11, color = appColors.textSecondary)
-                    }
-                }
-                Column(horizontalAlignment = Alignment.End) {
-                    Textview("${job.job_site?.distance_km ?: 0} km", size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Textview(stringResource(R.string.op_eta_min, job.job_site?.eta_minutes ?: 0), size = font_11, color = appColors.textSecondary)
-                }
+            InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
+            InfoRow(Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address)
+            if (job.job_site?.distance_km != null) {
+                InfoRow(
+                    Icons.Default.Navigation, stringResource(R.string.op_en_route),
+                    "${job.job_site.distance_km} km", sub = stringResource(R.string.op_eta_min, job.job_site.eta_minutes ?: 0)
+                )
             }
-            Spacer(modifier = Modifier.height(dimen_10))
-            BookingTag(stringResource(R.string.op_en_route).uppercase(), AmberPrimary)
         }
-        Textview(stringResource(R.string.op_location_shared), size = font_11, color = appColors.textHint)
+        // Turn-by-turn directions open in the Google Maps app (voice guidance in the phone's language)
         CommonGradientButton(
-            text = stringResource(R.string.op_navigate), leftIcon = Icons.Default.Navigation, onClick = { openMaps(context, job.job_site, true) },
-            enabled = job.job_site?.latitude != null
+            text = stringResource(R.string.op_open_google_maps), leftIcon = Icons.Default.Navigation, onClick = { openMaps(context, job.job_site, true) },
+            enabled = job.job_site?.latitude != null, height = dimen_56,
+            gradientColors = listOf(InfoBlue, InfoBlue), textColor = Color.White
         )
+        Textview(stringResource(R.string.op_location_shared), size = font_12, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         if (job.customer?.mobile_number != null) {
             CommonGradientButton(
                 text = stringResource(R.string.op_call_customer), leftIcon = Icons.Default.Call, onClick = { dial(context, job.customer) },
@@ -406,16 +465,7 @@ private fun SitePhotoScreen(job: OperatorJob, state: OperatorJobState, onIntent:
             )
         }
     ) {
-        GlassCard(contentPadding = dimen_12) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(dimen_22))
-                Spacer(modifier = Modifier.width(dimen_10))
-                Column {
-                    Textview(stringResource(R.string.op_reached_site), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Textview("${job.customer?.name.orEmpty()} · ${formatServerTime(job.arrival?.arrived_at)}", size = font_11, color = appColors.textSecondary)
-                }
-            }
-        }
+        OperatorStepHeader(job.next_action)
         CameraBox(onClick = picker::openChooser, uploading = state.isUploading, label = stringResource(R.string.op_take_site_photo))
         GlassCard(contentPadding = dimen_12) {
             listOf(R.string.op_photo_req_1, R.string.op_photo_req_2, R.string.op_photo_req_3).forEach {
@@ -464,34 +514,30 @@ private fun ChecklistScreen(job: OperatorJob, state: OperatorJobState, onIntent:
     val checklist = state.checklist
 
     BookingScaffold(onBack = onClose, title = stringResource(R.string.op_safety_checklist)) {
-        CraneHeaderCard(job.assigned_crane)
-        GlassCard(contentPadding = dimen_12) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_18))
-                Spacer(modifier = Modifier.width(dimen_8))
-                Textview(job.job_site?.address ?: job.job_site?.name.orEmpty(), size = font_12, color = appColors.textPrimary, modifier = Modifier.weight(1f))
-            }
-        }
+        OperatorStepHeader(job.next_action)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Textview(stringResource(R.string.op_checklist), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             Textview(
                 stringResource(R.string.op_n_of_m_completed, checklist?.completed_count ?: 0, checklist?.total ?: 0),
-                size = font_11, color = appColors.textSecondary
+                size = font_13, color = appColors.primaryText, fontWeight = FontWeight.SemiBold
             )
         }
-        // Rendered as the server sent it
+        // Rendered as the server sent it. The whole row is the tap target; a ticked row turns green.
         checklist?.items.orEmpty().forEach { item ->
             val done = item.done == true
-            GlassCard(contentPadding = dimen_12, onClick = { item.key?.let { onIntent(OperatorJobIntent.TickChecklist(it, !done)) } }) {
+            GlassCard(
+                contentPadding = dimen_14, borderColor = if (done) SuccessGreen else Color.Unspecified,
+                onClick = { item.key?.let { onIntent(OperatorJobIntent.TickChecklist(it, !done)) } }
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        if (done) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
-                        contentDescription = null, tint = if (done) AmberPrimary else appColors.textSecondary, modifier = Modifier.size(dimen_24)
+                        if (done) Icons.Default.CheckCircle else Icons.Default.CheckBoxOutlineBlank,
+                        contentDescription = null, tint = if (done) SuccessGreen else appColors.textSecondary, modifier = Modifier.size(dimen_30)
                     )
-                    Spacer(modifier = Modifier.width(dimen_12))
-                    Column {
-                        Textview(item.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                        Textview(item.description.orEmpty(), size = font_11, color = appColors.textSecondary)
+                    Spacer(modifier = Modifier.width(dimen_14))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(item.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                        Textview(item.description.orEmpty(), size = font_12, color = appColors.textSecondary)
                     }
                 }
             }
@@ -519,7 +565,8 @@ private fun ArrivalWaitScreen(job: OperatorJob, onIntent: (OperatorJobIntent) ->
     }
 
     BookingScaffold(onBack = onClose, title = stringResource(R.string.op_job_title)) {
-        Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_16), horizontalAlignment = Alignment.CenterHorizontally) {
+        OperatorStepHeader(job.next_action)
+        Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_8), horizontalAlignment = Alignment.CenterHorizontally) {
             IconBadge(icon = Icons.Default.LocationOn, accent = AmberPrimary, size = dimen_70, filled = true)
             Spacer(modifier = Modifier.height(dimen_12))
             Textview(stringResource(R.string.op_reached_site), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
@@ -557,7 +604,7 @@ private fun StartJobScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Un
             CommonGradientButton(text = stringResource(R.string.op_start_job), onClick = { onIntent(OperatorJobIntent.StartJob) }, enabled = job.can_start == true)
         }
     ) {
-        CraneHeaderCard(job.assigned_crane)
+        OperatorStepHeader(job.next_action)
         job.start_checks.orEmpty().forEach { check ->
             GlassCard(contentPadding = dimen_12) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -579,24 +626,6 @@ private fun StartJobScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Un
 // ---------------------------------------------------------------------------------------------
 // Job Monitoring and Photos & Notes
 // ---------------------------------------------------------------------------------------------
-
-/** Working and waiting seconds, ticking on the phone from the server's values (the phone clock is not used). */
-@Composable
-private fun rememberTimers(timers: JobTimers?): Pair<Long, Long> {
-    val receivedAt = remember(timers) { SystemClock.elapsedRealtime() }
-    var elapsed by remember(timers) { mutableLongStateOf(0L) }
-    val running = timers?.work_started_at != null && timers.work_ended_at == null
-    LaunchedEffect(timers) {
-        while (running) {
-            delay(1000)
-            elapsed = (SystemClock.elapsedRealtime() - receivedAt) / 1000
-        }
-    }
-    val waiting = timers?.is_waiting == true
-    val working = (timers?.working_seconds ?: 0L) + if (running && !waiting) elapsed else 0L
-    val waited = (timers?.waiting_seconds ?: 0L) + if (running && waiting) elapsed else 0L
-    return working to waited
-}
 
 @Composable
 private fun MonitorScreen(
@@ -627,87 +656,40 @@ private fun MonitorScreen(
         return
     }
 
-    val (working, waited) = rememberTimers(job.timers)
-    val isWaiting = job.timers?.is_waiting == true
-
     BookingScaffold(
         onBack = onClose,
         title = stringResource(R.string.op_job_monitoring),
         bottom = { CommonGradientButton(text = stringResource(R.string.op_finish_job), onClick = { finishing = true }) }
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            BookingTag(stringResource(R.string.op_active).uppercase(), SuccessGreen)
-            Spacer(modifier = Modifier.weight(1f))
-            Column(horizontalAlignment = Alignment.End) {
-                Textview(stringResource(R.string.op_booking_code, job.booking_code.orEmpty()), size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                Textview(formatServerTime(job.timers?.work_started_at), size = font_10, color = appColors.textSecondary)
-            }
-        }
-        CraneHeaderCard(job.assigned_crane)
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
-            GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_12) {
-                Textview(stringResource(R.string.op_working_duration), size = font_11, color = if (isWaiting) appColors.textSecondary else SuccessGreen)
-                Textview(formatClock(working), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            }
-            GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_12) {
-                Textview(stringResource(R.string.op_waiting_duration), size = font_11, color = if (isWaiting) appColors.primaryText else appColors.textSecondary)
-                Textview(formatClock(waited), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(dimen_6))
-                CommonGradientButton(
-                    text = stringResource(if (isWaiting) R.string.op_stop_waiting else R.string.op_add_waiting),
-                    onClick = { onIntent(OperatorJobIntent.ToggleWaiting(!isWaiting)) },
-                    height = dimen_30, textSize = font_10,
-                    gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
-                )
-            }
-        }
+        OperatorStepHeader(job.next_action)
+        // Fixed hours: the booked window and the time left, no running clock
+        FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration?.label)
         if (pendingExtra != null) {
-            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary, onClick = { extraOpen = true }) {
-                Textview(stringResource(R.string.op_extra_time_request), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.Bold)
-                Textview(stringResource(R.string.op_extra_requested_sub), size = font_11, color = appColors.textSecondary)
+            GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = { extraOpen = true }) {
+                Textview(stringResource(R.string.op_extra_time_request), size = font_15, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+                Textview(stringResource(R.string.op_extra_requested_sub), size = font_12, color = appColors.textSecondary)
             }
         }
-        GlassCard(contentPadding = dimen_14) {
-            Textview(stringResource(R.string.op_job_progress), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(dimen_8))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                job.progress.orEmpty().forEach { step -> ProgressDot(step) }
-            }
-        }
+        // Problems: grouped at the bottom, out of the way of the normal work
+        Spacer(modifier = Modifier.height(dimen_4))
+        Textview(stringResource(R.string.op_problem_at_site), size = font_13, color = appColors.textSecondary, fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
             CommonGradientButton(
                 text = stringResource(R.string.op_break_down), modifier = Modifier.weight(1f), onClick = { onReport("breakdown") },
-                height = dimen_40, textSize = font_12, gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
+                leftIcon = Icons.Default.Build, height = dimen_48, textSize = font_13,
+                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
             )
             CommonGradientButton(
                 text = stringResource(R.string.op_report_issue), modifier = Modifier.weight(1f), onClick = { onReport("issue") },
-                height = dimen_40, textSize = font_12, gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
+                leftIcon = Icons.Default.Warning, height = dimen_48, textSize = font_13,
+                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
             )
         }
         CommonGradientButton(
             text = stringResource(R.string.op_emergency), leftIcon = Icons.Default.Emergency, onClick = { onReport("emergency") },
-            height = dimen_40, textSize = font_12, gradientColors = listOf(Red, DarkRed), textColor = Color.White
+            height = dimen_48, textSize = font_14, gradientColors = listOf(Red, DarkRed), textColor = Color.White
         )
         Spacer(modifier = Modifier.height(dimen_8))
-    }
-}
-
-@Composable
-private fun ProgressDot(step: ProgressStep) {
-    val color = when (step.state) {
-        "done" -> SuccessGreen
-        "ongoing" -> SuccessGreen
-        else -> appColors.subtleBorder
-    }
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier.size(dimen_20).clip(CircleShape).background(if (step.state == "done") color else Color.Transparent).border(dimen_2, color, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            if (step.state == "done") Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color.Black, modifier = Modifier.size(dimen_14))
-        }
-        Textview(step.label.orEmpty(), size = font_10, color = appColors.textPrimary, maxLines = 1)
-        Textview(if (step.at != null) formatServerTime(step.at) else "", size = font_8, color = appColors.textSecondary)
     }
 }
 
@@ -899,12 +881,10 @@ private fun SummaryRows(summary: JobSummary?) {
     GlassCard(contentPadding = dimen_14) {
         Textview(stringResource(R.string.op_job_timing), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(dimen_6))
+        PriceLine(stringResource(R.string.fh_booked_hours), summary.base_hours?.let { stringResource(R.string.fh_n_hours, it.toInt()) } ?: "-")
         PriceLine(stringResource(R.string.op_start_time), formatServerTime(summary.start_time))
         PriceLine(stringResource(R.string.op_end_time), formatServerTime(summary.end_time))
-        PriceLine(stringResource(R.string.op_total_duration), formatSeconds(summary.total_seconds))
-        PriceLine(stringResource(R.string.op_working_time), formatSeconds(summary.working_seconds), valueColor = SuccessGreen)
-        PriceLine(stringResource(R.string.op_waiting_time), formatSeconds(summary.waiting_seconds), valueColor = AmberPrimary)
-        PriceLine(stringResource(R.string.op_extra_time), formatSeconds(summary.extra_seconds), valueColor = InfoBlue)
+        if ((summary.extra_seconds ?: 0L) > 0) PriceLine(stringResource(R.string.op_extra_time), formatSeconds(summary.extra_seconds), valueColor = InfoBlue)
     }
     GlassCard(contentPadding = dimen_14) {
         Textview(stringResource(R.string.op_earnings_summary), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
@@ -925,7 +905,7 @@ private fun SummaryScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Uni
         title = stringResource(R.string.op_job_summary),
         bottom = { CommonGradientButton(text = stringResource(R.string.op_request_confirmation), onClick = { onIntent(OperatorJobIntent.RequestConfirmation) }) }
     ) {
-        CraneHeaderCard(job.assigned_crane, job.customer?.name)
+        OperatorStepHeader(job.next_action)
         SummaryRows(job.summary)
     }
 }
@@ -943,29 +923,31 @@ private fun OtpScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, o
             )
         }
     ) {
-        CraneHeaderCard(job.assigned_crane, job.customer?.name)
-        GlassCard(contentPadding = dimen_12, borderColor = SuccessGreen) {
-            Textview(stringResource(R.string.op_job_completed), size = font_14, color = SuccessGreen, fontWeight = FontWeight.Bold)
-            Textview(stringResource(R.string.op_get_otp), size = font_12, color = appColors.textSecondary)
-        }
+        OperatorStepHeader(job.next_action)
+        // What was done, in two numbers
         GlassCard(contentPadding = dimen_14) {
+            PriceLine(stringResource(R.string.fh_booked_hours), job.duration?.label ?: "-")
             PriceLine(stringResource(R.string.op_final_amount), rupees(job.summary?.final_amount ?: job.settlement?.final_amount), bold = true)
         }
-        GlassInputField(
-            label = stringResource(R.string.op_enter_otp),
-            value = otp,
-            onValueChange = { otp = it.filter(Char::isDigit).take(6) },
-            placeholder = "••••••",
-            keyboardType = KeyboardType.NumberPassword
-        )
-        Textview(stringResource(R.string.op_otp_hint), size = font_11, color = appColors.textHint)
-        job.completion?.attempts_left?.let {
-            Textview(stringResource(R.string.op_attempts_left, it), size = font_11, color = appColors.textSecondary)
+        GlassCard(contentPadding = dimen_16, borderColor = AmberPrimary) {
+            Textview(stringResource(R.string.op_code_sent), size = font_13, color = appColors.textSecondary)
+            Spacer(modifier = Modifier.height(dimen_10))
+            GlassInputField(
+                label = stringResource(R.string.op_enter_otp),
+                value = otp,
+                onValueChange = { otp = it.filter(Char::isDigit).take(6) },
+                placeholder = "0 0 0 0 0 0",
+                keyboardType = KeyboardType.NumberPassword
+            )
+            job.completion?.attempts_left?.let {
+                Textview(stringResource(R.string.op_attempts_left, it), size = font_12, color = appColors.textSecondary)
+            }
         }
         // A new code replaces the old one
         Textview(
-            stringResource(R.string.op_resend_code), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.clickable { onIntent(OperatorJobIntent.RequestConfirmation) }
+            stringResource(R.string.op_resend_code), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().clickable { onIntent(OperatorJobIntent.RequestConfirmation) }.padding(vertical = dimen_12)
         )
     }
 }

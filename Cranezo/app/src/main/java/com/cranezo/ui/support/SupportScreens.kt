@@ -631,7 +631,7 @@ private fun MessageBubble(m: TicketMessage) {
                                 .clickable { fileUrl(path)?.let { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } }
                         )
                     }
-                    Textview(formatServerTime(m.created_at), size = font_8, color = if (mine) Color.Black.copy(alpha = 0.6f) else appColors.textHint, modifier = Modifier.align(Alignment.End))
+                    Textview(formatServerTime(m.created_at), size = font_10, color = if (mine) Color.Black.copy(alpha = 0.6f) else appColors.textHint, modifier = Modifier.align(Alignment.End))
                 }
             }
         }

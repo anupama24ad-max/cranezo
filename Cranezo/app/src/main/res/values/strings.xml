@@ -990,4 +990,46 @@
     <string name="sp_msg_closed">Request closed</string>
     <string name="ch_welcome">Welcome</string>
     <string name="ch_no_recent">No bookings yet. Book your first crane</string>
+
+    <!-- Simplified operator flow, customer timer, push channels -->
+    <string name="op_step_of">Step %1$d of %2$d</string>
+    <string name="op_step_accept">Accept the job</string>
+    <string name="op_step_accept_hint">Check the details and tap Accept.</string>
+    <string name="op_step_go">Go to the site</string>
+    <string name="op_step_go_hint">Follow Google Maps. At the site, tap the yellow button.</string>
+    <string name="op_step_safety">Photo and safety check</string>
+    <string name="op_step_safety_hint">Take one site photo, then tick every safety item.</string>
+    <string name="op_step_work">Work in progress</string>
+    <string name="op_step_work_hint">Work until the end time shown. Tap Finish Job when done.</string>
+    <string name="op_step_finish">Finish and get the customer code</string>
+    <string name="op_step_finish_hint">Ask the customer for the 6-digit code in their app.</string>
+    <string name="op_you_earn">You earn</string>
+    <string name="op_when">Date and time</string>
+    <string name="op_map">Map</string>
+    <string name="op_time_worked">Time worked</string>
+    <string name="op_status_working">Working</string>
+    <string name="op_status_waiting">Paused, waiting</string>
+    <string name="op_started_at">Started at %1$s</string>
+    <string name="op_waited_for">Waiting time %1$s</string>
+    <string name="op_pause_waiting">Pause: I am waiting</string>
+    <string name="op_resume_work">Resume work</string>
+    <string name="op_problem_at_site">Problem at the site?</string>
+    <string name="op_open_google_maps">Open Google Maps</string>
+    <string name="op_reached_button">I have reached the site</string>
+    <string name="op_code_sent">The customer has the code in their app.</string>
+    <string name="cj_time_used">Time used</string>
+    <string name="cj_of_booked">%1$s of %2$s booked</string>
+    <string name="cj_time_left">%1$s left</string>
+    <string name="cj_paused_waiting">Paused while the operator waits</string>
+    <string name="cj_confirm_arrival">Confirm crane arrived</string>
+    <string name="push_channel_urgent">Job alerts</string>
+    <string name="push_channel_urgent_desc">New jobs, crane arrival, customer code and emergencies</string>
+    <string name="push_channel_updates">Updates</string>
+    <string name="push_channel_updates_desc">Payments, receipts, announcements and support</string>
+    <!-- Fixed booked hours (no running clock) -->
+    <string name="fh_booked_hours">Booked hours</string>
+    <string name="fh_n_hours">%1$d hours</string>
+    <string name="fh_time_over">Booked time is over</string>
+    <string name="fh_total_price">Total price</string>
+    <string name="fh_until">%1$s · until %2$s</string>
 </resources>

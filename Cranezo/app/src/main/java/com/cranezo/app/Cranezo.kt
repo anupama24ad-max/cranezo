@@ -21,8 +21,9 @@ class Cranezo : Application(), Application.ActivityLifecycleCallbacks {
 
     override fun onCreate() {
         super.onCreate()
-//        FirebaseApp.initializeApp(this)
         instance = this
+        // Push notification channels (urgent job alerts, normal updates)
+        com.cranezo.push.PushNotifications.createChannels(this)
         sm = SessionManager(this)
         com.cranezo.ui.theme.AppThemeState.init(this)
 

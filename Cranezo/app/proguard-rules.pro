@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# ---- Cranezo ----
+# API models are read and written by Gson through reflection: keep their field names.
+-keepclassmembers class com.cranezo.** { <fields>; }
+-keep class com.cranezo.**.model.** { *; }
+-keep class com.cranezo.api.** { *; }
+-keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod
+-keep class * extends com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken

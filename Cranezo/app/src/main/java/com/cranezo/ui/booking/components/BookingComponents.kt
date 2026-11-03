@@ -33,6 +33,18 @@ import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.glassEffect
 import com.cranezo.ui.myprofile.components.MyProfileScaffold
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.sp
+import com.cranezo.ui.components.GlassCard
+import com.cranezo.utils.compactMinutes
+import com.cranezo.utils.formatServerTime
+import com.cranezo.utils.serverMillis
+import kotlinx.coroutines.delay
 import com.cranezo.ui.theme.*
 
 /** Frame of every Book a Crane screen. [step] 1..5 shows the progress line under the title. */
@@ -111,7 +123,7 @@ fun StepIndicator(current: Int) {
                 Spacer(modifier = Modifier.height(dimen_4))
                 Textview(
                     text = stringResource(label),
-                    size = font_8,
+                    size = font_10,
                     color = if (number == current) AmberPrimary else appColors.textSecondary,
                     maxLines = 1,
                     textAlign = TextAlign.Center
@@ -228,3 +240,54 @@ fun BookingTag(text: String, color: Color) {
 }
 
 private fun Modifier.androidxHeightIn(min: androidx.compose.ui.unit.Dp): Modifier = this.heightIn(min = min)
+
+/**
+ * Bookings are sold in fixed hours, so job screens show the booked window instead of a running clock:
+ * "8 Hours", "09:00 AM - 05:00 PM", a bar and "3h 20m left". The end time comes from the server and
+ * already includes approved extra time. It refreshes every 30 seconds; nothing ticks every second.
+ * Used by the customer (Job In Progress), owner (job monitoring) and operator (step 4).
+ */
+@Composable
+fun FixedHoursCard(startAt: String?, endAt: String?, durationLabel: String?, modifier: Modifier = Modifier) {
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(endAt) {
+        while (true) {
+            delay(30_000)
+            now = System.currentTimeMillis()
+        }
+    }
+    val start = serverMillis(startAt)
+    val end = serverMillis(endAt)
+    val minutesLeft = end?.let { ((it - now) / 60_000L).toInt() }
+    val endingSoon = minutesLeft != null && minutesLeft in 0..15
+    val over = minutesLeft != null && minutesLeft < 0
+    val progress = if (start != null && end != null && end > start) ((now - start).toFloat() / (end - start)).coerceIn(0f, 1f) else 0f
+
+    GlassCard(modifier = modifier, contentPadding = dimen_20) {
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Textview(stringResource(R.string.fh_booked_hours), size = font_13, color = appColors.textSecondary)
+            Textview(durationLabel ?: "-", size = 32.sp, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Textview(
+                "${formatServerTime(startAt)}  –  ${formatServerTime(endAt)}",
+                size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+            )
+        }
+        if (minutesLeft != null) {
+            Spacer(modifier = Modifier.height(dimen_16))
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth().height(dimen_8).clip(CircleShape),
+                color = if (over || endingSoon) Red else AmberPrimary, trackColor = appColors.subtleFill
+            )
+            Spacer(modifier = Modifier.height(dimen_8))
+            Textview(
+                text = when {
+                    over -> stringResource(R.string.fh_time_over)
+                    else -> stringResource(R.string.cj_time_left, compactMinutes(minutesLeft))
+                },
+                size = font_14, color = if (over || endingSoon) Red else appColors.textPrimary, fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}

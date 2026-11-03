@@ -837,4 +837,46 @@
     <string name="sp_msg_closed">अनुरोध बंद हो गया</string>
     <string name="ch_welcome">स्वागत है</string>
     <string name="ch_no_recent">अभी कोई बुकिंग नहीं। अपनी पहली क्रेन बुक करें</string>
+
+    <!-- Simplified operator flow, customer timer, push channels -->
+    <string name="op_step_of">चरण %1$d / %2$d</string>
+    <string name="op_step_accept">काम स्वीकार करें</string>
+    <string name="op_step_accept_hint">जानकारी देखें और स्वीकार करें दबाएँ।</string>
+    <string name="op_step_go">साइट पर जाएँ</string>
+    <string name="op_step_go_hint">Google Maps देखकर जाएँ। साइट पर पीला बटन दबाएँ।</string>
+    <string name="op_step_safety">फोटो और सुरक्षा जाँच</string>
+    <string name="op_step_safety_hint">साइट की एक फोटो लें, फिर हर सुरक्षा बिंदु पर टिक करें।</string>
+    <string name="op_step_work">काम चल रहा है</string>
+    <string name="op_step_work_hint">दिखाए गए समय तक काम करें। काम खत्म होने पर काम खत्म करें दबाएँ।</string>
+    <string name="op_step_finish">काम खत्म करें और ग्राहक कोड लें</string>
+    <string name="op_step_finish_hint">ग्राहक से उनके ऐप का 6 अंकों का कोड माँगें।</string>
+    <string name="op_you_earn">आपकी कमाई</string>
+    <string name="op_when">तारीख और समय</string>
+    <string name="op_map">नक्शा</string>
+    <string name="op_time_worked">काम का समय</string>
+    <string name="op_status_working">काम चालू</string>
+    <string name="op_status_waiting">रुका है, इंतज़ार</string>
+    <string name="op_started_at">%1$s पर शुरू हुआ</string>
+    <string name="op_waited_for">इंतज़ार का समय %1$s</string>
+    <string name="op_pause_waiting">रोकें: मैं इंतज़ार कर रहा हूँ</string>
+    <string name="op_resume_work">काम फिर शुरू करें</string>
+    <string name="op_problem_at_site">साइट पर कोई समस्या?</string>
+    <string name="op_open_google_maps">Google Maps खोलें</string>
+    <string name="op_reached_button">मैं साइट पर पहुँच गया</string>
+    <string name="op_code_sent">ग्राहक के ऐप में कोड है।</string>
+    <string name="cj_time_used">इस्तेमाल हुआ समय</string>
+    <string name="cj_of_booked">बुक किए %2$s में से %1$s</string>
+    <string name="cj_time_left">%1$s बाकी</string>
+    <string name="cj_paused_waiting">ऑपरेटर इंतज़ार कर रहा है, टाइमर रुका है</string>
+    <string name="cj_confirm_arrival">क्रेन पहुँचने की पुष्टि करें</string>
+    <string name="push_channel_urgent">काम की सूचनाएँ</string>
+    <string name="push_channel_urgent_desc">नए काम, क्रेन पहुँचना, ग्राहक कोड और आपातकाल</string>
+    <string name="push_channel_updates">अपडेट</string>
+    <string name="push_channel_updates_desc">भुगतान, रसीद, घोषणाएँ और सहायता</string>
+    <!-- Fixed booked hours (no running clock) -->
+    <string name="fh_booked_hours">बुक किए घंटे</string>
+    <string name="fh_n_hours">%1$d घंटे</string>
+    <string name="fh_time_over">बुक किया समय खत्म</string>
+    <string name="fh_total_price">कुल कीमत</string>
+    <string name="fh_until">%1$s · %2$s तक</string>
 </resources>

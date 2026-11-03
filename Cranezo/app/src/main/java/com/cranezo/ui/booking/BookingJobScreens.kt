@@ -3,7 +3,6 @@ package com.cranezo.ui.booking
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +57,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.R
 import com.cranezo.ui.booking.components.BookingScaffold
 import com.cranezo.ui.booking.components.BookingTag
+import com.cranezo.ui.booking.components.FixedHoursCard
 import com.cranezo.ui.booking.components.PriceLine
 import com.cranezo.ui.booking.model.Booking
 import com.cranezo.ui.booking.model.BookingActions
@@ -81,8 +81,8 @@ import com.cranezo.ui.mainhome.components.IconBadge
 import com.cranezo.ui.mainhome.components.InfoBlue
 import com.cranezo.ui.mainhome.components.SuccessGreen
 import com.cranezo.ui.operator.model.JobTimers
+import androidx.compose.ui.unit.sp
 import com.cranezo.ui.theme.*
-import com.cranezo.utils.formatClock
 import com.cranezo.utils.formatServerDateTime
 import com.cranezo.utils.formatServerTime
 import com.cranezo.utils.rupees
@@ -129,22 +129,6 @@ private fun PollWhileOpen(vm: BookingViewModel?, bookingId: String?, periodMs: L
     }
 }
 
-/** Elapsed working time, ticking on the phone from the server's value (the phone clock is not used). */
-@Composable
-private fun rememberWorkingSeconds(timers: JobTimers?): Pair<Long, Boolean> {
-    val receivedAt = remember(timers) { SystemClock.elapsedRealtime() }
-    var elapsed by remember(timers) { mutableLongStateOf(0L) }
-    val running = timers?.work_started_at != null && timers.work_ended_at == null
-    val paused = timers?.is_waiting == true
-    LaunchedEffect(timers) {
-        while (running && !paused) {
-            delay(1000)
-            elapsed = (SystemClock.elapsedRealtime() - receivedAt) / 1000
-        }
-    }
-    return ((timers?.working_seconds ?: 0L) + if (running && !paused) elapsed else 0L) to paused
-}
-
 @Composable
 private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
     GlassCard(contentPadding = dimen_12) {
@@ -172,7 +156,7 @@ private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
                 IconBadge(icon = Icons.Default.Call, accent = AmberPrimary, size = dimen_32)
                 Spacer(modifier = Modifier.width(dimen_10))
                 Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.bk_operator).uppercase(), size = font_8, color = appColors.textSecondary)
+                    Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
                     Textview(booking.operator.full_name ?: stringResource(R.string.bk_operator), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 }
                 booking.operator.rating?.let {
@@ -205,7 +189,7 @@ fun CraneArrivedScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
         bottom = {
             Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
                 if (booking.actions?.can_confirm_arrival == true && !waiting) {
-                    CommonGradientButton(text = stringResource(R.string.op_start_job), onClick = {
+                    CommonGradientButton(text = stringResource(R.string.cj_confirm_arrival), onClick = {
                         tapped = true
                         vm?.onIntent(BookingIntent.ConfirmArrival)
                     })
@@ -249,7 +233,7 @@ private fun BookingIdStatusRow(booking: Booking) {
     GlassCard(contentPadding = dimen_12) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Textview(stringResource(R.string.bk_booking_id).uppercase(), size = font_8, color = appColors.textSecondary)
+                Textview(stringResource(R.string.bk_booking_id).uppercase(), size = font_10, color = appColors.textSecondary)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Textview(booking.booking_code.orEmpty(), size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                     Spacer(modifier = Modifier.width(dimen_6))
@@ -263,7 +247,7 @@ private fun BookingIdStatusRow(booking: Booking) {
                 }
             }
             Column(horizontalAlignment = Alignment.End) {
-                Textview(stringResource(R.string.bk_booking_status).uppercase(), size = font_8, color = appColors.textSecondary)
+                Textview(stringResource(R.string.bk_booking_status).uppercase(), size = font_10, color = appColors.textSecondary)
                 Textview(booking.job?.stage_label ?: booking.status_label.orEmpty(), size = font_12, color = SuccessGreen, fontWeight = FontWeight.SemiBold)
             }
         }
@@ -287,8 +271,6 @@ fun JobInProgressScreen(
     val context = LocalContext.current
     // Re-synced every 30 seconds
     PollWhileOpen(vm, booking.booking_id, 30_000)
-    val (working, paused) = rememberWorkingSeconds(booking.timers)
-    val usage = booking.usage
     val pending = booking.extension?.pending
 
     BookingScaffold(
@@ -306,40 +288,8 @@ fun JobInProgressScreen(
             }
         }
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Textview(booking.booking_code.orEmpty(), size = font_11, color = appColors.textSecondary, modifier = Modifier.weight(1f))
-            BookingTag(stringResource(R.string.cj_live), SuccessGreen)
-        }
-        CraneOperatorCard(booking)
-
-        GlassCard(contentPadding = dimen_14) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.cj_job_started).uppercase(), size = font_8, color = appColors.textSecondary)
-                    Textview(formatServerDateTime(usage?.started_at ?: booking.timers?.work_started_at), size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                }
-                Column(horizontalAlignment = Alignment.End) {
-                    Textview(stringResource(R.string.cj_elapsed_time).uppercase(), size = font_8, color = appColors.textSecondary)
-                    Textview(formatClock(working), size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
-                    if (paused) Textview(stringResource(R.string.cj_paused), size = font_10, color = appColors.textSecondary)
-                }
-            }
-            Spacer(modifier = Modifier.height(dimen_10))
-            Row {
-                Textview(stringResource(R.string.cj_current_usage, hrsMin(usage?.used_seconds)), size = font_11, color = appColors.textSecondary, modifier = Modifier.weight(1f))
-                Textview(stringResource(R.string.cj_booked_hours, ((usage?.booked_seconds ?: 0L) / 3600).toInt()), size = font_11, color = appColors.textPrimary)
-            }
-            Spacer(modifier = Modifier.height(dimen_6))
-            LinearProgressIndicator(
-                progress = { ((usage?.percent_used ?: 0.0) / 100.0).toFloat().coerceIn(0f, 1f) },
-                modifier = Modifier.fillMaxWidth().height(dimen_6).clip(CircleShape),
-                color = AmberPrimary, trackColor = appColors.subtleFill
-            )
-            Textview(stringResource(R.string.cj_percent_used, (usage?.percent_used ?: 0.0).toInt()), size = font_10, color = appColors.textSecondary)
-            if (usage?.overtime_warning == true) {
-                Textview(stringResource(R.string.cj_overtime_approaching), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
-            }
-        }
+        // Fixed hours: what was booked, until when, and how much is left. No running clock.
+        FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label)
 
         // The extra time that is waiting for the operator
         if (pending != null) {
@@ -347,34 +297,23 @@ fun JobInProgressScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
                         Textview(stringResource(R.string.cj_request_time), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                        Textview(stringResource(R.string.cj_view_status).uppercase(), size = font_8, color = appColors.textSecondary)
+                        Textview(stringResource(R.string.cj_view_status).uppercase(), size = font_10, color = appColors.textSecondary)
                     }
                     BookingTag(stringResource(R.string.cj_pending), AmberPrimary)
                 }
             }
         }
 
-        GlassCard(contentPadding = dimen_12) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.LocationOn, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_16))
-                Spacer(modifier = Modifier.width(dimen_8))
-                Textview(booking.site?.name.orEmpty(), size = font_12, color = appColors.textPrimary)
-            }
-            Textview(stringResource(R.string.cj_booked_duration, booking.duration?.label.orEmpty()), size = font_11, color = appColors.textSecondary)
-        }
-
+        CraneOperatorCard(booking)
+        // Site and price together, nothing else
         GlassCard(contentPadding = dimen_14) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.cj_current_estimate).uppercase(), size = font_8, color = appColors.textSecondary)
-                    Textview(rupees(usage?.current_estimate?.amount), size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
-                    Textview(stringResource(R.string.bk_per_hour, rupees(usage?.current_estimate?.hourly_rate)), size = font_10, color = appColors.textSecondary)
-                }
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_18))
+                Spacer(modifier = Modifier.width(dimen_8))
+                Textview(booking.site?.address ?: booking.site?.name.orEmpty(), size = font_13, color = appColors.textPrimary, modifier = Modifier.weight(1f))
             }
-            if (!usage?.current_estimate?.note.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(dimen_6))
-                Textview(usage?.current_estimate?.note.orEmpty(), size = font_10, color = appColors.textHint)
-            }
+            Spacer(modifier = Modifier.height(dimen_10))
+            PriceLine(stringResource(R.string.fh_total_price), rupees(booking.payment?.final_total ?: booking.payment?.booking_amount), bold = true)
         }
         Spacer(modifier = Modifier.height(dimen_8))
     }
@@ -399,7 +338,6 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
     val max = ext?.max_minutes ?: 240
     var minutes by rememberSaveable { mutableIntStateOf(60) }
     var message by rememberSaveable { mutableStateOf("") }
-    val usage = booking.usage
 
     BookingScaffold(
         onBack = onBack,
@@ -415,27 +353,8 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
             }
         }
     ) {
-        CraneOperatorCard(booking, showOperator = false)
-        GlassCard(contentPadding = dimen_12) {
-            Row {
-                listOf(
-                    R.string.cj_booked to hrsMinText((usage?.booked_seconds ?: 0L)),
-                    R.string.cj_used to hrsMinText(usage?.used_seconds ?: 0L),
-                    R.string.cj_remaining to hrsMinText(usage?.remaining_seconds ?: 0L)
-                ).forEach { (label, value) ->
-                    Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Textview(stringResource(label), size = font_10, color = appColors.textSecondary)
-                        Textview(value, size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(dimen_6))
-            LinearProgressIndicator(
-                progress = { ((usage?.percent_used ?: 0.0) / 100.0).toFloat().coerceIn(0f, 1f) },
-                modifier = Modifier.fillMaxWidth().height(dimen_6).clip(CircleShape), color = AmberPrimary, trackColor = appColors.subtleFill
-            )
-            if (usage?.overtime_warning == true) Textview(stringResource(R.string.cj_overtime_approaching), size = font_10, color = appColors.primaryText)
-        }
+        // Where the booking stands now: the same booked-hours card as Job In Progress
+        FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label)
 
         GlassCard(contentPadding = dimen_14) {
             Textview(stringResource(R.string.cj_how_much_extra), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
@@ -485,8 +404,6 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
 @Composable
 private fun minutesChip(minutes: Int): String = minutesLabel(minutes)
 
-@Composable
-private fun hrsMinText(seconds: Long): String = hrsMin(seconds)
 
 @Composable
 private fun StepButton(icon: androidx.compose.ui.graphics.vector.ImageVector, enabled: Boolean, onClick: () -> Unit) {
@@ -561,11 +478,11 @@ fun ExtraTimeStatusScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {})
                 Spacer(modifier = Modifier.height(dimen_8))
                 Row {
                     Column(modifier = Modifier.weight(1f)) {
-                        Textview(stringResource(R.string.cj_requested_extra).uppercase(), size = font_8, color = appColors.textSecondary)
+                        Textview(stringResource(R.string.cj_requested_extra).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview("+ ${request.label.orEmpty()}", size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Textview(stringResource(R.string.cj_estimated_cost).uppercase(), size = font_8, color = appColors.textSecondary)
+                        Textview(stringResource(R.string.cj_estimated_cost).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(rupees(request.amount), size = font_16, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -735,7 +652,7 @@ fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.cj_balance_due).uppercase(), size = font_8, color = appColors.textSecondary)
+                    Textview(stringResource(R.string.cj_balance_due).uppercase(), size = font_10, color = appColors.textSecondary)
                     Textview(stringResource(R.string.cj_to_be_settled), size = font_10, color = appColors.textHint)
                 }
                 Textview(balance, size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)

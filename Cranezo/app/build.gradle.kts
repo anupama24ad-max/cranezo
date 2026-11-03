@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
-    id("kotlin-parcelize")
+    id("com.google.gms.google-services")
 }
 
 val defaultToken = project.findProperty("defaultToken") ?: "default_value_if_not_found"
@@ -27,7 +27,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // Smaller, faster release APK: unused code and resources are removed
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -60,8 +62,6 @@ android {
     }
     buildFeatures {
         compose = true
-        dataBinding = true
-        viewBinding = true
         buildConfig = true
     }
 }
@@ -77,10 +77,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -111,17 +107,9 @@ dependencies {
     //Lifecycle
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.common.java8)
-    implementation(libs.androidx.lifecycle.extensions)
 
-    // optional - helpers for implementing LifecycleOwner in a Service
-    implementation(libs.androidx.lifecycle.service)
 
-    //Navigation
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
 
-    implementation(libs.okhttp.v493)
     implementation(libs.logging.interceptor)
 
     implementation("androidx.core:core-splashscreen:1.0.1")
@@ -132,9 +120,10 @@ dependencies {
     // Location
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
-    // Razorpay
-    implementation("com.razorpay:checkout:1.6.33")
+    // Firebase Cloud Messaging (push notifications)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-messaging")
 
-    implementation(libs.lottie.compose)
+
     implementation(libs.coil.compose)
 }

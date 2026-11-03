@@ -40,6 +40,9 @@ fun toIsoWithOffset(date: String, time: String): String {
 
 private fun serverDate(iso: String?): Date? = parseServerTime(iso)
 
+/** Server time in epoch milliseconds, or null. */
+fun serverMillis(iso: String?): Long? = parseServerTime(iso)?.time
+
 /** Day of the month for the date block of a job card, e.g. "10". */
 fun serverDay(iso: String?): String =
     serverDate(iso)?.let { SimpleDateFormat("dd", Locale.getDefault()).format(it) }.orEmpty()

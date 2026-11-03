@@ -62,7 +62,6 @@ import com.cranezo.ui.mainhome.components.InfoBlue
 import com.cranezo.ui.mainhome.components.OwnerRequestHost
 import com.cranezo.ui.mainhome.components.SuccessGreen
 import com.cranezo.ui.operator.model.JobCrane
-import com.cranezo.ui.operator.model.ProgressStep
 import com.cranezo.ui.ownerjobs.model.OwnerJob
 import com.cranezo.ui.ownerjobs.model.OwnerJobCounts
 import com.cranezo.ui.ownerjobs.model.OwnerJobsIntent
@@ -70,7 +69,6 @@ import com.cranezo.ui.ownerjobs.model.OwnerJobsState
 import com.cranezo.ui.ownerjobs.model.OwnerLocation
 import com.cranezo.ui.theme.*
 import com.cranezo.utils.compactMinutes
-import com.cranezo.utils.formatClock
 import com.cranezo.utils.formatSeconds
 import com.cranezo.utils.formatServerDateTime
 import com.cranezo.utils.formatServerTime
@@ -166,7 +164,7 @@ fun OwnerJobsTab(
                     if (count != null) {
                         Spacer(modifier = Modifier.width(dimen_6))
                         Box(modifier = Modifier.size(dimen_16).clip(CircleShape).background(if (key == "new_requests" && count > 0) Red else AmberPrimary.copy(alpha = 0.4f)), contentAlignment = Alignment.Center) {
-                            Textview(count.toString(), size = font_8, color = Color.White, fontWeight = FontWeight.Bold)
+                            Textview(count.toString(), size = font_10, color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -307,10 +305,6 @@ private fun OwnerJobCard(
 
         if (job.tab == "active") {
             Spacer(modifier = Modifier.height(dimen_10))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                job.progress.orEmpty().forEach { step -> ProgressMini(step) }
-            }
-            Spacer(modifier = Modifier.height(dimen_8))
             OperatorRow(job, onCall)
             Spacer(modifier = Modifier.height(dimen_8))
             JobTimerBox(job)
@@ -365,37 +359,19 @@ private fun ViewDetails(onClick: () -> Unit) {
     )
 }
 
-@Composable
-private fun ProgressMini(step: ProgressStep) {
-    val color = if (step.state == "pending" || step.state == null) appColors.subtleBorder else SuccessGreen
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.size(dimen_10).clip(CircleShape).background(if (step.state == "done") color else Color.Transparent).then(Modifier.background(color.copy(alpha = if (step.state == "done") 1f else 0.4f))))
-        Textview(step.label.orEmpty(), size = font_8, color = appColors.textPrimary, maxLines = 1)
-        Textview(if (step.at != null) formatServerTime(step.at) else "", size = font_8, color = appColors.textSecondary)
-    }
-}
-
-/** The "Job in Progress" timer: working time, ticking from the server's value. */
+/** Active job line: the fixed booked window, e.g. "8 Hours · until 05:00 PM". No running clock. */
 @Composable
 fun JobTimerBox(job: OwnerJob) {
-    val timers = job.timers
-    val receivedAt = remember(timers) { android.os.SystemClock.elapsedRealtime() }
-    var elapsed by remember(timers) { androidx.compose.runtime.mutableLongStateOf(0L) }
-    val running = timers?.work_started_at != null && timers.work_ended_at == null
-    LaunchedEffect(timers) {
-        while (running) {
-            delay(1000)
-            elapsed = (android.os.SystemClock.elapsedRealtime() - receivedAt) / 1000
-        }
-    }
-    val working = (timers?.working_seconds ?: 0L) + if (running && timers?.is_waiting != true) elapsed else 0L
     Row(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_12)).background(appColors.subtleFill).padding(dimen_10),
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_12)).background(appColors.subtleFill).padding(dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Textview(stringResource(R.string.oj_job_progress), size = font_10, color = appColors.textSecondary)
-            Textview(formatClock(working), size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Textview(stringResource(R.string.fh_booked_hours), size = font_11, color = appColors.textSecondary)
+            Textview(
+                stringResource(R.string.fh_until, job.duration_label ?: job.duration?.label.orEmpty(), formatServerTime(job.schedule?.end_at)),
+                size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold
+            )
         }
         BookingTag(stringResource(R.string.oj_job_in_progress), AmberPrimary)
     }

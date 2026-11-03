@@ -251,6 +251,10 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun markReadApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<Any>?> =
         safeApiCall(conflictAsError = true) { api.plainPostApi("notifications/mark-read", h, json(body)) }
 
+    /** Saves this phone's Firebase push token for the signed-in user. */
+    suspend fun registerDeviceApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<Any>?> =
+        safeApiCall(conflictAsError = true) { api.plainPostApi("notifications/register-device", h, json(body)) }
+
     // ---- Operator jobs and earnings ----
 
     private val O = "operator/"

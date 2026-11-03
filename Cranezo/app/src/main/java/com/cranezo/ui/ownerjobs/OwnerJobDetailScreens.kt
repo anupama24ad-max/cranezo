@@ -50,6 +50,7 @@ import com.cranezo.core.composecore.BaseVMComposeActivity
 import com.cranezo.ui.booking.components.BookingScaffold
 import com.cranezo.ui.booking.components.BookingTag
 import com.cranezo.ui.booking.components.PriceLine
+import com.cranezo.ui.booking.components.FixedHoursCard
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.Textview
@@ -69,7 +70,6 @@ import com.cranezo.ui.ownerjobs.model.OwnerLocation
 import com.cranezo.ui.ownerjobs.model.TimelineStep
 import com.cranezo.ui.theme.*
 import com.cranezo.utils.fileUrl
-import com.cranezo.utils.formatClock
 import com.cranezo.utils.formatSeconds
 import com.cranezo.utils.formatServerDate
 import com.cranezo.utils.formatServerDateTime
@@ -334,23 +334,12 @@ fun OwnerJobDetailsScreen(
 
 @Composable
 private fun MonitoringBlock(job: OwnerJob, monitoring: Monitoring?) {
-    // The working time ticks on the phone from the server's value
-    GlassCard(contentPadding = dimen_12) {
-        Textview(stringResource(R.string.oj_job_progress), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(dimen_6))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            job.progress.orEmpty().forEach { step ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Textview(step.label.orEmpty(), size = font_10, color = if (step.state == "pending") appColors.textSecondary else SuccessGreen, maxLines = 1)
-                    Textview(if (step.at != null) formatServerTime(step.at) else "", size = font_8, color = appColors.textSecondary)
-                }
-            }
+    // Fixed hours: the booked window and time left, the same card the customer and operator see
+    FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration_label ?: job.duration?.label)
+    if ((monitoring?.extra_seconds ?: 0L) > 0) {
+        GlassCard(contentPadding = dimen_12) {
+            PriceLine(stringResource(R.string.op_extra_time), formatSeconds(monitoring?.extra_seconds))
         }
-    }
-    Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
-        Tile(stringResource(R.string.op_start_time), formatServerTime(monitoring?.start_time), Modifier.weight(1f))
-        Box(modifier = Modifier.weight(1f)) { JobTimerBox(job) }
-        if ((monitoring?.extra_seconds ?: 0L) > 0) Tile(stringResource(R.string.op_extra_time), formatClock(monitoring?.extra_seconds ?: 0L), Modifier.weight(1f))
     }
     if (!monitoring?.message.isNullOrBlank()) {
         GlassCard(contentPadding = dimen_12) {
@@ -466,7 +455,7 @@ private fun PhotoGrid(title: String, photos: List<com.cranezo.ui.operator.model.
                         ) {
                             AsyncImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
                         }
-                        if (photo.captured_at != null) Textview(formatServerDateTime(photo.captured_at), size = font_8, color = appColors.textSecondary, maxLines = 2)
+                        if (photo.captured_at != null) Textview(formatServerDateTime(photo.captured_at), size = font_10, color = appColors.textSecondary, maxLines = 2)
                     }
                 }
                 repeat(3 - row.size) { Spacer(modifier = Modifier.weight(1f)) }
