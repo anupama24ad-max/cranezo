@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -170,6 +171,7 @@ fun SelectableCard(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    minHeight: androidx.compose.ui.unit.Dp = androidx.compose.ui.unit.Dp.Unspecified,
     content: @Composable androidx.compose.foundation.layout.BoxScope.() -> Unit
 ) {
     Box(
@@ -224,3 +226,5 @@ fun BookingTag(text: String, color: Color) {
         Textview(text = text, size = font_10, color = color, fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
+
+private fun Modifier.androidxHeightIn(min: androidx.compose.ui.unit.Dp): Modifier = this.heightIn(min = min)

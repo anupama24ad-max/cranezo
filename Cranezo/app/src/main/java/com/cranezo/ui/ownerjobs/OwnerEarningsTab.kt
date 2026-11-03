@@ -223,7 +223,7 @@ fun OwnerEarningsTab(
             }
         }
         (if (showAll) state.jobs else state.jobs.take(3)).forEach { job ->
-            GlassCard(contentPadding = dimen_10, onClick = { job.booking_id?.let(onOpenJob) }) {
+            GlassCard(contentPadding = dimen_12, minHeight = dimen_88, onClick = { job.booking_id?.let(onOpenJob) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CraneImage(path = job.crane?.primary_photo, modifier = Modifier.size(dimen_56))
                     Spacer(modifier = Modifier.width(dimen_12))

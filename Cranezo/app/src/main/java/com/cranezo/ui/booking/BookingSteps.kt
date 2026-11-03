@@ -219,7 +219,7 @@ fun CraneTypeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext:
                     SelectableCard(
                         selected = selected,
                         onClick = { type.id?.let { vm?.onIntent(BookingIntent.SelectCraneType(it)) } },
-                        modifier = Modifier.weight(1f).aspectRatio(1.25f)
+                        modifier = Modifier.weight(1f).aspectRatio(1.25f).heightIn(min = dimen_132)
                     ) {
                         // The picture fills the card; the name sits in a dark strip along the bottom
                         CraneImage(
@@ -285,9 +285,9 @@ fun CapacityStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                         onClick = { capacity.id?.let { vm?.onIntent(BookingIntent.SelectCapacity(it)) } },
                         modifier = Modifier
                             .weight(1f)
-                            .heightIn(min = dimen_100)
+                            .heightIn(min = dimen_132)
                     ) {
-                        Column(modifier = Modifier.padding(dimen_14)) {
+                        Column(modifier = Modifier.padding(dimen_16)) {
                             Textview(
                                 text = capacity.name.orEmpty(),
                                 size = font_18,
@@ -396,7 +396,7 @@ private fun StartOptionCard(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    SelectableCard(selected = selected, onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+    SelectableCard(selected = selected, onClick = onClick, modifier = Modifier.fillMaxWidth(), minHeight = dimen_76) {
         Row(modifier = Modifier.padding(dimen_14), verticalAlignment = Alignment.CenterVertically) {
             IconBadge(icon = icon, accent = AmberPrimary, size = dimen_36)
             Spacer(modifier = Modifier.width(dimen_12))
@@ -556,7 +556,8 @@ fun DurationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
             SelectableCard(
                 selected = selected,
                 onClick = { type.id?.let { vm?.onIntent(BookingIntent.DurationTypeChanged(it)) } },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                minHeight = dimen_76
             ) {
                 Row(modifier = Modifier.padding(dimen_14), verticalAlignment = Alignment.CenterVertically) {
                     IconBadge(

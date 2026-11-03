@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -2442,6 +2443,8 @@ fun GlassCard(
     modifier: Modifier = Modifier,
     shape: Shape = RoundedCornerShape(dimen_16),
     contentPadding: Dp = dimen_16,
+    // Minimum height of the card type; the card grows with its content, never shrinks below it
+    minHeight: Dp = dimen_64,
     backgroundColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
     onClick: (() -> Unit)? = null,
@@ -2451,12 +2454,15 @@ fun GlassCard(
     Column(
         modifier = if(isGlassy){
             modifier
+                .fillMaxWidth()
                 .glassEffect(shape, backgroundColor, borderColor)
         }else{
             modifier
         }
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .padding(contentPadding),
+            .heightIn(min = minHeight)
+            // Padding is at least 16. A group whose rows carry their own padding passes less than 10 on purpose.
+            .padding(if (contentPadding < dimen_10) contentPadding else maxOf(contentPadding, dimen_16)),
         content = content
     )
 }

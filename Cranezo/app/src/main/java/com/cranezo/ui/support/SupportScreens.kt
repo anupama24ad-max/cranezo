@@ -213,7 +213,7 @@ private fun SectionHeader(title: String, trailing: String) {
 @Composable
 private fun NotificationRow(n: SupportNotification, today: Boolean, onClick: () -> Unit) {
     val accent = if (n.icon == "alert") Red else AmberPrimary
-    GlassCard(contentPadding = dimen_12, onClick = onClick) {
+    GlassCard(contentPadding = dimen_12, minHeight = dimen_88, onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBadge(icon = notificationIcon(n.icon), accent = accent, size = dimen_36)
             Spacer(modifier = Modifier.width(dimen_12))
@@ -328,7 +328,7 @@ fun HelpSupportHomeScreen(
         home?.tiles.orEmpty().chunked(2).forEach { row ->
             Row(modifier = Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                 row.forEach { tile ->
-                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight(), contentPadding = dimen_12, onClick = {
+                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight(), contentPadding = dimen_12, minHeight = dimen_112, onClick = {
                         if (tile.action == "call") {
                             if (home?.call_support?.available == true && !home.call_support.phone.isNullOrBlank()) dialNumber(context, home.call_support.phone)
                             else Toast.makeText(context, R.string.sp_phone_unavailable, Toast.LENGTH_LONG).show()
@@ -579,7 +579,7 @@ fun TicketsScreen(vm: SupportViewModel? = null, onBack: () -> Unit = {}, onOpen:
         }
         state.tickets.forEach { t ->
             val unread = (t.unread_replies ?: 0) > 0
-            GlassCard(contentPadding = dimen_12, onClick = { t.ticket_id?.let(onOpen) }) {
+            GlassCard(contentPadding = dimen_12, minHeight = dimen_88, onClick = { t.ticket_id?.let(onOpen) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Textview(t.ticket_code.orEmpty(), size = font_11, color = appColors.textSecondary, modifier = Modifier.weight(1f))
                     BookingTag(t.status_label.orEmpty(), statusColor(t.status_label))

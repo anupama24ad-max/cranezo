@@ -166,7 +166,7 @@ fun CustomerHomeTab(
             Textview(stringResource(R.string.home_quick_access), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Row(modifier = Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                 quick.forEach { item ->
-                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = dimen_112), contentPadding = dimen_14, onClick = { openScreen(context, item.screen, onProfile) }) {
+                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = dimen_120), contentPadding = dimen_14, onClick = { openScreen(context, item.screen, onProfile) }) {
                         Box {
                             IconBadge(icon = quickIcon(item.icon), accent = if (item.icon == "jobs") InfoBlue else AmberPrimary, size = dimen_36)
                             if ((item.badge ?: 0) > 0) {
@@ -196,7 +196,7 @@ fun CustomerHomeTab(
             Textview(stringResource(R.string.ch_no_recent), size = font_13, color = appColors.textSecondary)
         }
         recent.forEach { booking ->
-            GlassCard(contentPadding = dimen_10, onClick = { booking.booking_id?.let { context.startActivity(BookingActivity.bookingIntent(context, it)) } }) {
+            GlassCard(contentPadding = dimen_10, minHeight = dimen_104, onClick = { booking.booking_id?.let { context.startActivity(BookingActivity.bookingIntent(context, it)) } }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CraneImage(path = booking.crane?.primary_photo, modifier = Modifier.size(dimen_70))
                     Spacer(modifier = Modifier.width(dimen_12))

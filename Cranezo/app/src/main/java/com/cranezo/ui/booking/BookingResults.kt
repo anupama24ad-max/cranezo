@@ -551,7 +551,8 @@ fun PaymentScreen(
             SelectableCard(
                 selected = selected,
                 onClick = { if (enabled) Unit },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                minHeight = dimen_76
             ) {
                 Row(modifier = Modifier.padding(dimen_14), verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {

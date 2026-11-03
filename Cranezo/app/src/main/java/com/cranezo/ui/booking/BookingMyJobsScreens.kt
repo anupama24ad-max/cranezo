@@ -127,7 +127,7 @@ fun MyJobsScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
             Textview(stringResource(R.string.bk_no_bookings), size = font_14, color = appColors.textSecondary, modifier = Modifier.fillMaxWidth().padding(top = dimen_40), textAlign = TextAlign.Center)
         }
         state.jobs.forEach { job ->
-            GlassCard(contentPadding = dimen_12, onClick = { job.booking_id?.let { vm?.onIntent(BookingIntent.OpenBooking(it)) } }) {
+            GlassCard(contentPadding = dimen_12, minHeight = dimen_104, onClick = { job.booking_id?.let { vm?.onIntent(BookingIntent.OpenBooking(it)) } }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CraneImage(path = job.crane?.primary_photo, modifier = Modifier.size(dimen_70))
                     Spacer(modifier = Modifier.width(dimen_12))

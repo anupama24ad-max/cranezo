@@ -380,7 +380,7 @@ private fun Modifier.clickableTab(onClick: () -> Unit): Modifier = this.then(
 
 @Composable
 private fun EarningTile(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier = Modifier, tint: Color = AmberPrimary) {
-    GlassCard(modifier = modifier, contentPadding = dimen_12) {
+    GlassCard(modifier = modifier, contentPadding = dimen_12, minHeight = dimen_96) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBadge(icon = icon, accent = tint, size = dimen_36)
             Spacer(modifier = Modifier.width(dimen_10))
@@ -430,7 +430,7 @@ fun OperatorEarningsTab(
 
         state.earningItems.forEach { item ->
             val settled = item.settlement_status == "settled"
-            GlassCard(contentPadding = dimen_12, onClick = { item.booking_id?.let(onOpenJob) }) {
+            GlassCard(contentPadding = dimen_12, minHeight = dimen_88, onClick = { item.booking_id?.let(onOpenJob) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CraneImage(path = null, modifier = Modifier.size(dimen_56))
                     Spacer(modifier = Modifier.width(dimen_12))
