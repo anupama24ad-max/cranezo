@@ -29,12 +29,10 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -545,6 +543,10 @@ private fun PaymentRows(payment: BookingPayment?) {
     PriceLine(stringResource(R.string.cj_booking_amount, (payment.booking_hours ?: 0.0).toInt()), rupees(payment.booking_amount))
     // Hidden at 0
     if ((payment.extra_time_amount ?: 0.0) > 0) PriceLine(stringResource(R.string.cj_extra_time_min, payment.extra_minutes ?: 0), rupees(payment.extra_time_amount))
+    // the owner's extra charges and GST, line by line
+    payment.breakdown.orEmpty()
+        .filter { it.key?.startsWith("charge_") == true || it.key == "gst" }
+        .forEach { PriceLine(it.label.orEmpty(), rupees(it.amount)) }
     Spacer(modifier = Modifier.height(dimen_4))
     PriceLine(stringResource(R.string.cj_final_total), rupees(payment.final_total), bold = true)
     // With Cash on Delivery nothing is collected in advance, so this row is usually hidden
@@ -580,6 +582,17 @@ fun JobCompletedScreen(
                         gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
                     )
                 }
+                // payment not recorded, unhappy with the work, etc.: opens the complaint form for this booking
+                val context = androidx.compose.ui.platform.LocalContext.current
+                Textview(
+                    stringResource(R.string.fin_raise_complaint), size = font_13, color = appColors.textSecondary,
+                    modifier = Modifier.fillMaxWidth().clickable {
+                        context.startActivity(
+                            com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMPLAINT_NEW, booking.booking_id)
+                        )
+                    }.padding(vertical = dimen_6),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
             }
         }
     ) {
@@ -617,29 +630,19 @@ fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
     val state = rememberBooking(vm)
     val booking = state.booking ?: return
     val payment = booking.payment
-    var confirm by remember { mutableStateOf(false) }
     val balance = rupees(payment?.balance_due)
 
-    if (confirm) {
-        AlertDialog(
-            onDismissRequest = { confirm = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.cj_confirm_cash_title)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.cj_confirm_cash_message, balance)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirm = false
-                    vm?.onIntent(BookingIntent.Pay("COD"))
-                }) { androidx.compose.material3.Text(stringResource(R.string.cj_yes_paid)) }
-            },
-            dismissButton = { TextButton(onClick = { confirm = false }) { androidx.compose.material3.Text(stringResource(R.string.common_cancel)) } }
-        )
-    }
-
+    // No popup: the button already says "Confirm Cash Payment ₹X"; one line above it says when to tap
     BookingScaffold(
         onBack = onBack,
         title = stringResource(R.string.cj_final_payment_title),
         subtitle = stringResource(R.string.cj_final_payment_sub),
-        bottom = { CommonGradientButton(text = stringResource(R.string.cj_confirm_cash_payment, balance), onClick = { confirm = true }) }
+        bottom = {
+            Column {
+                Textview(stringResource(R.string.fin_cash_note), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(bottom = dimen_8))
+                CommonGradientButton(text = stringResource(R.string.cj_confirm_cash_payment, balance), onClick = { vm?.onIntent(BookingIntent.Pay("COD")) })
+            }
+        }
     ) {
         CraneOperatorCard(booking)
         GlassCard(contentPadding = dimen_14) {

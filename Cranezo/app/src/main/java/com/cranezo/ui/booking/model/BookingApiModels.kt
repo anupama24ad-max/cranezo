@@ -57,7 +57,10 @@ data class BookingPrice(
     val total_amount: Double? = null,
     val advance_percent: Int? = null,
     val advance_amount: Double? = null,
-    val remaining_amount: Double? = null
+    val remaining_amount: Double? = null,
+    // what the customer will actually pay: crane hire + owner charges + GST
+    val total_payable: Double? = null,
+    val breakdown: List<com.cranezo.ui.finance.model.BillLine>? = null
 )
 
 data class ProviderInfo(
@@ -170,7 +173,9 @@ data class BookingPayment(
     val balance_due: Double? = null,
     val payment_reference: String? = null,
     val paid_at: String? = null,
-    val payment_methods: List<PaymentMethodOption>? = null
+    val payment_methods: List<PaymentMethodOption>? = null,
+    // full bill: crane hire, extra time, owner charges, GST, total
+    val breakdown: List<com.cranezo.ui.finance.model.BillLine>? = null
 )
 
 data class Booking(

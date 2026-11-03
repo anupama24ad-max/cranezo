@@ -52,7 +52,6 @@ import com.cranezo.ui.cranes.CranesActivity
 import com.cranezo.ui.cranes.MyCranesScreen
 import com.cranezo.ui.myprofile.MyProfileActivity
 import com.cranezo.ui.myprofile.ProfileRoutes
-import com.cranezo.ui.operator.NewJobAlert
 import com.cranezo.ui.operator.OperatorActivity
 import com.cranezo.ui.ownerjobs.OwnerEarningsTab
 import com.cranezo.ui.ownerjobs.OwnerEarningsViewModel
@@ -63,7 +62,6 @@ import com.cranezo.ui.operator.OperatorEarningsTab
 import com.cranezo.ui.operator.OperatorHomeTab
 import com.cranezo.ui.operator.OperatorJobsTab
 import com.cranezo.ui.operator.OperatorTabsViewModel
-import com.cranezo.ui.operator.model.OperatorTabsIntent
 import com.cranezo.ui.mainhome.model.MyCranesState
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeTabs
@@ -118,16 +116,7 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
         ?.let { a -> remember { androidx.lifecycle.ViewModelProvider(a)[com.cranezo.ui.customerhome.CustomerHomeViewModel::class.java] } }
     val openOwnerJob: (String) -> Unit = { id -> context.startActivity(OwnerJobActivity.intent(context, id)) }
     val openOwnerLive: (String) -> Unit = { id -> context.startActivity(OwnerJobActivity.intent(context, id, live = true)) }
-    val incomingJob = opVm?.uiState?.collectAsStateWithLifecycle()?.value?.incomingJob
-    if (opVm != null && incomingJob != null) {
-        NewJobAlert(
-            onView = {
-                opVm.onIntent(OperatorTabsIntent.DismissIncoming)
-                openJob(incomingJob)
-            },
-            onLater = { opVm.onIntent(OperatorTabsIntent.DismissIncoming) }
-        )
-    }
+    // A new job for the operator shows as a card at the top of the Home tab (OperatorHomeTab), not as a popup
 
     // The bottom bar (and the screens behind it) depend on the user's role
     val tabs = MainHomeTabs.forRole(state.role)

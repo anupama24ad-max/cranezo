@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Payments, commission, settlements, operator job requests and complaints (ui/finance) -->
+<resources>
+    <!-- entry points -->
+    <string name="fin_entry_owner">Money &amp; Requests</string>
+    <string name="fin_entry_operator">Find Jobs &amp; Payments</string>
+    <string name="fin_entry_customer">Payments &amp; Complaints</string>
+    <string name="fin_raise_complaint">Report a problem with this job</string>
+    <string name="fin_edit_commission">Operator earnings</string>
+    <string name="fin_edit_commission_sub">Set or change what the operator gets</string>
+
+    <!-- hubs -->
+    <string name="fin_hub_owner">Money &amp; Requests</string>
+    <string name="fin_hub_operator">Find Jobs &amp; Payments</string>
+    <string name="fin_hub_customer">Payments &amp; Complaints</string>
+
+    <!-- common -->
+    <string name="fin_save">Save</string>
+    <string name="fin_saving">Saving…</string>
+    <string name="fin_send">Send</string>
+    <string name="fin_sending">Sending…</string>
+    <string name="fin_cancel">Cancel</string>
+    <string name="fin_remove">Remove</string>
+    <string name="fin_call">Call</string>
+    <string name="fin_history">History</string>
+    <string name="fin_not_found">Not found. Go back and try again.</string>
+    <string name="fin_job">Job</string>
+    <string name="fin_where">Where</string>
+    <string name="fin_when">When</string>
+    <string name="fin_duration">Hours</string>
+    <string name="fin_amount">Amount</string>
+    <string name="fin_customer">Customer</string>
+    <string name="fin_operator">Operator</string>
+    <string name="fin_status">Status</string>
+    <string name="fin_jobs_count">%1$d job(s)</string>
+    <string name="fin_enter_amount">Enter a number.</string>
+    <string name="fin_select_jobs">Tick at least one job.</string>
+    <string name="fin_write_message">Write a message first.</string>
+
+    <!-- owner: GST and charges -->
+    <string name="fin_billing_title">GST &amp; Charges</string>
+    <string name="fin_billing_subtitle">Added to every new booking bill</string>
+    <string name="fin_gst">GST</string>
+    <string name="fin_gst_percent">GST (%)</string>
+    <string name="fin_gst_number">GST number (optional)</string>
+    <string name="fin_gst_hint">Put 0 if you do not charge GST. New bookings use the new value; old bookings do not change.</string>
+    <string name="fin_charges">Extra charges</string>
+    <string name="fin_charges_hint">For example handling charge or service charge. The customer sees each one on the bill.</string>
+    <string name="fin_charge_n">Charge %1$d</string>
+    <string name="fin_charge_name">Name</string>
+    <string name="fin_charge_name_hint">Handling charge</string>
+    <string name="fin_type_fixed">Fixed amount (₹)</string>
+    <string name="fin_type_percent">Percent of job amount (%)</string>
+    <string name="fin_value_amount">Amount (₹)</string>
+    <string name="fin_value_percent">Percent (%)</string>
+    <string name="fin_value_per_km">Rupees per km (₹)</string>
+    <string name="fin_add_charge">Add a charge</string>
+    <string name="fin_default_commission">Operator pay (default)</string>
+    <string name="fin_default_commission_hint">Used when you give a job to an operator. You can change it for each job.</string>
+    <string name="fin_commission_percent">Percent of job amount</string>
+    <string name="fin_commission_per_km">Per km</string>
+    <string name="fin_commission_fixed">Fixed amount</string>
+    <string name="fin_platform_fee_note">Cranezo platform fee is %1$s%% of the job amount before GST.</string>
+
+    <!-- owner: one job's money -->
+    <string name="fin_job_money_title">Job money</string>
+    <string name="fin_bill_breakdown">Bill</string>
+    <string name="fin_bill_not_final">This bill becomes final when the job is completed.</string>
+    <string name="fin_operator_earning">Operator earnings</string>
+    <string name="fin_operator_gets">Operator gets</string>
+    <string name="fin_commission_paid_on">Paid to the operator on %1$s</string>
+    <string name="fin_how_pay_operator">How do you pay the operator for this job?</string>
+    <string name="fin_distance_km">Job distance: %1$s km</string>
+    <string name="fin_save_commission">Save operator pay</string>
+    <string name="fin_assign_first">Give this job to an operator first.</string>
+
+    <!-- owner: pay operators -->
+    <string name="fin_pay_operators">Pay operators</string>
+    <string name="fin_pay_operators_sub">Money you still have to give your operators</string>
+    <string name="fin_total_to_pay">Total to pay</string>
+    <string name="fin_no_operator_dues">Nothing to pay. All operators are paid.</string>
+    <string name="fin_jobs_no_commission">%1$d job(s) need operator pay set first</string>
+    <string name="fin_pay_name">Pay %1$s</string>
+    <string name="fin_step_choose_jobs">1. Tick the jobs you are paying for</string>
+    <string name="fin_step_how_paid">2. How did you pay?</string>
+    <string name="fin_set_commission_first">Set operator pay for this job first</string>
+    <string name="fin_you_pay_now">You pay now</string>
+    <string name="fin_method_cash">Cash</string>
+    <string name="fin_method_bank">Bank transfer</string>
+    <string name="fin_reference">Reference number</string>
+    <string name="fin_reference_hint">UPI / UTR number</string>
+    <string name="fin_pay_operator_note">Give the money first, then tap below. The operator gets a message.</string>
+    <string name="fin_mark_paid">I have paid %1$s</string>
+
+    <!-- owner: platform settlement -->
+    <string name="fin_platform_title">Settlement with Cranezo</string>
+    <string name="fin_platform_sub">Platform fee you owe, or money Cranezo owes you</string>
+    <string name="fin_balance_now">Balance now</string>
+    <string name="fin_you_owe_platform">You owe Cranezo (cash jobs)</string>
+    <string name="fin_platform_owes_you">Cranezo owes you (online jobs)</string>
+    <string name="fin_platform_explain">Cash jobs: you got the money, so you pay the platform fee. Online jobs: Cranezo got the money, so Cranezo pays you. The Cranezo team settles this with you.</string>
+    <string name="fin_unpaid_jobs">%1$d completed job(s) not paid by the customer yet</string>
+    <string name="fin_jobs_not_settled">Jobs not settled yet</string>
+    <string name="fin_all_settled">Everything is settled.</string>
+    <string name="fin_customer_not_paid">Customer has not paid</string>
+    <string name="fin_paid_online">Paid online</string>
+    <string name="fin_paid_cash">Paid in cash</string>
+    <string name="fin_you_pay_x">You pay %1$s</string>
+    <string name="fin_you_get_x">You get %1$s</string>
+    <string name="fin_no_history">No settlements yet.</string>
+
+    <!-- payments list -->
+    <string name="fin_payments_title">Payments</string>
+    <string name="fin_payments_sub">Every payment made by customers</string>
+    <string name="fin_customer_payments_sub">Payments you made for your bookings</string>
+    <string name="fin_no_payments">No payments yet.</string>
+
+    <!-- owner: job requests from operators -->
+    <string name="fin_job_requests_title">Operators asking for jobs</string>
+    <string name="fin_job_requests_sub">Give a job to an operator who asked for it</string>
+    <string name="fin_no_requests">No operator has asked for a job.</string>
+    <string name="fin_license_ok">License checked</string>
+    <string name="fin_license_not_checked">License not checked yet</string>
+    <string name="fin_reject">No, thanks</string>
+    <string name="fin_reject_now">Say no</string>
+    <string name="fin_give_job">Give job</string>
+    <string name="fin_reason_optional">Reason (optional)</string>
+    <string name="fin_reason_hint">For example: job already given</string>
+
+    <!-- operator -->
+    <string name="fin_find_jobs">Find jobs</string>
+    <string name="fin_find_jobs_sub">Open jobs from owners. Ask the owner to give you one.</string>
+    <string name="fin_no_open_jobs">No open jobs right now. Check again later.</string>
+    <string name="fin_km_away">%1$s km away</string>
+    <string name="fin_you_earn">You earn</string>
+    <string name="fin_ask_for_job">Ask for this job</string>
+    <string name="fin_send_request">Send request</string>
+    <string name="fin_message_optional">Message to owner (optional)</string>
+    <string name="fin_message_hint">For example: I am 5 km away</string>
+    <string name="fin_my_requests">My job requests</string>
+    <string name="fin_my_requests_sub">Jobs you asked owners for</string>
+    <string name="fin_no_my_requests">You have not asked for any job yet.</string>
+    <string name="fin_withdraw">Take back request</string>
+    <string name="fin_my_payments">My payments</string>
+    <string name="fin_my_payments_sub">What you earned and what the owner paid you</string>
+    <string name="fin_my_earnings">My earnings</string>
+    <string name="fin_total_earned">Total earned</string>
+    <string name="fin_paid_to_you">Paid to you</string>
+    <string name="fin_owner_yet_to_pay">Owner still has to pay</string>
+    <string name="fin_jobs_waiting_commission">%1$d job(s) waiting for the owner to set your pay</string>
+    <string name="fin_payments_received">Payments received</string>
+    <string name="fin_no_payments_yet">No payments received yet.</string>
+
+    <!-- complaints -->
+    <string name="fin_complaints_title">Complaints</string>
+    <string name="fin_complaints_customer_sub">Tell us about a problem with a job or a payment</string>
+    <string name="fin_complaints_owner_sub">Problems your customers reported</string>
+    <string name="fin_no_complaints">No complaints.</string>
+    <string name="fin_new_complaint">Report a problem</string>
+    <string name="fin_new_complaint_sub">The owner and the Cranezo team will see it</string>
+    <string name="fin_step_what_wrong">1. What went wrong?</string>
+    <string name="fin_step_which_booking">2. Which booking?</string>
+    <string name="fin_no_booking">Not about one booking</string>
+    <string name="fin_step_tell_us">3. Tell us what happened</string>
+    <string name="fin_describe">What happened</string>
+    <string name="fin_describe_hint">Write in your own words</string>
+    <string name="fin_submit_complaint">Send complaint</string>
+    <string name="fin_choose_problem">Choose what went wrong.</string>
+    <string name="fin_describe_problem">Please write a little more about the problem.</string>
+    <string name="fin_complaint">Complaint</string>
+    <string name="fin_outcome">Result: %1$s</string>
+    <string name="fin_status_changed">Status: %1$s</string>
+    <string name="fin_add_message">Add a message</string>
+    <string name="fin_message">Message</string>
+    <string name="fin_message_hint2">Write your message</string>
+    <string name="fin_change_status">Change status</string>
+    <string name="fin_status_keep">Keep as it is</string>
+    <string name="fin_status_in_review">Checking it</string>
+    <string name="fin_status_resolved">Solved</string>
+
+    <!-- inline confirmations that replace popups -->
+    <string name="fin_finish_note">Tapping Finish Job ends the job. The customer gets a code to confirm.</string>
+    <string name="fin_cash_note">Tap only after you have given the cash to the operator.</string>
+    <string name="fin_new_job_banner">New job for you</string>
+    <string name="fin_new_job_banner_sub">An owner gave you a job. Open it to accept or say no.</string>
+    <string name="fin_open_job">Open job</string>
+</resources>

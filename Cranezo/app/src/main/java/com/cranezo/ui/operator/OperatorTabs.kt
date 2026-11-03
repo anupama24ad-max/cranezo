@@ -127,6 +127,17 @@ fun OperatorHomeTab(
     ) {
         HomeHeader(name = home?.greeting_name.orEmpty(), subtitle = stringResource(R.string.op_home_subtitle))
 
+        // A job the owner just gave: shown here on the page (sound + vibration), not as a popup
+        state.incomingJob?.let { id ->
+            NewJobAlert(
+                onView = {
+                    vm?.onIntent(OperatorTabsIntent.DismissIncoming)
+                    onOpenJob(id)
+                },
+                onLater = { vm?.onIntent(OperatorTabsIntent.DismissIncoming) }
+            )
+        }
+
         // Resume a job that is on the road or in progress
         home?.active_job?.booking_id?.let { id ->
             GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary, onClick = { onOpenJob(id) }) {
@@ -137,6 +148,22 @@ fun OperatorHomeTab(
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary)
                 }
+            }
+        }
+
+        // Open jobs from owners: the operator can ask for one
+        val context = androidx.compose.ui.platform.LocalContext.current
+        GlassCard(contentPadding = dimen_12, onClick = {
+            context.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.FIND_JOBS))
+        }) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
+                Spacer(modifier = Modifier.width(dimen_12))
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.fin_find_jobs), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(stringResource(R.string.fin_find_jobs_sub), size = font_11, color = appColors.textSecondary)
+                }
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary)
             }
         }
 
@@ -459,7 +486,7 @@ fun OperatorEarningsTab(
     }
 }
 
-/** "New Job Request": a sound and a vibration, then View Job or Later. */
+/** "New job for you": a sound and a vibration, then a card at the top of Home with Open job / Later. No popup. */
 @Composable
 fun NewJobAlert(onView: () -> Unit, onLater: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -470,15 +497,22 @@ fun NewJobAlert(onView: () -> Unit, onLater: () -> Unit) {
             (context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator)?.vibrate(600)
         }
     }
-    androidx.compose.material3.AlertDialog(
-        onDismissRequest = onLater,
-        title = { androidx.compose.material3.Text(stringResource(R.string.bk_new_request)) },
-        text = { androidx.compose.material3.Text(stringResource(R.string.op_new_job_message)) },
-        confirmButton = {
-            androidx.compose.material3.TextButton(onClick = onView) { androidx.compose.material3.Text(stringResource(R.string.op_view_job)) }
-        },
-        dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onLater) { androidx.compose.material3.Text(stringResource(R.string.op_later)) }
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBadge(icon = Icons.Default.Work, accent = AmberPrimary, size = dimen_40)
+            Spacer(modifier = Modifier.width(dimen_12))
+            Column(modifier = Modifier.weight(1f)) {
+                Textview(stringResource(R.string.fin_new_job_banner), size = font_16, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+                Textview(stringResource(R.string.fin_new_job_banner_sub), size = font_12, color = appColors.textSecondary)
+            }
         }
-    )
+        Spacer(modifier = Modifier.height(dimen_10))
+        Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
+            CommonGradientButton(
+                text = stringResource(R.string.op_later), modifier = Modifier.weight(1f), height = dimen_44, onClick = onLater,
+                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
+            )
+            CommonGradientButton(text = stringResource(R.string.fin_open_job), modifier = Modifier.weight(1f), height = dimen_44, onClick = onView)
+        }
+    }
 }

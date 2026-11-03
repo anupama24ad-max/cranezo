@@ -35,9 +35,7 @@ import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -302,22 +300,8 @@ private fun InfoRow(
 private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     val accepted = job.next_action == NextAction.START_JOURNEY
+    // Decline asks once more on the page itself (no popup): the bottom bar turns into Cancel / Yes, decline
     var confirmDecline by remember { mutableStateOf(false) }
-
-    if (confirmDecline) {
-        AlertDialog(
-            onDismissRequest = { confirmDecline = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.op_decline_title)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.op_decline_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmDecline = false
-                    onIntent(OperatorJobIntent.Decline(""))
-                }) { androidx.compose.material3.Text(stringResource(R.string.bk_decline)) }
-            },
-            dismissButton = { TextButton(onClick = { confirmDecline = false }) { androidx.compose.material3.Text(stringResource(R.string.common_cancel)) } }
-        )
-    }
 
     BookingScaffold(
         onBack = onClose,
@@ -328,6 +312,24 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
                     text = stringResource(R.string.op_start_navigation),
                     onClick = { onIntent(OperatorJobIntent.StartJourney) }
                 )
+            } else if (confirmDecline) {
+                Column {
+                    Textview(stringResource(R.string.op_decline_message), size = font_13, color = appColors.textPrimary, modifier = Modifier.padding(bottom = dimen_8))
+                    Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+                        CommonGradientButton(
+                            text = stringResource(R.string.common_cancel), modifier = Modifier.weight(1f), onClick = { confirmDecline = false },
+                            gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
+                        )
+                        CommonGradientButton(
+                            text = stringResource(R.string.bk_decline), modifier = Modifier.weight(1f),
+                            onClick = {
+                                confirmDecline = false
+                                onIntent(OperatorJobIntent.Decline(""))
+                            },
+                            gradientColors = listOf(Red, Red), textColor = androidx.compose.ui.graphics.Color.White
+                        )
+                    }
+                }
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                     CommonGradientButton(
@@ -703,27 +705,21 @@ private fun PhotosNotesScreen(job: OperatorJob, state: OperatorJobState, onInten
     }
     ImageSourceBottomSheet(picker)
     var notes by rememberSaveable { mutableStateOf("") }
-    var confirm by remember { mutableStateOf(false) }
 
-    if (confirm) {
-        AlertDialog(
-            onDismissRequest = { confirm = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.op_finish_title)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.op_finish_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirm = false
-                    onIntent(OperatorJobIntent.Finish(notes))
-                }) { androidx.compose.material3.Text(stringResource(R.string.op_finish_job)) }
-            },
-            dismissButton = { TextButton(onClick = { confirm = false }) { androidx.compose.material3.Text(stringResource(R.string.common_cancel)) } }
-        )
-    }
-
+    // No popup: the button says exactly what it does, with one line of explanation above it
     BookingScaffold(
         onBack = onBack,
         title = stringResource(R.string.op_photos_notes),
-        bottom = { CommonGradientButton(text = stringResource(R.string.common_continue), onClick = { confirm = true }, enabled = !state.isUploading) }
+        bottom = {
+            Column {
+                Textview(stringResource(R.string.fin_finish_note), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(bottom = dimen_8))
+                CommonGradientButton(
+                    text = stringResource(R.string.op_finish_job),
+                    onClick = { onIntent(OperatorJobIntent.Finish(notes)) },
+                    enabled = !state.isUploading
+                )
+            }
+        }
     ) {
         CraneHeaderCard(job.assigned_crane)
         GlassCard(contentPadding = dimen_12) {
@@ -785,20 +781,6 @@ private fun ReportScreen(kind: String, state: OperatorJobState, onIntent: (Opera
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) { permission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
 
-    if (confirmEmergency) {
-        AlertDialog(
-            onDismissRequest = { confirmEmergency = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.op_emergency)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.op_emergency_confirm)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmEmergency = false
-                    onIntent(OperatorJobIntent.ReportEmergency)
-                }) { androidx.compose.material3.Text(stringResource(R.string.op_get_help_now)) }
-            },
-            dismissButton = { TextButton(onClick = { confirmEmergency = false }) { androidx.compose.material3.Text(stringResource(R.string.common_cancel)) } }
-        )
-    }
 
     if (kind == "emergency") {
         BookingScaffold(onBack = onBack, title = stringResource(R.string.op_emergency)) {
@@ -811,10 +793,31 @@ private fun ReportScreen(kind: String, state: OperatorJobState, onIntent: (Opera
             GlassCard(contentPadding = dimen_12) {
                 Textview(stringResource(R.string.op_emergency_note), size = font_12, color = appColors.primaryText)
             }
-            CommonGradientButton(
-                text = stringResource(R.string.op_get_help_now), onClick = { confirmEmergency = true },
-                gradientColors = listOf(Red, DarkRed), textColor = Color.White
-            )
+            // A second tap on the page confirms (no popup), so help is never called by accident
+            if (confirmEmergency) {
+                GlassCard(contentPadding = dimen_12) {
+                    Textview(stringResource(R.string.op_emergency_confirm), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+                    CommonGradientButton(
+                        text = stringResource(R.string.common_cancel), modifier = Modifier.weight(1f), onClick = { confirmEmergency = false },
+                        gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
+                    )
+                    CommonGradientButton(
+                        text = stringResource(R.string.op_get_help_now), modifier = Modifier.weight(1f),
+                        onClick = {
+                            confirmEmergency = false
+                            onIntent(OperatorJobIntent.ReportEmergency)
+                        },
+                        gradientColors = listOf(Red, DarkRed), textColor = Color.White
+                    )
+                }
+            } else {
+                CommonGradientButton(
+                    text = stringResource(R.string.op_get_help_now), onClick = { confirmEmergency = true },
+                    gradientColors = listOf(Red, DarkRed), textColor = Color.White
+                )
+            }
             GlassCard(contentPadding = dimen_12) {
                 Textview(stringResource(R.string.op_when_to_use), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 listOf(R.string.op_use_1, R.string.op_use_2, R.string.op_use_3, R.string.op_use_4).forEach {

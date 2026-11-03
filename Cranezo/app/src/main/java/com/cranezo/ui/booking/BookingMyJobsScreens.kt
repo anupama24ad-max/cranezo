@@ -27,9 +27,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -197,21 +195,6 @@ fun JobDetailsScreen(
         "awaiting_confirmation" -> { ShareCodeScreen(vm, onBack); return }
     }
 
-    if (cancelOpen) {
-        AlertDialog(
-            onDismissRequest = { cancelOpen = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.cj_cancel_booking_title)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.cj_cancel_booking_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    cancelOpen = false
-                    vm?.onIntent(BookingIntent.CancelBooking)
-                }) { androidx.compose.material3.Text(stringResource(R.string.cj_cancel_booking)) }
-            },
-            dismissButton = { TextButton(onClick = { cancelOpen = false }) { androidx.compose.material3.Text(stringResource(R.string.common_back)) } }
-        )
-    }
-
     val completed = booking.stage == "completed"
     val closed = booking.stage == "closed"
     val actions = booking.actions
@@ -232,10 +215,24 @@ fun JobDetailsScreen(
                     else -> {
                         if (actions?.can_track == true) CommonGradientButton(text = stringResource(R.string.cj_view_live_tracking), onClick = onTrack)
                         if (actions?.can_cancel == true) {
-                            CommonGradientButton(
-                                text = stringResource(R.string.cj_cancel_booking), onClick = { cancelOpen = true },
-                                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
-                            )
+                            // asks once more right here (no popup)
+                            if (cancelOpen) {
+                                com.cranezo.ui.components.InlineConfirm(
+                                    message = stringResource(R.string.cj_cancel_booking_message),
+                                    confirmText = stringResource(R.string.cj_cancel_booking),
+                                    cancelText = stringResource(R.string.common_back),
+                                    onConfirm = {
+                                        cancelOpen = false
+                                        vm?.onIntent(BookingIntent.CancelBooking)
+                                    },
+                                    onCancel = { cancelOpen = false }
+                                )
+                            } else {
+                                CommonGradientButton(
+                                    text = stringResource(R.string.cj_cancel_booking), onClick = { cancelOpen = true },
+                                    gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
+                                )
+                            }
                         }
                     }
                 }

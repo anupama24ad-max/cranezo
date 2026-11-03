@@ -19,6 +19,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.ui.platform.LocalContext
+import com.cranezo.ui.finance.FinanceActivity
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Language
@@ -160,6 +163,7 @@ fun HomeProfileScreen(
     }
 
     val role = UserRole.fromId(profile?.role_id) ?: state.role
+    val context = LocalContext.current
     val name = profile?.full_name?.ifBlank { null } ?: state.userName
     val languageName = profile?.language?.name
 
@@ -233,6 +237,13 @@ fun HomeProfileScreen(
             DocumentsCard(profile?.operator?.documents.orEmpty(), onOpen)
 
             MenuGroup {
+                // find open jobs, job requests and the payments the owner made
+                MenuRow(
+                    icon = Icons.Default.AccountBalanceWallet,
+                    title = stringResource(R.string.fin_entry_operator),
+                    subtitle = stringResource(R.string.fin_find_jobs_sub),
+                    onClick = { context.startActivity(FinanceActivity.intent(context)) }
+                )
                 MenuRow(
                     icon = Icons.Default.Language,
                     title = stringResource(R.string.mp_language),
@@ -251,6 +262,14 @@ fun HomeProfileScreen(
         } else {
             GroupLabel(stringResource(R.string.mp_group_account))
             MenuGroup {
+                // owner: job requests, operator pay, settlement, GST and charges, complaints
+                // customer: payment history and complaints
+                MenuRow(
+                    icon = Icons.Default.AccountBalanceWallet,
+                    title = stringResource(if (role == UserRole.CRANE_OWNER) R.string.fin_entry_owner else R.string.fin_entry_customer),
+                    subtitle = stringResource(if (role == UserRole.CRANE_OWNER) R.string.fin_platform_sub else R.string.fin_complaints_customer_sub),
+                    onClick = { context.startActivity(FinanceActivity.intent(context)) }
+                )
                 MenuRow(
                     icon = Icons.Default.Person,
                     title = stringResource(R.string.mp_personal_info),

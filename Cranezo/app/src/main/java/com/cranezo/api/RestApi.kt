@@ -350,4 +350,9 @@ interface RestApi {
     @POST
     suspend fun customerHomeApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.customerhome.model.CustomerHome>>
 
+    // ---- Payments, commission, settlements, job requests, complaints: raw JSON, parsed per screen ----
+
+    @POST
+    suspend fun financeApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.google.gson.JsonElement>>
+
 }

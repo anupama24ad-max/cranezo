@@ -384,4 +384,8 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun customerHome(h: Map<String, String>) =
         safeApiCall(conflictAsError = true) { api.customerHomeApi("home/customer", h, json(JSONObject())) }
 
+    /** Payments, commission, settlements, job requests and complaints. [path] is relative, e.g. "owner/billing/settings". */
+    suspend fun financePost(path: String, h: Map<String, String>, body: JSONObject = JSONObject()) =
+        safeApiCall(conflictAsError = true) { api.financeApi(path, h, json(body)) }
+
 }

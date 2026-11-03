@@ -298,6 +298,20 @@ fun OwnerJobDetailsScreen(
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
                 )
             }
+            // full bill (GST, charges, platform fee) and what the operator earns on this job
+            if (operator != null && job.booking_id != null) {
+                Spacer(modifier = Modifier.height(dimen_8))
+                CommonGradientButton(
+                    text = stringResource(R.string.fin_edit_commission),
+                    onClick = {
+                        context.startActivity(
+                            com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMMISSION, job.booking_id)
+                        )
+                    },
+                    height = dimen_40, textSize = font_12,
+                    gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
+                )
+            }
         }
 
         if (job.tab == "active") MonitoringBlock(job, job.monitoring)

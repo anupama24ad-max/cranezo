@@ -52,9 +52,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Work
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -279,21 +277,6 @@ fun HelpSupportHomeScreen(
     var confirmEmergency by remember { mutableStateOf(false) }
     val home = state.home
 
-    if (confirmEmergency) {
-        AlertDialog(
-            onDismissRequest = { confirmEmergency = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.sp_call_emergency_title)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.sp_call_emergency_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmEmergency = false
-                    vm?.onIntent(SupportIntent.Emergency(null, ""))
-                }) { androidx.compose.material3.Text(stringResource(R.string.sp_yes_call)) }
-            },
-            dismissButton = { TextButton(onClick = { confirmEmergency = false }) { androidx.compose.material3.Text(stringResource(R.string.common_cancel)) } }
-        )
-    }
-
     BookingScaffold(onBack = onBack, title = stringResource(R.string.mp_help_support), subtitle = stringResource(R.string.sp_here_to_help)) {
         // Search opens the FAQ search
         GlassCard(contentPadding = dimen_12, onClick = onSearch) {
@@ -320,6 +303,18 @@ fun HelpSupportHomeScreen(
                     text = stringResource(if (e.available == true) R.string.sp_call_now else R.string.sp_raise_emergency),
                     onClick = { confirmEmergency = true }, height = dimen_40, textSize = font_12,
                     gradientColors = listOf(Red.copy(alpha = 0.25f), Red.copy(alpha = 0.25f)), textColor = Red
+                )
+            }
+            // asks once more right below the card (no popup)
+            if (confirmEmergency) {
+                com.cranezo.ui.components.InlineConfirm(
+                    message = stringResource(R.string.sp_call_emergency_message),
+                    confirmText = stringResource(R.string.sp_yes_call),
+                    onConfirm = {
+                        confirmEmergency = false
+                        vm?.onIntent(SupportIntent.Emergency(null, ""))
+                    },
+                    onCancel = { confirmEmergency = false }
                 )
             }
         }
@@ -675,21 +670,6 @@ fun ConversationScreen(
     val count = ticket?.messages?.size ?: 0
     LaunchedEffect(count) { if (count > 0) listState.animateScrollToItem(count - 1) }
 
-    if (confirmClose) {
-        AlertDialog(
-            onDismissRequest = { confirmClose = false },
-            title = { androidx.compose.material3.Text(stringResource(R.string.sp_close_title)) },
-            text = { androidx.compose.material3.Text(stringResource(R.string.sp_close_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmClose = false
-                    vm?.onIntent(SupportIntent.CloseTicket)
-                }) { androidx.compose.material3.Text(stringResource(R.string.sp_close_request)) }
-            },
-            dismissButton = { TextButton(onClick = { confirmClose = false }) { androidx.compose.material3.Text(stringResource(R.string.common_cancel)) } }
-        )
-    }
-
     ScreenBackground(darkImageRes = R.drawable.app_bg) {
         Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
             CraneScreenHeader(
@@ -708,6 +688,19 @@ fun ConversationScreen(
                     Spacer(modifier = Modifier.width(dimen_8))
                     Textview(ticket.category_label.orEmpty(), size = font_11, color = appColors.textSecondary)
                 }
+            }
+            // Close request asks once more under the header (no popup)
+            if (confirmClose) {
+                com.cranezo.ui.components.InlineConfirm(
+                    message = stringResource(R.string.sp_close_message),
+                    confirmText = stringResource(R.string.sp_close_request),
+                    modifier = Modifier.padding(horizontal = dimen_20, vertical = dimen_8),
+                    onConfirm = {
+                        confirmClose = false
+                        vm?.onIntent(SupportIntent.CloseTicket)
+                    },
+                    onCancel = { confirmClose = false }
+                )
             }
             LazyColumn(
                 state = listState,

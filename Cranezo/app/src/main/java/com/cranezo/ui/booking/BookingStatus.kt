@@ -280,7 +280,7 @@ fun BookingConfirmedScreen(
                 Spacer(modifier = Modifier.height(dimen_8))
                 PriceLine(stringResource(R.string.bk_advance_due, payment.advance_percent ?: 0), rupees(payment.advance_amount), valueColor = AmberPrimary)
                 PriceLine(stringResource(R.string.bk_remaining_amount), rupees(payment.remaining_amount))
-                PriceLine(stringResource(R.string.bk_total_amount), rupees(payment.total_amount))
+                PriceLine(stringResource(R.string.bk_total_amount), rupees(booking.price?.total_payable ?: payment.total_amount))
                 Textview(payment.method_name.orEmpty(), size = font_11, color = appColors.textSecondary)
             }
         }

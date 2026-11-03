@@ -97,6 +97,11 @@
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Cranezo" />
         <activity
+            android:name=".ui.finance.FinanceActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
             android:name=".ui.booking.BookingActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"

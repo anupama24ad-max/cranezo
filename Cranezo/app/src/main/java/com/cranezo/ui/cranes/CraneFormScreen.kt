@@ -39,11 +39,9 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -184,24 +182,8 @@ fun CraneFormScreen(
     var showOperatorSheet by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(operatorAddedSignal) { if (operatorAddedSignal > 0) showOperatorSheet = false }
 
-    // Editing a crane that goes back to review is confirmed first
+    // Editing a crane that goes back to review is confirmed first (inline, at the Save button)
     var showReverifyDialog by rememberSaveable { mutableStateOf(false) }
-    if (showReverifyDialog) {
-        AlertDialog(
-            onDismissRequest = { showReverifyDialog = false },
-            title = { Text(stringResource(R.string.crane_reverify_title)) },
-            text = { Text(stringResource(R.string.crane_reverify_message)) },
-            confirmButton = {
-                TextButton(onClick = {
-                    showReverifyDialog = false
-                    onIntent(CranesIntent.SaveEdit)
-                }) { Text(stringResource(R.string.crane_reverify_confirm)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showReverifyDialog = false }) { Text(stringResource(R.string.common_cancel)) }
-            }
-        )
-    }
 
     if (showOperatorSheet) {
         OperatorPickerSheet(
@@ -449,6 +431,19 @@ fun CraneFormScreen(
                     .padding(horizontal = dimen_16)
                     .padding(top = dimen_8, bottom = dimen_12)
             ) {
+                // Editing a crane that goes back to review asks once more, here on the page (no popup)
+                if (showReverifyDialog) {
+                    com.cranezo.ui.components.InlineConfirm(
+                        message = stringResource(R.string.crane_reverify_message),
+                        confirmText = stringResource(R.string.crane_reverify_confirm),
+                        danger = false,
+                        onConfirm = {
+                            showReverifyDialog = false
+                            onIntent(CranesIntent.SaveEdit)
+                        },
+                        onCancel = { showReverifyDialog = false }
+                    )
+                } else
                 // Not clickable while a file is still uploading or the request is running
                 CommonGradientButton(
                     text = stringResource(if (isEdit) R.string.crane_save_changes else R.string.crane_submit),

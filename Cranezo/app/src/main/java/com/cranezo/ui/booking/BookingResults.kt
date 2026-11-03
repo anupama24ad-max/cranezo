@@ -415,8 +415,12 @@ private fun PriceBreakdown(price: BookingPrice?) {
             valueColor = if (price.fuel_included == true) SuccessGreen else appColors.textPrimary
         )
         PriceLine(stringResource(R.string.bk_other_charges), rupees(price.other_charges))
+        // the crane owner's extra charges and GST, so the total below is what the customer really pays
+        price.breakdown.orEmpty()
+            .filter { it.key?.startsWith("charge_") == true || it.key == "gst" }
+            .forEach { PriceLine(it.label.orEmpty(), rupees(it.amount)) }
         Spacer(modifier = Modifier.height(dimen_6))
-        PriceLine(stringResource(R.string.bk_estimated_total), rupees(price.total_amount), bold = true)
+        PriceLine(stringResource(R.string.bk_estimated_total), rupees(price.total_payable ?: price.total_amount), bold = true)
     }
 }
 
@@ -537,7 +541,7 @@ fun PaymentScreen(
                 Spacer(modifier = Modifier.height(dimen_8))
                 PriceLine(stringResource(R.string.bk_advance_due, price.advance_percent ?: 0), rupees(price.advance_amount), valueColor = AmberPrimary)
                 PriceLine(stringResource(R.string.bk_remaining_amount), rupees(price.remaining_amount))
-                PriceLine(stringResource(R.string.bk_total_amount), rupees(price.total_amount))
+                PriceLine(stringResource(R.string.bk_total_amount), rupees(price.total_payable ?: price.total_amount))
                 Spacer(modifier = Modifier.height(dimen_6))
                 PriceLine(stringResource(R.string.bk_advance_due, price.advance_percent ?: 0), rupees(price.advance_amount), bold = true)
             }
