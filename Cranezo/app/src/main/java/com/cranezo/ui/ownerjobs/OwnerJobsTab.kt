@@ -162,7 +162,7 @@ fun OwnerJobsTab(
                         .padding(horizontal = dimen_12, vertical = dimen_6),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Textview(stringResource(label), size = font_11, color = if (selected) AmberPrimary else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal, maxLines = 1)
+                    Textview(stringResource(label), size = font_11, color = if (selected) appColors.primaryText else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal, maxLines = 1)
                     if (count != null) {
                         Spacer(modifier = Modifier.width(dimen_6))
                         Box(modifier = Modifier.size(dimen_16).clip(CircleShape).background(if (key == "new_requests" && count > 0) Red else AmberPrimary.copy(alpha = 0.4f)), contentAlignment = Alignment.Center) {
@@ -282,7 +282,7 @@ private fun OwnerJobCard(
                 "completed" -> formatServerDateTime(job.completed_at)
                 else -> ""
             }
-            Textview(hint, size = font_10, color = if (job.tab == "upcoming") AmberPrimary else appColors.textSecondary)
+            Textview(hint, size = font_10, color = if (job.tab == "upcoming") appColors.primaryText else appColors.textSecondary)
         }
         Spacer(modifier = Modifier.height(dimen_8))
 
@@ -333,20 +333,20 @@ private fun OwnerJobCard(
                         if (job.seconds_left != null) onExpired()
                     }
                     if (job.seconds_left != null) {
-                        Textview(stringResource(R.string.oj_time_left, "%02d:%02d".format(left / 60, left % 60)), size = font_10, color = AmberPrimary, modifier = Modifier.padding(bottom = dimen_6))
+                        Textview(stringResource(R.string.oj_time_left, "%02d:%02d".format(left / 60, left % 60)), size = font_10, color = appColors.primaryText, modifier = Modifier.padding(bottom = dimen_6))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                         CommonGradientButton(
-                            text = stringResource(R.string.bk_decline), modifier = Modifier.weight(1f), onClick = onDecline, height = dimen_36, textSize = font_12,
+                            text = stringResource(R.string.bk_decline), modifier = Modifier.weight(1f), onClick = onDecline, height = dimen_40, textSize = font_12,
                             gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
                         )
-                        CommonGradientButton(text = stringResource(R.string.bk_accept), modifier = Modifier.weight(1f), onClick = onAccept, height = dimen_36, textSize = font_12)
+                        CommonGradientButton(text = stringResource(R.string.bk_accept), modifier = Modifier.weight(1f), onClick = onAccept, height = dimen_40, textSize = font_12)
                     }
                 }
             }
             "active" -> {
                 CommonGradientButton(
-                    text = stringResource(R.string.oj_view_live_location), onClick = onLive, height = dimen_36, textSize = font_12,
+                    text = stringResource(R.string.oj_view_live_location), onClick = onLive, height = dimen_40, textSize = font_12,
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
                 )
                 Spacer(modifier = Modifier.height(dimen_8))
@@ -360,7 +360,7 @@ private fun OwnerJobCard(
 @Composable
 private fun ViewDetails(onClick: () -> Unit) {
     CommonGradientButton(
-        text = stringResource(R.string.oj_view_details), onClick = onClick, height = dimen_36, textSize = font_12,
+        text = stringResource(R.string.oj_view_details), onClick = onClick, height = dimen_40, textSize = font_12,
         gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
     )
 }

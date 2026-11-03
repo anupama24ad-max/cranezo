@@ -114,7 +114,7 @@ fun CustomerHomeScreen(
                     gradientColors = listOf(LightYellow, DarkYellow),
                     textColor = Color.Black,
                     textSize = font_14,
-                    height = dimen_36,
+                    height = dimen_40,
                     rightIcon = Icons.AutoMirrored.Filled.ArrowForward,
                     iconSize = dimen_16,
                     onClick = { onNavigate(Dest.BookCrane.route) }

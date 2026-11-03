@@ -242,7 +242,7 @@ fun CustomBottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = dimen_16, vertical = dimen_8)
+            .padding(horizontal = dimen_20, vertical = dimen_12)
     ) {
         // Glass is a separate layer so the raised center button can overflow the bar
         Box(

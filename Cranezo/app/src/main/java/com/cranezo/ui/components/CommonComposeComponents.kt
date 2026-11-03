@@ -2364,15 +2364,12 @@ fun Modifier.glassEffect(
     // Tiles nested in a card shine softer than the card itself, so the card stays the brighter level
     val shinePeak = colors.glassBorderTop.let { it.copy(alpha = it.alpha * if (inset) 0.5f else 1f) }
     val shine = remember(shinePeak) { shineBrush(shinePeak) }
-    val borderBrush = when {
-        borderColor.isSpecified -> SolidColor(borderColor)
-        colors.isDark -> shine
-        else -> Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
-    }
+    val borderBrush = if (borderColor.isSpecified) SolidColor(borderColor)
+    else Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
 
     this
         .then(
-            if (colors.isDark) Modifier else Modifier.shadow(
+            if (colors.isDark && colors.glassShadow == Color.Transparent) Modifier else Modifier.shadow(
                 elevation = dimen_8,
                 shape = shape,
                 clip = false,
@@ -2443,7 +2440,7 @@ fun GlassBox(
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(dimen_20),
+    shape: Shape = RoundedCornerShape(dimen_16),
     contentPadding: Dp = dimen_16,
     backgroundColor: Color = Color.Unspecified,
     borderColor: Color = Color.Unspecified,
@@ -2480,50 +2477,69 @@ fun ScreenBackground(
     content: @Composable BoxScope.() -> Unit
 ) {
     val colors = appColors
-    val imageRes = if (colors.isDark) darkImageRes else (lightImageRes ?: darkImageRes)
+
+    // One fixed background for every screen: blue glow top-right, dark centre, amber glow bottom-left.
+    // The image parameters are kept so callers still compile; the background is always drawn from tokens.
+    // Hero screens (language, onboarding, login, role) keep their full-bleed photo from the design;
+    // every other screen uses the glow background below
+    val heroRes = if (colors.isDark) darkImageRes else (lightImageRes ?: darkImageRes)
+    val useImage = heroRes != null && heroRes != R.drawable.app_bg
 
     Box(modifier = modifier.fillMaxSize()) {
-        if (imageRes != null) {
+        if (useImage && heroRes != null) {
             Image(
-                painter = painterResource(id = imageRes),
+                painter = painterResource(id = heroRes),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            val scrim = when {
-                colors.isDark -> Brush.verticalGradient(
-                    listOf(Black.copy(alpha = 0.60f), Transparent, Transparent)
-                )
-
-                lightImageRes == null -> Brush.verticalGradient(
-                    listOf(
-                        colors.imageVeil.copy(alpha = 0.92f),
-                        colors.imageVeil.copy(alpha = 0.60f),
-                        colors.imageVeil.copy(alpha = 0.82f)
-                    )
-                )
-
-                else -> null
-            }
-            if (scrim != null) {
-                Box(modifier = Modifier.fillMaxSize().background(scrim))
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Brush.verticalGradient(listOf(colors.screenTop, colors.screenBottom)))
-                    .drawBehind {
+            val scrim = if (colors.isDark) Brush.verticalGradient(listOf(Black.copy(alpha = 0.60f), Transparent, Transparent))
+            else Brush.verticalGradient(
+                listOf(colors.imageVeil.copy(alpha = 0.92f), colors.imageVeil.copy(alpha = 0.60f), colors.imageVeil.copy(alpha = 0.82f))
+            )
+            Box(modifier = Modifier.fillMaxSize().background(scrim))
+        }
+        if (!useImage) Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.bgBase)
+                .drawBehind {
+                    // Centre darkness (dark mode only): the middle of the screen feels black
+                    if (colors.isDark) {
                         drawRect(
                             brush = Brush.radialGradient(
-                                colors = listOf(colors.screenGlow, Color.Transparent),
-                                center = Offset(0f, size.height),
-                                radius = size.maxDimension * 0.6f
+                                colors = listOf(colors.bgCenter, colors.bgBase, colors.bgEdge),
+                                center = Offset(size.width / 2f, size.height / 2f),
+                                radius = size.maxDimension * 0.75f
                             )
                         )
                     }
-            )
-        }
+                    // Top-right blue glow, centred slightly outside the screen
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colorStops = arrayOf(
+                                0f to colors.glowBlue.copy(alpha = colors.glowBlueAlpha),
+                                0.5f to colors.glowBlue.copy(alpha = colors.glowBlueAlpha * 0.35f),
+                                1f to colors.glowBlue.copy(alpha = 0f)
+                            ),
+                            center = Offset(size.width * 1.05f, -size.height * 0.05f),
+                            radius = size.width * 0.9f
+                        )
+                    )
+                    // Bottom-left amber glow, a little weaker so text on cards stays readable
+                    drawRect(
+                        brush = Brush.radialGradient(
+                            colorStops = arrayOf(
+                                0f to colors.glowAmber.copy(alpha = colors.glowAmberAlpha),
+                                0.5f to colors.glowAmber.copy(alpha = colors.glowAmberAlpha * 0.33f),
+                                1f to colors.glowAmber.copy(alpha = 0f)
+                            ),
+                            center = Offset(-size.width * 0.05f, size.height * 1.05f),
+                            radius = size.width * 0.85f
+                        )
+                    )
+                }
+        )
         content()
     }
 }
@@ -2654,7 +2670,7 @@ fun CommonGradientButton(
     textColor: Color = Black,
     textSize: TextUnit = font_16,
     fontWeight: FontWeight = FontWeight.Bold,
-    height: Dp = dimen_42,
+    height: Dp = dimen_52,
     shape: Shape = RoundedCornerShape(dimen_34),
     leftImage: Int? = null,
     leftIcon: ImageVector? = null,

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -89,7 +90,7 @@ fun TopBannerHost(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         AnimatedVisibility(
@@ -122,8 +123,9 @@ fun TopBannerHost(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(10.dp, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+                        .heightIn(min = 52.dp)
+                        .shadow(10.dp, androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                         .background(visuals.bg)
                         .padding(horizontal = 14.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically

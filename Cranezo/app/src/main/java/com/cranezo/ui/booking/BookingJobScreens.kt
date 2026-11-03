@@ -320,7 +320,7 @@ fun JobInProgressScreen(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Textview(stringResource(R.string.cj_elapsed_time).uppercase(), size = font_8, color = appColors.textSecondary)
-                    Textview(formatClock(working), size = font_22, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                    Textview(formatClock(working), size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     if (paused) Textview(stringResource(R.string.cj_paused), size = font_10, color = appColors.textSecondary)
                 }
             }
@@ -337,7 +337,7 @@ fun JobInProgressScreen(
             )
             Textview(stringResource(R.string.cj_percent_used, (usage?.percent_used ?: 0.0).toInt()), size = font_10, color = appColors.textSecondary)
             if (usage?.overtime_warning == true) {
-                Textview(stringResource(R.string.cj_overtime_approaching), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                Textview(stringResource(R.string.cj_overtime_approaching), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
         }
 
@@ -367,7 +367,7 @@ fun JobInProgressScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     Textview(stringResource(R.string.cj_current_estimate).uppercase(), size = font_8, color = appColors.textSecondary)
-                    Textview(rupees(usage?.current_estimate?.amount), size = font_22, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                    Textview(rupees(usage?.current_estimate?.amount), size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     Textview(stringResource(R.string.bk_per_hour, rupees(usage?.current_estimate?.hourly_rate)), size = font_10, color = appColors.textSecondary)
                 }
             }
@@ -434,7 +434,7 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
                 progress = { ((usage?.percent_used ?: 0.0) / 100.0).toFloat().coerceIn(0f, 1f) },
                 modifier = Modifier.fillMaxWidth().height(dimen_6).clip(CircleShape), color = AmberPrimary, trackColor = appColors.subtleFill
             )
-            if (usage?.overtime_warning == true) Textview(stringResource(R.string.cj_overtime_approaching), size = font_10, color = AmberPrimary)
+            if (usage?.overtime_warning == true) Textview(stringResource(R.string.cj_overtime_approaching), size = font_10, color = appColors.primaryText)
         }
 
         GlassCard(contentPadding = dimen_14) {
@@ -458,7 +458,7 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
                             .background(if (selected) AmberPrimary.copy(alpha = 0.2f) else appColors.subtleFill)
                             .clickable { minutes = option }.padding(vertical = dimen_8),
                         contentAlignment = Alignment.Center
-                    ) { Textview(minutesChip(option), size = font_11, color = if (selected) AmberPrimary else appColors.textPrimary, maxLines = 1) }
+                    ) { Textview(minutesChip(option), size = font_11, color = if (selected) appColors.primaryText else appColors.textPrimary, maxLines = 1) }
                 }
             }
         }
@@ -470,7 +470,7 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
                     Textview(stringResource(R.string.cj_estimated_additional), size = font_11, color = appColors.textSecondary)
                     Textview(stringResource(R.string.bk_per_hour, rupees(ext?.hourly_rate)), size = font_10, color = appColors.textHint)
                 }
-                Textview(rupees((ext?.hourly_rate ?: 0.0) * minutes / 60.0), size = font_20, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                Textview(rupees((ext?.hourly_rate ?: 0.0) * minutes / 60.0), size = font_20, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             }
         }
         GlassInputField(
@@ -566,14 +566,14 @@ fun ExtraTimeStatusScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {})
                     }
                     Column(horizontalAlignment = Alignment.End) {
                         Textview(stringResource(R.string.cj_estimated_cost).uppercase(), size = font_8, color = appColors.textSecondary)
-                        Textview(rupees(request.amount), size = font_16, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                        Textview(rupees(request.amount), size = font_16, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     }
                 }
                 if (pending != null) {
                     Spacer(modifier = Modifier.height(dimen_8))
                     Textview(
                         stringResource(R.string.cj_awaiting_operator, "%02d:%02d".format(secondsLeft / 60, secondsLeft % 60)),
-                        size = font_12, color = AmberPrimary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
+                        size = font_12, color = appColors.primaryText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center
                     )
                 }
                 if (!request.reject_reason.isNullOrBlank()) Textview(request.reject_reason, size = font_11, color = appColors.textSecondary)
@@ -608,7 +608,7 @@ fun ShareCodeScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                 Textview(stringResource(R.string.cj_share_code_text), size = font_13, color = appColors.textSecondary, textAlign = TextAlign.Center)
                 Spacer(modifier = Modifier.height(dimen_12))
                 // Only while the confirmation is awaited: the server sends null in every other state
-                Textview(code?.chunked(3)?.joinToString(" ") ?: "- - -", size = font_32, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                Textview(code?.chunked(3)?.joinToString(" ") ?: "- - -", size = font_32, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                 if (booking.job?.completion_otp_expires_at != null) {
                     Spacer(modifier = Modifier.height(dimen_6))
                     Textview(stringResource(R.string.cj_valid_until, formatServerTime(booking.job.completion_otp_expires_at)), size = font_11, color = appColors.textHint)
@@ -738,7 +738,7 @@ fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                     Textview(stringResource(R.string.cj_balance_due).uppercase(), size = font_8, color = appColors.textSecondary)
                     Textview(stringResource(R.string.cj_to_be_settled), size = font_10, color = appColors.textHint)
                 }
-                Textview(balance, size = font_22, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                Textview(balance, size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             }
         }
         Textview(stringResource(R.string.bk_select_payment_method), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)

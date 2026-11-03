@@ -132,7 +132,7 @@ fun OperatorHomeTab(
             GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary, onClick = { onOpenJob(id) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Textview(stringResource(R.string.op_resume_job), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.op_resume_job), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                         Textview(home.active_job.booking_code.orEmpty(), size = font_11, color = appColors.textSecondary)
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary)
@@ -158,7 +158,7 @@ fun OperatorHomeTab(
                 CommonGradientButton(
                     text = stringResource(if (home?.online == true) R.string.op_go_offline else R.string.op_go_online),
                     onClick = { vm?.onIntent(OperatorTabsIntent.ToggleOnline) },
-                    height = dimen_36,
+                    height = dimen_40,
                     textSize = font_12,
                     modifier = Modifier.width(dimen_120),
                     gradientColors = if (home?.online == true) listOf(appColors.subtleFill, appColors.subtleFill) else listOf(SuccessGreen, SuccessGreen),
@@ -238,7 +238,7 @@ fun OperatorHomeTab(
                     Textview(stringResource(R.string.op_todays_earnings), size = font_12, color = appColors.textSecondary)
                     Textview(rupees(home?.today_earnings ?: 0.0), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 }
-                Textview(stringResource(R.string.op_view_earnings), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                Textview(stringResource(R.string.op_view_earnings), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
         }
 
@@ -259,7 +259,7 @@ fun OperatorHomeTab(
                         )
                     }
                 }
-                Textview(stringResource(R.string.op_view_documents), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                Textview(stringResource(R.string.op_view_documents), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
@@ -355,7 +355,7 @@ fun OperatorJobsTab(
                 CommonGradientButton(
                     text = stringResource(R.string.op_view_job),
                     onClick = { job.booking_id?.let(onOpenJob) },
-                    height = dimen_34,
+                    height = dimen_40,
                     textSize = font_12,
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill),
                     textColor = AmberPrimary

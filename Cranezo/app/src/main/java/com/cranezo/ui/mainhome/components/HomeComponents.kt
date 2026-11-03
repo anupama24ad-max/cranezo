@@ -315,7 +315,7 @@ fun GlassTextButton(
             .padding(horizontal = dimen_14, vertical = dimen_6),
         contentAlignment = Alignment.Center
     ) {
-        Textview(text = text, size = font_12, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+        Textview(text = text, size = font_12, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
     }
 }
 

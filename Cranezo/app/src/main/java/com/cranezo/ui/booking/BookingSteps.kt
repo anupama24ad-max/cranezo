@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -76,6 +77,7 @@ import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.GlassDateField
 import com.cranezo.ui.components.GlassFieldBox
 import com.cranezo.ui.components.GlassInputField
+import com.cranezo.ui.components.SearchInput
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.components.glassEffect
 import com.cranezo.ui.cranes.components.CraneImage
@@ -217,23 +219,29 @@ fun CraneTypeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext:
                     SelectableCard(
                         selected = selected,
                         onClick = { type.id?.let { vm?.onIntent(BookingIntent.SelectCraneType(it)) } },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f).aspectRatio(1.25f)
                     ) {
-                        Column {
-                            CraneImage(
-                                path = type.image,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(dimen_100),
-                                shape = RoundedCornerShape(topStart = dimen_16, topEnd = dimen_16)
-                            )
+                        // The picture fills the card; the name sits in a dark strip along the bottom
+                        CraneImage(
+                            path = type.image,
+                            modifier = Modifier.matchParentSize(),
+                            shape = RoundedCornerShape(dimen_16)
+                        )
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .fillMaxWidth()
+                                .height(dimen_36)
+                                .background(Color.Black.copy(alpha = 0.45f))
+                                .padding(horizontal = dimen_10),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
                             Textview(
                                 text = type.name.orEmpty(),
                                 size = font_13,
-                                color = appColors.textPrimary,
+                                color = Color.White,
                                 fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                modifier = Modifier.padding(dimen_10)
+                                maxLines = 1
                             )
                         }
                         if (selected) SelectedCheck(Modifier.align(Alignment.TopEnd).padding(dimen_8))
@@ -327,26 +335,12 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
     ) {
         StepTitle(R.string.bk_location_title, R.string.bk_location_subtitle)
 
-        GlassInputField(
-            label = stringResource(R.string.bk_search_location),
+        SearchInput(
             value = query,
             onValueChange = { query = it },
             placeholder = stringResource(R.string.bk_search_location),
-            leftIcon = Icons.Default.Search,
-            rightContent = {
-                if (state.isLocating) {
-                    CircularProgressIndicator(color = AmberPrimary, strokeWidth = dimen_2, modifier = Modifier.size(dimen_18))
-                } else {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = null,
-                        tint = AmberPrimary,
-                        modifier = Modifier
-                            .size(dimen_22)
-                            .clickable { vm?.onIntent(BookingIntent.SearchAddress(query)) }
-                    )
-                }
-            }
+            isLoading = state.isLocating,
+            onSearch = { vm?.onIntent(BookingIntent.SearchAddress(it)) }
         )
 
         GlassCard(

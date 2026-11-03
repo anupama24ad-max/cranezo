@@ -114,7 +114,7 @@ fun MyJobsScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                         .padding(horizontal = dimen_12, vertical = dimen_6),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Textview(stringResource(label), size = font_11, color = if (selected) AmberPrimary else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
+                    Textview(stringResource(label), size = font_11, color = if (selected) appColors.primaryText else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
                     if (count != null) {
                         Spacer(modifier = Modifier.width(dimen_6))
                         Textview(count.toString(), size = font_10, color = appColors.textSecondary)
@@ -144,7 +144,7 @@ fun MyJobsScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_12))
                             Textview(formatServerDate(job.start_at), size = font_11, color = appColors.textSecondary, modifier = Modifier.weight(1f))
-                            Textview(rupees(job.amount), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                            Textview(rupees(job.amount), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                         }
                         if (job.status_label == "Awaiting Owner" && job.tab == "upcoming") BookingTag(job.status_label.orEmpty(), InfoBlue)
                         if (job.can_rate == true) BookingTag(stringResource(R.string.cj_rate), AmberPrimary)
@@ -323,7 +323,7 @@ fun JobDetailsScreen(
                 }
             }
             if (actions?.can_rate == true) {
-                Textview(stringResource(R.string.cj_rate_from_jobs), size = font_11, color = AmberPrimary)
+                Textview(stringResource(R.string.cj_rate_from_jobs), size = font_11, color = appColors.primaryText)
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
@@ -398,7 +398,7 @@ fun TrackMyCranesScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
 
     BookingScaffold(onBack = onBack, title = stringResource(R.string.cj_track_cranes), subtitle = stringResource(R.string.cj_track_sub)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Textview(stringResource(R.string.cj_n_active_cranes, state.activeTracks.size), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Textview(stringResource(R.string.cj_n_active_cranes, state.activeTracks.size), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             BookingTag(stringResource(R.string.cj_realtime_sync), appColors.textSecondary)
         }
         if (state.activeLoaded && state.activeTracks.isEmpty()) {
@@ -430,14 +430,14 @@ fun TrackMyCranesScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                     }
                     Column(modifier = Modifier.weight(1f).clip(RoundedCornerShape(dimen_10)).background(appColors.subtleFill).padding(dimen_8)) {
                         Textview(stringResource(R.string.bk_eta).uppercase(), size = font_8, color = appColors.textSecondary)
-                        Textview(if (t.eta_minutes != null) stringResource(R.string.bk_eta_min, t.eta_minutes) else "–", size = font_13, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                        Textview(if (t.eta_minutes != null) stringResource(R.string.bk_eta_min, t.eta_minutes) else "–", size = font_13, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     }
                 }
                 Spacer(modifier = Modifier.height(dimen_8))
                 CommonGradientButton(
                     text = stringResource(R.string.cj_view_live_tracking),
                     onClick = { t.booking_id?.let { vm?.onIntent(BookingIntent.OpenBooking(it)) } },
-                    height = dimen_36, textSize = font_12
+                    height = dimen_40, textSize = font_12
                 )
             }
         }

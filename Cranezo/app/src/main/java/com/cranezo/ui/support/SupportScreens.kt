@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,6 +81,7 @@ import com.cranezo.ui.booking.components.BookingTag
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.GlassInputField
+import com.cranezo.ui.components.SearchInput
 import com.cranezo.ui.components.ScreenBackground
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.cranes.components.CraneScreenHeader
@@ -176,7 +178,7 @@ fun NotificationsScreen(vm: SupportViewModel? = null, onBack: () -> Unit = {}) {
         action = {
             if ((state.summary?.unread ?: 0) > 0) {
                 Textview(
-                    stringResource(R.string.sp_mark_all_read), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                    stringResource(R.string.sp_mark_all_read), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable { vm?.onIntent(SupportIntent.MarkAllRead) }
                 )
             }
@@ -316,7 +318,7 @@ fun HelpSupportHomeScreen(
                 // Without a number the team can still be alerted, but there is nothing to call
                 CommonGradientButton(
                     text = stringResource(if (e.available == true) R.string.sp_call_now else R.string.sp_raise_emergency),
-                    onClick = { confirmEmergency = true }, height = dimen_34, textSize = font_12,
+                    onClick = { confirmEmergency = true }, height = dimen_40, textSize = font_12,
                     gradientColors = listOf(Red.copy(alpha = 0.25f), Red.copy(alpha = 0.25f)), textColor = Red
                 )
             }
@@ -324,9 +326,9 @@ fun HelpSupportHomeScreen(
 
         // The tiles are drawn as the server sent them: 6 for customers and owners, 4 for operators
         home?.tiles.orEmpty().chunked(2).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+            Row(modifier = Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                 row.forEach { tile ->
-                    GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_12, onClick = {
+                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight(), contentPadding = dimen_12, onClick = {
                         if (tile.action == "call") {
                             if (home?.call_support?.available == true && !home.call_support.phone.isNullOrBlank()) dialNumber(context, home.call_support.phone)
                             else Toast.makeText(context, R.string.sp_phone_unavailable, Toast.LENGTH_LONG).show()
@@ -406,10 +408,7 @@ fun FaqScreen(
         title = title.ifBlank { stringResource(R.string.sp_faqs) },
         bottom = { CommonGradientButton(text = stringResource(R.string.sp_still_need_help), onClick = onContact) }
     ) {
-        GlassInputField(
-            label = "", value = query, onValueChange = { query = it }, placeholder = stringResource(R.string.sp_search_help),
-            leftIcon = Icons.Default.Search
-        )
+        SearchInput(value = query, onValueChange = { query = it }, placeholder = stringResource(R.string.sp_search_help))
         if (category == null && state.faqCategories.isNotEmpty()) {
             @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
             androidx.compose.foundation.layout.FlowRow(horizontalArrangement = Arrangement.spacedBy(dimen_8), verticalArrangement = Arrangement.spacedBy(dimen_8)) {
@@ -420,7 +419,7 @@ fun FaqScreen(
                         modifier = Modifier.clip(RoundedCornerShape(dimen_14))
                             .background(if (isSelected) AmberPrimary.copy(alpha = 0.2f) else appColors.subtleFill)
                             .clickable { selected = code }.padding(horizontal = dimen_10, vertical = dimen_6)
-                    ) { Textview(label, size = font_11, color = if (isSelected) AmberPrimary else appColors.textPrimary) }
+                    ) { Textview(label, size = font_11, color = if (isSelected) appColors.primaryText else appColors.textPrimary) }
                 }
             }
         }
@@ -510,7 +509,7 @@ fun CreateTicketScreen(
                 IconBadge(icon = Icons.Default.CheckCircle, accent = SuccessGreen, size = dimen_56, filled = true)
                 Spacer(modifier = Modifier.height(dimen_10))
                 Textview(stringResource(R.string.sp_request_sent), size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                Textview(created.ticket_code.orEmpty(), size = font_14, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                Textview(created.ticket_code.orEmpty(), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
             return@BookingScaffold
         }
@@ -572,7 +571,7 @@ fun TicketsScreen(vm: SupportViewModel? = null, onBack: () -> Unit = {}, onOpen:
                 Box(
                     modifier = Modifier.clip(RoundedCornerShape(dimen_14)).background(if (selected) AmberPrimary.copy(alpha = 0.2f) else appColors.subtleFill)
                         .clickable { vm?.onIntent(SupportIntent.LoadTickets(key)) }.padding(horizontal = dimen_14, vertical = dimen_6)
-                ) { Textview(stringResource(label), size = font_12, color = if (selected) AmberPrimary else appColors.textPrimary) }
+                ) { Textview(stringResource(label), size = font_12, color = if (selected) appColors.primaryText else appColors.textPrimary) }
             }
         }
         if (state.ticketsLoaded && state.tickets.isEmpty()) {
@@ -623,7 +622,7 @@ private fun MessageBubble(m: TicketMessage) {
                         .background(if (mine) AmberPrimary.copy(alpha = 0.85f) else appColors.subtleFill)
                         .padding(dimen_10)
                 ) {
-                    if (!mine) Textview(m.sender_label.orEmpty(), size = font_10, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                    if (!mine) Textview(m.sender_label.orEmpty(), size = font_10, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
                     if (!m.body.isNullOrBlank()) Textview(m.body, size = font_13, color = if (mine) Color.Black else appColors.textPrimary)
                     m.attachments.orEmpty().forEach { path ->
                         AsyncImage(

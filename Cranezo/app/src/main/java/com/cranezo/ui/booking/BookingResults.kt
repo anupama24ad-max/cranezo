@@ -215,13 +215,13 @@ private fun AvailableCraneCard(crane: AvailableCrane, onSelect: () -> Unit) {
         Spacer(modifier = Modifier.height(dimen_10))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.Bottom) {
-                Textview(rupees(crane.hourly_rate), size = font_18, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                Textview(rupees(crane.hourly_rate), size = font_18, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                 Textview(stringResource(R.string.bk_per_hour_short), size = font_11, color = appColors.textSecondary)
             }
             CommonGradientButton(
                 text = stringResource(R.string.bk_select_crane),
                 onClick = onSelect,
-                height = dimen_34,
+                height = dimen_40,
                 textSize = font_12,
                 modifier = Modifier.width(dimen_120)
             )
@@ -295,7 +295,7 @@ fun BookableCraneScreen(
                 Textview(crane.title.orEmpty(), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 RatingRow(crane.rating, crane.reviews_count)
             }
-            Textview(rupees(crane.hourly_rate), size = font_18, color = AmberPrimary, fontWeight = FontWeight.Bold)
+            Textview(rupees(crane.hourly_rate), size = font_18, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.bk_per_hour_short), size = font_11, color = appColors.textSecondary)
         }
 

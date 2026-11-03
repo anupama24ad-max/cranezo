@@ -163,7 +163,7 @@ fun OperatorDocumentsScreen(
                         )
                     }
                     if (busy) {
-                        Textview(text = stringResource(R.string.mp_uploading), size = font_11, color = AmberPrimary)
+                        Textview(text = stringResource(R.string.mp_uploading), size = font_11, color = appColors.primaryText)
                     } else if (doc.key == "operator_license") {
                         CraneSmallButton(
                             text = stringResource(R.string.mp_replace_front),

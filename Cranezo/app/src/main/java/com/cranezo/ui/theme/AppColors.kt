@@ -7,9 +7,9 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
- * Semantic colors that change between light and dark mode.
+ * The colour tokens of the app, one value per theme. This file is the only place for colour values:
+ * screens and components read them with `appColors` and never contain a colour of their own.
  *
- * Read them inside any composable with `appColors`:
  * ```
  * Textview(text = "Hello", color = appColors.textPrimary)
  * ```
@@ -18,10 +18,22 @@ import androidx.compose.ui.graphics.Color
 @Immutable
 data class AppColors(
     val isDark: Boolean,
+    // Signature background: base, dark centre, edge, and the two corner glows
+    val bgBase: Color,
+    val bgCenter: Color,
+    val bgEdge: Color,
+    val glowBlue: Color,
+    val glowBlueAlpha: Float,
+    val glowAmber: Color,
+    val glowAmberAlpha: Float,
     // Text
     val textPrimary: Color,
     val textSecondary: Color,
     val textHint: Color,
+    // Amber used as text: darker in light mode so it is readable on white
+    val primaryText: Color,
+    // Fill of selected states
+    val primaryTint: Color,
     // Glass surfaces (see Modifier.glassEffect)
     val glassTop: Color,
     val glassBottom: Color,
@@ -44,20 +56,29 @@ data class AppColors(
 
 val DarkAppColors = AppColors(
     isDark = true,
-    textPrimary = White,
-    textSecondary = Grey,
-    textHint = DarkSlate,
-    // Nearly transparent: the screen background shows through, like real glass
-    glassTop = White.copy(alpha = 0.07f),
-    glassBottom = White.copy(alpha = 0.02f),
-    glassSheen = White.copy(alpha = 0.05f),
-    // Strongest point of the shine on the edge (see Modifier.glassEffect)
-    glassBorderTop = White.copy(alpha = 0.30f),
-    glassBorderBottom = White.copy(alpha = 0.02f),
+    bgBase = Color(0xFF040810),
+    bgCenter = Color(0xFF02050C),
+    bgEdge = Color(0xFF050A15),
+    glowBlue = Color(0xFF2563EB),
+    glowBlueAlpha = 0.38f,
+    glowAmber = Color(0xFFF59E0B),
+    glowAmberAlpha = 0.30f,
+    textPrimary = Color(0xFFFFFFFF),
+    textSecondary = Color(0xFF94A3B8),
+    textHint = Color(0xFF64748B),
+    primaryText = Color(0xFFF59E0B),
+    primaryTint = Color(0xFFF59E0B).copy(alpha = 0.12f),
+    // card.fill: translucent glass, so the corner glows show through
+    glassTop = Color(0xFF0A1226).copy(alpha = 0.55f),
+    glassBottom = Color(0xFF0A1226).copy(alpha = 0.55f),
+    glassSheen = Color(0xFFFFFFFF).copy(alpha = 0.04f),
+    // card.borderTop (top-lit edge) to card.border
+    glassBorderTop = Color(0xFFFFFFFF).copy(alpha = 0.18f),
+    glassBorderBottom = Color(0xFFFFFFFF).copy(alpha = 0.10f),
     glassShadow = Color.Transparent,
-    glassInset = Color.Black.copy(alpha = 0.30f),
-    subtleFill = White.copy(alpha = 0.08f),
-    subtleBorder = White.copy(alpha = 0.12f),
+    glassInset = Color(0xFFFFFFFF).copy(alpha = 0.04f),
+    subtleFill = Color(0xFFFFFFFF).copy(alpha = 0.06f),
+    subtleBorder = Color(0xFF1A2A47),
     imageVeil = Color.Transparent,
     screenTop = Color(0xFF0B1F3F),
     screenBottom = Color(0xFF050810),
@@ -66,19 +87,29 @@ val DarkAppColors = AppColors(
 
 val LightAppColors = AppColors(
     isDark = false,
+    bgBase = Color(0xFFF6F7FB),
+    bgCenter = Color(0xFFF6F7FB),
+    bgEdge = Color(0xFFF6F7FB),
+    glowBlue = Color(0xFF2563EB),
+    glowBlueAlpha = 0.10f,
+    glowAmber = Color(0xFFF59E0B),
+    glowAmberAlpha = 0.16f,
     textPrimary = Color(0xFF0F172A),
-    textSecondary = Color(0xFF475569),
+    textSecondary = Color(0xFF64748B),
     textHint = Color(0xFF94A3B8),
-    glassTop = White.copy(alpha = 0.88f),
-    glassBottom = White.copy(alpha = 0.60f),
-    glassSheen = White.copy(alpha = 0.70f),
-    glassBorderTop = White,
-    glassBorderBottom = Color(0xFFCBD5E1).copy(alpha = 0.70f),
-    glassShadow = Color(0xFF1E3A5F).copy(alpha = 0.25f),
+    primaryText = Color(0xFFB45309),
+    primaryTint = Color(0xFFF59E0B).copy(alpha = 0.14f),
+    // card.fill: frosted white, the soft yellow glow shows faintly through
+    glassTop = Color(0xFFFFFFFF).copy(alpha = 0.78f),
+    glassBottom = Color(0xFFFFFFFF).copy(alpha = 0.78f),
+    glassSheen = Color(0xFFFFFFFF),
+    glassBorderTop = Color(0xFFFFFFFF).copy(alpha = 0.90f),
+    glassBorderBottom = Color(0xFF0F172A).copy(alpha = 0.08f),
+    glassShadow = Color(0xFF0F172A).copy(alpha = 0.08f),
     glassInset = Color(0xFF0F172A).copy(alpha = 0.04f),
-    subtleFill = Color(0xFF0F172A).copy(alpha = 0.05f),
-    subtleBorder = Color(0xFF0F172A).copy(alpha = 0.10f),
-    imageVeil = White,
+    subtleFill = Color(0xFFF1F4F9),
+    subtleBorder = Color(0xFFCBD5E1),
+    imageVeil = Color(0xFFFFFFFF),
     screenTop = Color(0xFFEAF1FB),
     screenBottom = Color(0xFFF9FBFE),
     screenGlow = Color(0x33FFA000)

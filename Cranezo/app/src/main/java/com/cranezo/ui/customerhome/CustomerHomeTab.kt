@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -162,9 +164,9 @@ fun CustomerHomeTab(
         val quick = home?.quick_access.orEmpty()
         if (quick.isNotEmpty()) {
             Textview(stringResource(R.string.home_quick_access), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
+            Row(modifier = Modifier.height(androidx.compose.foundation.layout.IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                 quick.forEach { item ->
-                    GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_12, onClick = { openScreen(context, item.screen, onProfile) }) {
+                    GlassCard(modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = dimen_112), contentPadding = dimen_14, onClick = { openScreen(context, item.screen, onProfile) }) {
                         Box {
                             IconBadge(icon = quickIcon(item.icon), accent = if (item.icon == "jobs") InfoBlue else AmberPrimary, size = dimen_36)
                             if ((item.badge ?: 0) > 0) {
@@ -185,7 +187,7 @@ fun CustomerHomeTab(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Textview(stringResource(R.string.home_recent_booking), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             Textview(
-                stringResource(R.string.common_view_all), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                stringResource(R.string.common_view_all), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.clickable { openScreen(context, "my_jobs", onProfile) }
             )
         }
@@ -268,7 +270,7 @@ private fun BannerCarousel(banners: List<HomeBanner>, onAction: (BannerAction?) 
                         Textview(banner.title, size = font_24, color = Color.White, fontWeight = FontWeight.Bold)
                         if (!banner.subtitle.isNullOrBlank()) Textview(banner.subtitle, size = font_11, color = Color.White.copy(alpha = 0.85f))
                         if (!banner.button_text.isNullOrBlank()) {
-                            CommonGradientButton(text = banner.button_text, onClick = { onAction(banner.action) }, height = dimen_34, textSize = font_12, modifier = Modifier.width(dimen_140))
+                            CommonGradientButton(text = banner.button_text, onClick = { onAction(banner.action) }, height = dimen_40, textSize = font_12, modifier = Modifier.width(dimen_140))
                         }
                     }
                 }

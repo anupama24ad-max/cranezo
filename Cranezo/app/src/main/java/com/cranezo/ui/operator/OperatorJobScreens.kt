@@ -298,7 +298,7 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
                 if (job.job_site?.latitude != null) {
                     CommonGradientButton(
                         text = stringResource(R.string.op_view_location), onClick = { openMaps(context, job.job_site, false) },
-                        height = dimen_32, textSize = font_11, modifier = Modifier.width(dimen_120),
+                        height = dimen_40, textSize = font_11, modifier = Modifier.width(dimen_120),
                         gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
                     )
                 }
@@ -435,7 +435,7 @@ private fun SitePhotoScreen(job: OperatorJob, state: OperatorJobState, onIntent:
                     }
                     Spacer(modifier = Modifier.height(dimen_8))
                     CommonGradientButton(
-                        text = stringResource(R.string.op_retake), onClick = picker::openChooser, height = dimen_32, textSize = font_11,
+                        text = stringResource(R.string.op_retake), onClick = picker::openChooser, height = dimen_40, textSize = font_11,
                         gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
                     )
                 }
@@ -531,7 +531,7 @@ private fun ArrivalWaitScreen(job: OperatorJob, onIntent: (OperatorJobIntent) ->
             LabelValueCard(stringResource(R.string.op_assigned_crane), job.assigned_crane?.model_name.orEmpty(), Modifier.weight(1f), job.assigned_crane?.registration_number)
         }
         GlassCard(contentPadding = dimen_12) {
-            Textview(stringResource(R.string.op_waiting_customer), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
+            Textview(stringResource(R.string.op_waiting_customer), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.op_waiting_customer_sub), size = font_12, color = appColors.textSecondary)
         }
         // Only while the customer has not confirmed
@@ -650,7 +650,7 @@ private fun MonitorScreen(
                 Textview(formatClock(working), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             }
             GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_12) {
-                Textview(stringResource(R.string.op_waiting_duration), size = font_11, color = if (isWaiting) AmberPrimary else appColors.textSecondary)
+                Textview(stringResource(R.string.op_waiting_duration), size = font_11, color = if (isWaiting) appColors.primaryText else appColors.textSecondary)
                 Textview(formatClock(waited), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(dimen_6))
                 CommonGradientButton(
@@ -663,7 +663,7 @@ private fun MonitorScreen(
         }
         if (pendingExtra != null) {
             GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary, onClick = { extraOpen = true }) {
-                Textview(stringResource(R.string.op_extra_time_request), size = font_13, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                Textview(stringResource(R.string.op_extra_time_request), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                 Textview(stringResource(R.string.op_extra_requested_sub), size = font_11, color = appColors.textSecondary)
             }
         }
@@ -677,16 +677,16 @@ private fun MonitorScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
             CommonGradientButton(
                 text = stringResource(R.string.op_break_down), modifier = Modifier.weight(1f), onClick = { onReport("breakdown") },
-                height = dimen_38, textSize = font_12, gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
+                height = dimen_40, textSize = font_12, gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
             )
             CommonGradientButton(
                 text = stringResource(R.string.op_report_issue), modifier = Modifier.weight(1f), onClick = { onReport("issue") },
-                height = dimen_38, textSize = font_12, gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
+                height = dimen_40, textSize = font_12, gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
             )
         }
         CommonGradientButton(
             text = stringResource(R.string.op_emergency), leftIcon = Icons.Default.Emergency, onClick = { onReport("emergency") },
-            height = dimen_38, textSize = font_12, gradientColors = listOf(Red, DarkRed), textColor = Color.White
+            height = dimen_40, textSize = font_12, gradientColors = listOf(Red, DarkRed), textColor = Color.White
         )
         Spacer(modifier = Modifier.height(dimen_8))
     }
@@ -827,7 +827,7 @@ private fun ReportScreen(kind: String, state: OperatorJobState, onIntent: (Opera
                 Textview(stringResource(R.string.op_emergency_sub), size = font_12, color = appColors.textSecondary)
             }
             GlassCard(contentPadding = dimen_12) {
-                Textview(stringResource(R.string.op_emergency_note), size = font_12, color = AmberPrimary)
+                Textview(stringResource(R.string.op_emergency_note), size = font_12, color = appColors.primaryText)
             }
             CommonGradientButton(
                 text = stringResource(R.string.op_get_help_now), onClick = { confirmEmergency = true },
@@ -964,7 +964,7 @@ private fun OtpScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, o
         }
         // A new code replaces the old one
         Textview(
-            stringResource(R.string.op_resend_code), size = font_13, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+            stringResource(R.string.op_resend_code), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
             modifier = Modifier.clickable { onIntent(OperatorJobIntent.RequestConfirmation) }
         )
     }
@@ -986,7 +986,7 @@ private fun CompletedScreen(job: OperatorJob, onClose: () -> Unit) {
         CraneHeaderCard(job.assigned_crane, job.customer?.name)
         SummaryRows(job.summary)
         job.settlement?.status_label?.let {
-            Textview(it, size = font_12, color = AmberPrimary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            Textview(it, size = font_12, color = appColors.primaryText, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
         }
     }
 }
@@ -1020,7 +1020,7 @@ private fun ExtraTimeAnswerScreen(
         }
     ) {
         GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
-            Textview(stringResource(R.string.op_pending_approval), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
+            Textview(stringResource(R.string.op_pending_approval), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.op_extra_requested_sub), size = font_12, color = appColors.textSecondary)
             Textview("%02d:%02d".format(secondsLeft / 60, secondsLeft % 60), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
         }
@@ -1033,7 +1033,7 @@ private fun ExtraTimeAnswerScreen(
         }
         GlassCard(contentPadding = dimen_14) {
             Textview(stringResource(R.string.op_requested_extension), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Textview("+ ${request.label.orEmpty()}", size = font_20, color = AmberPrimary, fontWeight = FontWeight.Bold)
+            Textview("+ ${request.label.orEmpty()}", size = font_20, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(dimen_6))
             PriceLine(stringResource(R.string.op_additional_amount), rupees(request.amount))
             PriceLine(stringResource(R.string.op_new_end_time), formatServerDateTime(request.new_end_at))

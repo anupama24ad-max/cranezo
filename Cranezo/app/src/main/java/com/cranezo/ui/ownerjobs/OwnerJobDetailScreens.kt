@@ -252,7 +252,7 @@ fun OwnerJobDetailsScreen(
                 }
                 if (location?.latitude != null) {
                     Textview(
-                        stringResource(R.string.oj_view_on_map), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                        stringResource(R.string.oj_view_on_map), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.clickable { openMapAt(context, location.latitude, location.longitude) }
                     )
                 }
@@ -294,7 +294,7 @@ fun OwnerJobDetailsScreen(
                 Spacer(modifier = Modifier.height(dimen_8))
                 CommonGradientButton(
                     text = stringResource(if (operator == null) R.string.oj_assign_operator else R.string.oj_change_operator),
-                    onClick = { pickOperator = true }, height = dimen_34, textSize = font_12,
+                    onClick = { pickOperator = true }, height = dimen_40, textSize = font_12,
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
                 )
             }
@@ -406,7 +406,7 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
                     BookingTag(track.status_label.orEmpty(), SuccessGreen)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    track.eta_minutes?.let { Textview(stringResource(R.string.bk_eta_min, it), size = font_20, color = AmberPrimary, fontWeight = FontWeight.Bold) }
+                    track.eta_minutes?.let { Textview(stringResource(R.string.bk_eta_min, it), size = font_20, color = appColors.primaryText, fontWeight = FontWeight.Bold) }
                     track.distance_km?.let { Textview(stringResource(R.string.bk_km_away, String.format(Locale.US, "%.1f", it)), size = font_11, color = appColors.textSecondary) }
                 }
             }

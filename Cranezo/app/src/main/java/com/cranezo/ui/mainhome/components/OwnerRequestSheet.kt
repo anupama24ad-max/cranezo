@@ -161,7 +161,7 @@ private fun RequestDetails(request: OwnerRequest) {
                     }
                     if (location?.latitude != null && location.longitude != null) {
                         Textview(
-                            stringResource(R.string.bk_view_on_map), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                            stringResource(R.string.bk_view_on_map), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.clickableNoRipple {
                                 context.startActivity(
                                     Intent(Intent.ACTION_VIEW, Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}"))
@@ -181,7 +181,7 @@ private fun RequestDetails(request: OwnerRequest) {
             Icons.Default.CurrencyRupee, stringResource(R.string.bk_approx_earnings), rupees(request.approx_earnings),
             extra = {
                 Textview(
-                    stringResource(R.string.bk_view_breakdown), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                    stringResource(R.string.bk_view_breakdown), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickableNoRipple { showBreakdown = !showBreakdown }
                 )
             }
@@ -211,7 +211,7 @@ private fun NewRequestContent(request: OwnerRequest, secondsLeft: Int, onAccept:
         }
         Textview(
             "%02d:%02d".format(secondsLeft / 60, secondsLeft % 60),
-            size = font_16, color = AmberPrimary, fontWeight = FontWeight.Bold
+            size = font_16, color = appColors.primaryText, fontWeight = FontWeight.Bold
         )
     }
     GlassCard(contentPadding = dimen_10) {

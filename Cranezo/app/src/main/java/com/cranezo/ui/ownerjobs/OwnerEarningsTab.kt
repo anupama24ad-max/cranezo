@@ -120,7 +120,7 @@ fun OwnerEarningsTab(
                         .padding(vertical = dimen_8),
                     contentAlignment = Alignment.Center
                 ) {
-                    Textview(stringResource(label), size = font_11, maxLines = 1, color = if (selected) AmberPrimary else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
+                    Textview(stringResource(label), size = font_11, maxLines = 1, color = if (selected) appColors.primaryText else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
                 }
             }
         }
@@ -198,7 +198,7 @@ fun OwnerEarningsTab(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Schedule, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_18))
                     Spacer(modifier = Modifier.width(dimen_6))
-                    Textview(stringResource(R.string.oe_pending), size = font_12, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                    Textview(stringResource(R.string.oe_pending), size = font_12, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                 }
                 Textview(rupees(pending?.amount ?: 0.0), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 if (pending?.expected_by != null) {
@@ -217,7 +217,7 @@ fun OwnerEarningsTab(
             Textview(stringResource(R.string.oe_recent_jobs), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             if (state.jobs.size > 3 || state.jobsHasMore) {
                 Textview(
-                    stringResource(if (showAll) R.string.oe_show_less else R.string.common_view_all), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                    stringResource(if (showAll) R.string.oe_show_less else R.string.common_view_all), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable { showAll = !showAll }
                 )
             }
@@ -279,7 +279,7 @@ private fun TrendCard(state: OwnerEarningsState, onIntent: (OwnerEarningsIntent)
                         .clickable { onIntent(OwnerEarningsIntent.SelectRange(key)) }
                         .padding(horizontal = dimen_8, vertical = dimen_3)
                 ) {
-                    Textview(stringResource(label), size = font_10, color = if (selected) AmberPrimary else appColors.textSecondary)
+                    Textview(stringResource(label), size = font_10, color = if (selected) appColors.primaryText else appColors.textSecondary)
                 }
             }
         }
@@ -291,7 +291,7 @@ private fun TrendCard(state: OwnerEarningsState, onIntent: (OwnerEarningsIntent)
             return@GlassCard
         }
 
-        Textview(stringResource(R.string.oe_peak, rupees(peak.net), peak.label.orEmpty()), size = font_11, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+        Textview(stringResource(R.string.oe_peak, rupees(peak.net), peak.label.orEmpty()), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
         val max = (points.maxOfOrNull { it.net ?: 0.0 } ?: 1.0).coerceAtLeast(1.0)
         Canvas(modifier = Modifier.fillMaxWidth().height(dimen_100).padding(top = dimen_6)) {
             val slot = size.width / points.size

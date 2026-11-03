@@ -93,7 +93,7 @@ fun MyCranesScreen(
                 gradientColors = listOf(AmberPrimary, AmberSecondary, AmberDark),
                 textColor = Color.Black,
                 textSize = font_13,
-                height = dimen_38,
+                height = dimen_40,
                 leftIcon = Icons.Default.Add,
                 iconSize = dimen_18,
                 modifier = Modifier.fillMaxWidth(0.4f),

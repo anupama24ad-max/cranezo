@@ -91,6 +91,7 @@ fun MyProfileScaffold(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(Color.Transparent, appColors.bgBase.copy(alpha = 0.85f))))
                         .padding(horizontal = dimen_20, vertical = dimen_12)
                 ) { bottom() }
             }

@@ -181,7 +181,7 @@ fun OperatorHomeScreen(
                         color = appColors.textPrimary,
                         fontWeight = FontWeight.Bold
                     )
-                    Textview(text = data.jobMonth, size = font_10, color = AmberPrimary)
+                    Textview(text = data.jobMonth, size = font_10, color = appColors.primaryText)
                 }
                 Spacer(modifier = Modifier.width(dimen_12))
                 Column(modifier = Modifier.weight(1f)) {

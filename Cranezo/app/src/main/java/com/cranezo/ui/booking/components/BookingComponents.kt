@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.cranezo.R
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.Textview
@@ -132,7 +133,8 @@ fun BottomButtons(
         if (onBack != null) {
             CommonGradientButton(
                 text = stringResource(R.string.common_back),
-                modifier = Modifier.weight(0.7f),
+                modifier = Modifier.weight(0.4f),
+                height = dimen_52,
                 onClick = onBack,
                 gradientColors = listOf(appColors.subtleFill, appColors.subtleFill),
                 textColor = appColors.textPrimary
@@ -140,7 +142,8 @@ fun BottomButtons(
         }
         CommonGradientButton(
             text = mainText,
-            modifier = Modifier.weight(1.3f),
+            modifier = Modifier.weight(0.6f),
+            height = dimen_52,
             onClick = onMain,
             enabled = enabled
         )
@@ -152,7 +155,7 @@ fun BottomButtons(
 fun SelectedCheck(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .size(dimen_22)
+            .size(dimen_24)
             .clip(CircleShape)
             .background(AmberPrimary),
         contentAlignment = Alignment.Center
@@ -171,9 +174,11 @@ fun SelectableCard(
 ) {
     Box(
         modifier = modifier
+            .background(if (selected) appColors.primaryTint else Color.Transparent, RoundedCornerShape(dimen_16))
             .glassEffect(
                 shape = RoundedCornerShape(dimen_16),
-                borderColor = if (selected) AmberPrimary else Color.Unspecified
+                borderColor = if (selected) AmberPrimary else Color.Unspecified,
+                borderWidth = 1.5.dp
             )
             .clip(RoundedCornerShape(dimen_16))
             .clickable { onClick() },

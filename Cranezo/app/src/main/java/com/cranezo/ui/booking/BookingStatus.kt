@@ -160,7 +160,7 @@ fun WaitingScreen(
                 Spacer(modifier = Modifier.height(dimen_16))
                 Textview(
                     text = "%02d:%02d".format(secondsLeft / 60, secondsLeft % 60),
-                    size = font_32, color = AmberPrimary, fontWeight = FontWeight.Bold
+                    size = font_32, color = appColors.primaryText, fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -371,12 +371,12 @@ fun TrackScreen(
                 Column(horizontalAlignment = Alignment.End) {
                     // null while the crane is not moving yet: the scheduled time is shown instead
                     if (track.eta_minutes != null) {
-                        Textview(stringResource(R.string.bk_eta_min, track.eta_minutes), size = font_20, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.bk_eta_min, track.eta_minutes), size = font_20, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                         track.distance_km?.let {
                             Textview(stringResource(R.string.bk_km_away, String.format(java.util.Locale.US, "%.1f", it)), size = font_11, color = appColors.textSecondary)
                         }
                     } else {
-                        Textview(formatServerDateTime(track.start_at), size = font_12, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                        Textview(formatServerDateTime(track.start_at), size = font_12, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     }
                 }
             }
