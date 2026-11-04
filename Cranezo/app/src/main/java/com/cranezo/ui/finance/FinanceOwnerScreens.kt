@@ -236,10 +236,14 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
     var gstNumber by rememberSaveable { mutableStateOf("") }
     var commissionType by rememberSaveable { mutableStateOf("percent") }
     var commissionValue by rememberSaveable { mutableStateOf("") }
+    var advance by rememberSaveable { mutableStateOf("") }
+    var perKm by rememberSaveable { mutableStateOf("") }
     val charges = remember { mutableStateListOf<Charge>() }
     var filled by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(b) {
         if (b != null && !filled) {
+            advance = b.advance_percent?.toString().orEmpty()
+            perKm = b.per_km_rate?.let { trimNumber(it) }.orEmpty()
             gst = b.gst_percent?.let { trimNumber(it) }.orEmpty()
             gstNumber = b.gst_number.orEmpty()
             commissionType = b.default_commission_type ?: "percent"
@@ -252,6 +256,19 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
 
     FinPage(stringResource(R.string.fin_billing_title), onBack, subtitle = stringResource(R.string.fin_billing_subtitle)) {
         Notice(state.notice)
+        // what the customer pays online when you accept a request, and your charge per km after the free distance
+        FinSection(stringResource(R.string.rq_advance_and_distance)) {
+            GlassInputField(
+                label = stringResource(R.string.rq_advance_percent_label), value = advance,
+                onValueChange = { advance = it.filter { c -> c.isDigit() }.take(3) }, placeholder = "20", keyboardType = KeyboardType.Number
+            )
+            Spacer(modifier = Modifier.height(dimen_10))
+            GlassInputField(
+                label = stringResource(R.string.rq_per_km_label), value = perKm,
+                onValueChange = { perKm = it.filter { c -> c.isDigit() || c == '.' } }, placeholder = "50", keyboardType = KeyboardType.Decimal
+            )
+            Textview(stringResource(R.string.rq_advance_hint), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_6))
+        }
         FinSection(stringResource(R.string.fin_gst)) {
             GlassInputField(
                 label = stringResource(R.string.fin_gst_percent), value = gst, onValueChange = { gst = it.filter { c -> c.isDigit() || c == '.' } },
@@ -313,7 +330,7 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
         CommonGradientButton(
             text = if (state.saving) stringResource(R.string.fin_saving) else stringResource(R.string.fin_save),
             enabled = !state.saving,
-            onClick = { vm.saveBilling(gst, gstNumber, charges.toList(), commissionType, commissionValue) }
+            onClick = { vm.saveBilling(gst, gstNumber, charges.toList(), commissionType, commissionValue, advance, perKm) }
         )
         Spacer(modifier = Modifier.height(dimen_16))
     }

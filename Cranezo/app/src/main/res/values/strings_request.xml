@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Rapido-style booking: review & price, request, pay advance, owner requests (ui/booking/request) -->
+<resources>
+    <string name="rq_review_title">Your price</string>
+    <string name="rq_try_again">Try again</string>
+    <string name="rq_done">Done</string>
+    <string name="rq_none_title">No crane free near you</string>
+    <string name="rq_none_body">No crane of this type is free within %1$s km for this time. Send your request to our team and we will find one and call you.</string>
+    <string name="rq_note_label">Anything we should know?</string>
+    <string name="rq_note_hint">For example: urgent, call after 10 am</string>
+    <string name="rq_send_team">Send to Cranezo team</string>
+    <string name="rq_change_details">Change time or place</string>
+    <string name="rq_sent_team_title">Sent to our team</string>
+    <string name="rq_sent_team_body">Our team has your request and will call you soon.</string>
+    <string name="rq_cranes_near">%1$d cranes near you</string>
+    <string name="rq_usual_price">Usual price for %1$d hours</string>
+    <string name="rq_distance_charge">Distance charge (first %1$s km free)</string>
+    <string name="rq_free">Free</string>
+    <string name="rq_your_offer">Your offer</string>
+    <string name="rq_offer_hint">This is the crane hire you offer. Every owner near you sees it. A higher offer gets accepted faster.</string>
+    <string name="rq_min_offer">Lowest offer: %1$s</string>
+    <string name="rq_auto_raise">Raise my price automatically</string>
+    <string name="rq_auto_raise_hint">If nobody accepts, your offer goes up every %1$s minutes</string>
+    <string name="rq_auto_raise_max">Highest price I will pay (₹)</string>
+    <string name="rq_send_note">When an owner accepts, you pay an advance online within %1$s minutes. The rest is paid after the job.</string>
+    <string name="rq_find_crane">Find a crane</string>
+    <string name="rq_sending">Sending…</string>
+
+    <string name="rq_status_title">Your crane request</string>
+    <string name="rq_searching_title">Finding a crane</string>
+    <string name="rq_searching_sub">Sent to %1$d crane(s) near you</string>
+    <string name="rq_no_answer_yet">No owner yet?</string>
+    <string name="rq_raise_by">Raise price by %1$s</string>
+    <string name="rq_raise_wait">You can raise the price after a short wait.</string>
+    <string name="rq_raised_times">Raised %1$d time(s). First offer: %2$s</string>
+    <string name="rq_auto_on">Auto raise is on, up to %1$s</string>
+    <string name="rq_accepted_title">%1$s accepted your request</string>
+    <string name="rq_pay_within">Pay within</string>
+    <string name="rq_advance_pct">Advance (%1$d%%)</string>
+    <string name="rq_advance_now">Pay now (advance)</string>
+    <string name="rq_balance_later">Pay after the job</string>
+    <string name="rq_test_payment_note">Test payment: online payment is not connected yet, so no money is taken.</string>
+    <string name="rq_pay_advance">Pay advance %1$s</string>
+    <string name="rq_paying">Paying…</string>
+    <string name="rq_booked_title">Your crane is booked</string>
+    <string name="rq_booked_body">Advance received. %1$s will send the crane and operator.</string>
+    <string name="rq_view_booking">View booking</string>
+    <string name="rq_expired_body">No owner accepted in time. Try again with a higher price, or send your request to our team.</string>
+    <string name="rq_payment_expired_body">The advance was not paid in time, so the booking was cancelled and the crane was released.</string>
+    <string name="rq_try_higher">Try again</string>
+    <string name="rq_cancelled_body">This request was cancelled.</string>
+    <string name="rq_cancel_request">Cancel request</string>
+    <string name="rq_cancel_confirm">Cancel this request? Owners will stop seeing it.</string>
+    <string name="rq_cancel_yes">Yes, cancel</string>
+
+    <string name="rq_owner_title">Crane requests near you</string>
+    <string name="rq_owner_sub">Accept first and the job is yours</string>
+    <string name="rq_owner_card_sub">Customers asking for a crane like yours</string>
+    <string name="rq_owner_no_cranes">You need a verified, available crane with a location to get requests.</string>
+    <string name="rq_owner_none">No requests right now. You will get a notification when one comes.</string>
+    <string name="rq_price_raised">Price raised</string>
+    <string name="rq_customer_offers">Customer offers (crane hire)</string>
+    <string name="rq_your_usual">Your usual price %1$s</string>
+    <string name="rq_plus_distance">+ distance %1$s</string>
+    <string name="rq_accept_with">Accept with %1$s</string>
+    <string name="rq_owner_rule">The customer then pays your advance within %1$s minutes. Your crane is held until then.</string>
+
+    <string name="rq_advance_and_distance">Advance &amp; distance</string>
+    <string name="rq_advance_percent_label">Advance the customer pays (%)</string>
+    <string name="rq_per_km_label">Your charge per km after the free distance (₹)</string>
+    <string name="rq_advance_hint">The advance is paid online to Cranezo when you accept a request, and settled to you. ₹ per km cannot be less than the Cranezo minimum.</string>
+</resources>

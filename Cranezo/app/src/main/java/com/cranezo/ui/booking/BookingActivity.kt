@@ -33,6 +33,9 @@ object BookingRoutes {
     const val PAY = "pay"
     const val PAID = "paid"
     const val ACTIVE_TRACKING = "active_tracking"
+    // Rapido style: review & price, then the request (searching / pay advance)
+    const val OFFER = "offer"
+    const val REQUEST = "request"
 }
 
 /**
@@ -83,6 +86,19 @@ class BookingActivity :
         val leave: () -> Unit = { if (!nav.popBackStack()) finish() }
         BackHandler { leave() }
 
+        // Crane requests (send to every nearby owner, pay the advance) have their own view model
+        val requestVm = androidx.compose.runtime.remember {
+            androidx.lifecycle.ViewModelProvider(this@BookingActivity)[com.cranezo.ui.booking.request.RequestViewModel::class.java]
+        }
+        // "Book a crane" while a request is still running reopens it (resume)
+        LaunchedEffect(Unit) {
+            if (start == BookingRoutes.TYPE) {
+                requestVm.loadActive {
+                    nav.navigate(BookingRoutes.REQUEST) { popUpTo(BookingRoutes.TYPE) { inclusive = true } }
+                }
+            }
+        }
+
         // Back to an earlier step of the same flow
         val backTo: (String) -> Unit = { route -> nav.popBackStack(route, inclusive = false) }
 
@@ -100,8 +116,30 @@ class BookingActivity :
                 DateTimeStep(vm, onBack = leave, onNext = { nav.navigate(BookingRoutes.DURATION) })
             }
             composable(BookingRoutes.DURATION) {
-                // The search opens the list of cranes when it has an answer
-                DurationStep(vm, onBack = leave, onNext = { vm.onIntent(BookingIntent.Search) })
+                // No list of cranes: the customer sees the price and makes an offer to every owner nearby
+                DurationStep(vm, onBack = leave, onNext = { nav.navigate(BookingRoutes.OFFER) })
+            }
+            composable(BookingRoutes.OFFER) {
+                com.cranezo.ui.booking.request.OfferScreen(
+                    bookingVm = vm,
+                    vm = requestVm,
+                    onBack = leave,
+                    onEdit = { backTo(BookingRoutes.DATETIME) },
+                    onSent = { nav.navigate(BookingRoutes.REQUEST) { popUpTo(BookingRoutes.TYPE) { inclusive = true } } },
+                    onClose = { finish() }
+                )
+            }
+            composable(BookingRoutes.REQUEST) {
+                com.cranezo.ui.booking.request.RequestStatusScreen(
+                    vm = requestVm,
+                    onClose = { finish() },
+                    onBooked = { id ->
+                        requestVm.clearRequest()
+                        vm.onIntent(BookingIntent.OpenBooking(id))
+                    },
+                    // start again from the type step with a fresh offer
+                    onTryAgain = { nav.navigate(BookingRoutes.TYPE) { popUpTo(BookingRoutes.REQUEST) { inclusive = true } } }
+                )
             }
             composable(BookingRoutes.RESULTS) {
                 AvailableCranesScreen(vm, onBack = leave, onEditRequirements = { backTo(BookingRoutes.DURATION) })

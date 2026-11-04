@@ -63,6 +63,8 @@ data class BillingSettings(
     val charges: List<Charge>? = null,
     val default_commission_type: String? = null,
     val default_commission_value: Double? = null,
+    val advance_percent: Int? = null,
+    val per_km_rate: Double? = null,
     val platform_fee_percent: Double? = null,
     val charge_types: List<IdName>? = null,
     val commission_types: List<IdName>? = null

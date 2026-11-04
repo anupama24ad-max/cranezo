@@ -215,6 +215,29 @@ class BookingViewModel @Inject constructor(
         .put("duration", durationJson(s))
         .also { body -> scheduledAt(s)?.let { body.put("scheduled_at", it) } }
 
+    /**
+     * The 5 steps as one crane request (Rapido style: sent to every nearby owner).
+     * Null while a step is still missing.
+     */
+    fun requestBody(): JSONObject? {
+        val s = _uiState.value
+        if (s.craneType == null || s.capacity == null || s.latitude == null || s.longitude == null) return null
+        val address = s.siteAddress.ifBlank { String.format(Locale.US, "%.5f, %.5f", s.latitude, s.longitude) }
+        return requirement(s)
+            .put("crane_type", s.craneType)
+            .put("capacity", s.capacity)
+            .put("site_address", address)
+            .also { body -> if (s.siteName.isNotBlank()) body.put("site_name", s.siteName) }
+    }
+
+    /** Names shown on the review screen, e.g. "50 Ton" and "Mobile Crane" */
+    fun chosenNames(): Pair<String, String> {
+        val s = _uiState.value
+        val type = s.options?.crane_types?.firstOrNull { it.id == s.craneType }?.name.orEmpty()
+        val capacity = s.options?.capacities?.firstOrNull { it.id == s.capacity }?.name.orEmpty()
+        return capacity to type
+    }
+
     private fun searchBody(s: BookingUiState, min: Int): JSONObject =
         requirement(s).put("crane_type", s.craneType).put("capacity", s.capacity)
             .put("min", min).put("max", min + PAGE)

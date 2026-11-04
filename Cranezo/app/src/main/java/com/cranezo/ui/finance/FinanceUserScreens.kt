@@ -52,6 +52,7 @@ import com.cranezo.utils.formatServerDateTime
 fun FinanceHubScreen(role: String, onBack: () -> Unit, onOpen: (String) -> Unit) {
     when (role) {
         "CRANE_OWNER" -> FinPage(stringResource(R.string.fin_hub_owner), onBack) {
+            FinMenuRow(Icons.Filled.Search, stringResource(R.string.rq_owner_title), stringResource(R.string.rq_owner_card_sub)) { onOpen(FinanceRoutes.CRANE_REQUESTS) }
             FinMenuRow(Icons.Filled.PersonSearch, stringResource(R.string.fin_job_requests_title), stringResource(R.string.fin_job_requests_sub)) { onOpen(FinanceRoutes.JOB_REQUESTS) }
             FinMenuRow(Icons.Filled.Groups, stringResource(R.string.fin_pay_operators), stringResource(R.string.fin_pay_operators_sub)) { onOpen(FinanceRoutes.OPERATOR_DUES) }
             FinMenuRow(Icons.Filled.AccountBalance, stringResource(R.string.fin_platform_title), stringResource(R.string.fin_platform_sub)) { onOpen(FinanceRoutes.PLATFORM) }

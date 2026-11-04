@@ -37,6 +37,7 @@ import com.cranezo.ui.mainhome.components.twoDigits
 import com.cranezo.ui.mainhome.model.Dest
 import com.cranezo.ui.mainhome.model.MainHomeUiState
 import com.cranezo.ui.theme.*
+import com.cranezo.ui.components.Textview
 
 @Composable
 fun OwnerHomeScreen(
@@ -105,6 +106,24 @@ fun OwnerHomeScreen(
                 )
             }
         )
+
+        // Customers near your cranes asking for a crane: accept first and the job is yours
+        val context = androidx.compose.ui.platform.LocalContext.current
+        GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = {
+            context.startActivity(
+                com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
+            )
+        }) {
+            androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.rq_owner_title), size = font_16, color = appColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Textview(stringResource(R.string.rq_owner_card_sub), size = font_12, color = appColors.textSecondary)
+                }
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary
+                )
+            }
+        }
 
         // One action. My Cranes, Jobs and Earnings are already in the bottom bar and the cards above.
         CommonGradientButton(

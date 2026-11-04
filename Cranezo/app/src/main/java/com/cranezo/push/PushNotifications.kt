@@ -16,6 +16,7 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import com.cranezo.R
 import com.cranezo.ui.booking.BookingActivity
+import com.cranezo.ui.booking.BookingRoutes
 import com.cranezo.ui.mainhome.MainHomeActivity
 import com.cranezo.ui.operator.OperatorActivity
 import com.cranezo.ui.ownerjobs.OwnerJobActivity
@@ -117,6 +118,9 @@ object PushNotifications {
             "owner_job" -> bookingId?.let { OwnerJobActivity.intent(context, it) }
             "operator_job" -> bookingId?.let { OperatorActivity.intent(context, it) }
             "announcement", "support_ticket" -> SupportActivity.intent(context, SupportRoutes.NOTIFICATIONS)
+            // Rapido-style requests: the owner's list of requests near them; the customer's request screen
+            "owner_crane_requests" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
+            "crane_request" -> BookingActivity.intent(context, BookingRoutes.REQUEST)
             // "owner_request": the request popup lives on Home, which is already opened
             else -> null
         }

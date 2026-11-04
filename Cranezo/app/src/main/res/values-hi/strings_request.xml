@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rq_review_title">आपकी कीमत</string>
+    <string name="rq_try_again">फिर कोशिश करें</string>
+    <string name="rq_done">ठीक है</string>
+    <string name="rq_none_title">आपके पास कोई क्रेन खाली नहीं</string>
+    <string name="rq_none_body">इस समय %1$s किमी के अंदर इस प्रकार की कोई क्रेन खाली नहीं है। अपना अनुरोध हमारी टीम को भेजें, हम क्रेन ढूंढकर आपको कॉल करेंगे।</string>
+    <string name="rq_note_label">कुछ और बताना है?</string>
+    <string name="rq_note_hint">जैसे: जल्दी चाहिए, 10 बजे के बाद कॉल करें</string>
+    <string name="rq_send_team">Cranezo टीम को भेजें</string>
+    <string name="rq_change_details">समय या जगह बदलें</string>
+    <string name="rq_sent_team_title">टीम को भेज दिया</string>
+    <string name="rq_sent_team_body">हमारी टीम के पास आपका अनुरोध है और जल्द ही आपको कॉल करेगी।</string>
+    <string name="rq_cranes_near">आपके पास %1$d क्रेन</string>
+    <string name="rq_usual_price">%1$d घंटे की सामान्य कीमत</string>
+    <string name="rq_distance_charge">दूरी शुल्क (पहले %1$s किमी मुफ्त)</string>
+    <string name="rq_free">मुफ्त</string>
+    <string name="rq_your_offer">आपका ऑफर</string>
+    <string name="rq_offer_hint">यह क्रेन किराया है जो आप देंगे। आपके पास के सभी मालिक इसे देखेंगे। ज़्यादा ऑफर जल्दी स्वीकार होता है।</string>
+    <string name="rq_min_offer">सबसे कम ऑफर: %1$s</string>
+    <string name="rq_auto_raise">मेरी कीमत अपने आप बढ़ाएं</string>
+    <string name="rq_auto_raise_hint">अगर कोई स्वीकार नहीं करता, तो हर %1$s मिनट में ऑफर बढ़ेगा</string>
+    <string name="rq_auto_raise_max">मैं सबसे ज़्यादा कितना दूंगा (₹)</string>
+    <string name="rq_send_note">जब मालिक स्वीकार करे, तो %1$s मिनट में ऑनलाइन एडवांस दें। बाकी काम के बाद दें।</string>
+    <string name="rq_find_crane">क्रेन खोजें</string>
+    <string name="rq_sending">भेजा जा रहा है…</string>
+
+    <string name="rq_status_title">आपका क्रेन अनुरोध</string>
+    <string name="rq_searching_title">क्रेन खोजी जा रही है</string>
+    <string name="rq_searching_sub">आपके पास %1$d क्रेन को भेजा गया</string>
+    <string name="rq_no_answer_yet">अभी तक कोई मालिक नहीं?</string>
+    <string name="rq_raise_by">कीमत %1$s बढ़ाएं</string>
+    <string name="rq_raise_wait">थोड़ी देर बाद आप कीमत बढ़ा सकते हैं।</string>
+    <string name="rq_raised_times">%1$d बार बढ़ाया। पहला ऑफर: %2$s</string>
+    <string name="rq_auto_on">अपने आप बढ़ना चालू है, %1$s तक</string>
+    <string name="rq_accepted_title">%1$s ने आपका अनुरोध स्वीकार किया</string>
+    <string name="rq_pay_within">इतने समय में भुगतान करें</string>
+    <string name="rq_advance_pct">एडवांस (%1$d%%)</string>
+    <string name="rq_advance_now">अभी दें (एडवांस)</string>
+    <string name="rq_balance_later">काम के बाद दें</string>
+    <string name="rq_test_payment_note">टेस्ट भुगतान: ऑनलाइन भुगतान अभी जुड़ा नहीं है, इसलिए कोई पैसा नहीं कटेगा।</string>
+    <string name="rq_pay_advance">एडवांस %1$s दें</string>
+    <string name="rq_paying">भुगतान हो रहा है…</string>
+    <string name="rq_booked_title">आपकी क्रेन बुक हो गई</string>
+    <string name="rq_booked_body">एडवांस मिल गया। %1$s क्रेन और ऑपरेटर भेजेंगे।</string>
+    <string name="rq_view_booking">बुकिंग देखें</string>
+    <string name="rq_expired_body">समय पर किसी मालिक ने स्वीकार नहीं किया। ज़्यादा कीमत के साथ फिर कोशिश करें, या टीम को भेजें।</string>
+    <string name="rq_payment_expired_body">समय पर एडवांस नहीं दिया गया, इसलिए बुकिंग रद्द हुई और क्रेन छोड़ दी गई।</string>
+    <string name="rq_try_higher">फिर कोशिश करें</string>
+    <string name="rq_cancelled_body">यह अनुरोध रद्द किया गया।</string>
+    <string name="rq_cancel_request">अनुरोध रद्द करें</string>
+    <string name="rq_cancel_confirm">यह अनुरोध रद्द करें? मालिक इसे देखना बंद कर देंगे।</string>
+    <string name="rq_cancel_yes">हाँ, रद्द करें</string>
+
+    <string name="rq_owner_title">आपके पास के क्रेन अनुरोध</string>
+    <string name="rq_owner_sub">पहले स्वीकार करें और काम आपका</string>
+    <string name="rq_owner_card_sub">आपकी जैसी क्रेन माँग रहे ग्राहक</string>
+    <string name="rq_owner_no_cranes">अनुरोध पाने के लिए जाँची हुई, खाली और लोकेशन वाली क्रेन चाहिए।</string>
+    <string name="rq_owner_none">अभी कोई अनुरोध नहीं। आने पर आपको सूचना मिलेगी।</string>
+    <string name="rq_price_raised">कीमत बढ़ी</string>
+    <string name="rq_customer_offers">ग्राहक का ऑफर (क्रेन किराया)</string>
+    <string name="rq_your_usual">आपकी सामान्य कीमत %1$s</string>
+    <string name="rq_plus_distance">+ दूरी %1$s</string>
+    <string name="rq_accept_with">%1$s से स्वीकार करें</string>
+    <string name="rq_owner_rule">फिर ग्राहक %1$s मिनट में आपका एडवांस देगा। तब तक आपकी क्रेन रुकी रहेगी।</string>
+
+    <string name="rq_advance_and_distance">एडवांस और दूरी</string>
+    <string name="rq_advance_percent_label">ग्राहक कितना एडवांस देगा (%)</string>
+    <string name="rq_per_km_label">मुफ्त दूरी के बाद आपका प्रति किमी शुल्क (₹)</string>
+    <string name="rq_advance_hint">अनुरोध स्वीकार करने पर एडवांस Cranezo को ऑनलाइन मिलता है और आपको दिया जाता है। प्रति किमी शुल्क Cranezo के न्यूनतम से कम नहीं हो सकता।</string>
+</resources>

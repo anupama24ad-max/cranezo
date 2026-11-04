@@ -141,7 +141,10 @@ class FinanceViewModel @Inject constructor(
         _ui.update { it.copy(billing = d) }
     }
 
-    fun saveBilling(gst: String, gstNumber: String, charges: List<Charge>, commissionType: String, commissionValue: String) {
+    fun saveBilling(
+        gst: String, gstNumber: String, charges: List<Charge>, commissionType: String, commissionValue: String,
+        advancePercent: String, perKmRate: String
+    ) {
         val list = JSONArray()
         charges.filter { !it.name.isNullOrBlank() }.forEach { c ->
             list.put(JSONObject().put("name", c.name).put("type", c.type ?: "fixed").put("value", c.value ?: 0.0))
@@ -152,10 +155,13 @@ class FinanceViewModel @Inject constructor(
             .put("charges", list)
             .put("default_commission_type", commissionType)
             .put("default_commission_value", commissionValue.toDoubleOrNull() ?: 0.0)
+        advancePercent.toIntOrNull()?.let { body.put("advance_percent", it) }
+        perKmRate.toDoubleOrNull()?.let { body.put("per_km_rate", it) }
         call<BillingSettings>("owner/billing/settings/save", body, typeOf<BillingSettings>(), saving = true) { d ->
             _ui.update { it.copy(billing = it.billing?.copy(
                 gst_percent = d?.gst_percent, gst_number = d?.gst_number, charges = d?.charges,
-                default_commission_type = d?.default_commission_type, default_commission_value = d?.default_commission_value
+                default_commission_type = d?.default_commission_type, default_commission_value = d?.default_commission_value,
+                advance_percent = d?.advance_percent, per_km_rate = d?.per_km_rate
             ) ?: d) }
         }
     }

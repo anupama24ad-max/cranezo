@@ -23,6 +23,8 @@ object FinanceRoutes {
     const val PAY_OPERATOR = "pay_operator"
     const val PLATFORM = "platform"
     const val JOB_REQUESTS = "job_requests"
+    // Rapido-style customer requests near the owner's cranes
+    const val CRANE_REQUESTS = "crane_requests"
     // owner and customer
     const val TRANSACTIONS = "transactions"
     const val COMPLAINTS = "complaints"
@@ -90,6 +92,18 @@ class FinanceActivity : BaseVMComposeActivity<FinanceViewModel>(FinanceViewModel
             }
             composable(FinanceRoutes.PLATFORM) { OwnerPlatformScreen(vm, leave) }
             composable(FinanceRoutes.JOB_REQUESTS) { OwnerJobRequestsScreen(vm, leave, dial) }
+            composable(FinanceRoutes.CRANE_REQUESTS) {
+                val requestVm = androidx.compose.runtime.remember {
+                    androidx.lifecycle.ViewModelProvider(this@FinanceActivity)[com.cranezo.ui.booking.request.RequestViewModel::class.java]
+                }
+                com.cranezo.ui.booking.request.OwnerCraneRequestsScreen(
+                    requestVm, leave,
+                    // the job is mine: open it (it waits for the customer's advance)
+                    onAccepted = { bookingId ->
+                        startActivity(com.cranezo.ui.ownerjobs.OwnerJobActivity.intent(this@FinanceActivity, bookingId))
+                    }
+                )
+            }
 
             composable(FinanceRoutes.TRANSACTIONS) { TransactionsScreen(vm, leave) }
             composable(FinanceRoutes.COMPLAINTS) {

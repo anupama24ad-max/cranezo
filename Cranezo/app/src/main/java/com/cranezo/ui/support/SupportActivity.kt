@@ -76,6 +76,12 @@ class SupportActivity :
                             "operator_job" -> bookingId?.let { startActivity(OperatorActivity.intent(this@SupportActivity, it)) }
                             // The request popup and tab live on the home screen
                             "owner_request" -> finish()
+                            "owner_crane_requests" -> startActivity(
+                                com.cranezo.ui.finance.FinanceActivity.intent(this@SupportActivity, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
+                            )
+                            "crane_request" -> startActivity(
+                                BookingActivity.intent(this@SupportActivity, com.cranezo.ui.booking.BookingRoutes.REQUEST)
+                            )
                             "announcement" -> nav.navigate(SupportRoutes.ANNOUNCEMENT)
                             "support_ticket" -> target.ticket_id?.let {
                                 vm.onIntent(SupportIntent.OpenTicket(it))

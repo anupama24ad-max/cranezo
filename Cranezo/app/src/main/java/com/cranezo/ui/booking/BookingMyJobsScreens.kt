@@ -188,6 +188,16 @@ fun JobDetailsScreen(
         }
     }
 
+    // An owner accepted and the advance is not paid yet: the request screen has the countdown and Pay button
+    if (booking.stage == "awaiting_payment") {
+        val context = androidx.compose.ui.platform.LocalContext.current
+        LaunchedEffect(booking.booking_id) {
+            context.startActivity(com.cranezo.ui.booking.BookingActivity.intent(context, BookingRoutes.REQUEST))
+            onBack()
+        }
+        return
+    }
+
     when (booking.stage) {
         "awaiting_owner" -> { WaitingScreen(vm, onConfirmed = {}, onChooseAnother = { vm?.onIntent(BookingIntent.BookAgain) }, onClose = onBack); return }
         "arrived" -> { CraneArrivedScreen(vm, onBack); return }
