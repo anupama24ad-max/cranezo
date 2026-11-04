@@ -3,7 +3,6 @@ package com.cranezo.ui.support
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -326,7 +325,7 @@ fun HelpSupportHomeScreen(
                     GlassCard(modifier = Modifier.weight(1f).fillMaxHeight(), contentPadding = dimen_12, minHeight = dimen_112, onClick = {
                         if (tile.action == "call") {
                             if (home?.call_support?.available == true && !home.call_support.phone.isNullOrBlank()) dialNumber(context, home.call_support.phone)
-                            else Toast.makeText(context, R.string.sp_phone_unavailable, Toast.LENGTH_LONG).show()
+                            else com.cranezo.ui.components.AppMessages.show(context.getString(R.string.sp_phone_unavailable))
                         } else onTile(tile)
                     }) {
                         IconBadge(icon = tileIcon(tile.icon), accent = AmberPrimary, size = dimen_32)

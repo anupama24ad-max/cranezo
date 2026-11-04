@@ -29,7 +29,16 @@ class LoginActivity : BaseVMComposeActivity<LoginViewModel>(LoginViewModel::clas
             }
         }
 
-        LoginScreen(vm = vm)
+        // Back (screen button or phone button) goes to language selection.
+        // After a logout this is the first screen, so the language screen is opened instead of closing the app.
+        val back: () -> Unit = {
+            if (isTaskRoot) {
+                startActivity(Intent(this@LoginActivity, com.cranezo.ui.chooselanguage.ChooseLanguageActivity::class.java))
+            }
+            finish()
+        }
+        androidx.activity.compose.BackHandler { back() }
+        LoginScreen(vm = vm, onBack = back)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -3,7 +3,6 @@ package com.cranezo.utils.imagePicker
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -161,7 +160,7 @@ private fun launchCamera(context: Context, launch: (Uri) -> Unit) {
     try {
         launch(createTempImageUri(context))
     } catch (e: ActivityNotFoundException) {
-        Toast.makeText(context, context.getString(R.string.picker_no_camera), Toast.LENGTH_SHORT).show()
+        com.cranezo.ui.components.AppMessages.show(context.getString(R.string.picker_no_camera))
     }
 }
 

@@ -17,9 +17,11 @@ class ChooseRoleActivity : BaseVMComposeActivity<ChooseRoleViewModel>(
 
     @Composable
     override fun Content(vm: ChooseRoleViewModel) {
+        // Phone back does not return to the (already used) OTP screen; it just sends the app to the background
+        androidx.activity.compose.BackHandler { moveTaskToBack(true) }
         ChooseRoleScreen(
             vm = vm,
-            onBackClick = { finish() },
+            onBackClick = { moveTaskToBack(true) },
             onContinueClick = { role ->
                 sm.setUserRole(role.name)
                 val intent = android.content.Intent(this@ChooseRoleActivity, com.cranezo.ui.profile.ProfileActivity::class.java)

@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -133,7 +132,7 @@ private fun NotSureRow() {
     }
 
     if (show) {
-        val soon = { Toast.makeText(context, R.string.tab_coming_soon, Toast.LENGTH_SHORT).show() }
+        val soon = { com.cranezo.ui.components.AppMessages.show(context.getString(R.string.tab_coming_soon)) }
         ModalBottomSheet(
             onDismissRequest = { show = false },
             shape = RoundedCornerShape(topStart = dimen_28, topEnd = dimen_28),
@@ -276,8 +275,9 @@ fun CapacityStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
         }
     ) {
         StepTitle(R.string.bk_capacity_title, R.string.bk_capacity_subtitle)
-        state.options?.capacities.orEmpty().chunked(2).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+        // Small tiles, 3 per row, title only (e.g. "50 Ton"): quick to scan and tap
+        state.options?.capacities.orEmpty().chunked(3).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
                 row.forEach { capacity ->
                     val selected = capacity.id == state.capacity
                     SelectableCard(
@@ -285,22 +285,21 @@ fun CapacityStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                         onClick = { capacity.id?.let { vm?.onIntent(BookingIntent.SelectCapacity(it)) } },
                         modifier = Modifier
                             .weight(1f)
-                            .heightIn(min = dimen_132)
+                            .height(dimen_56)
                     ) {
-                        Column(modifier = Modifier.padding(dimen_16)) {
-                            Textview(
-                                text = capacity.name.orEmpty(),
-                                size = font_18,
-                                color = appColors.textPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(dimen_6))
-                            Textview(text = capacity.description.orEmpty(), size = font_11, color = appColors.textSecondary)
-                        }
-                        if (selected) SelectedCheck(Modifier.align(Alignment.TopEnd).padding(dimen_8))
+                        Textview(
+                            text = capacity.name.orEmpty(),
+                            size = font_15,
+                            color = if (selected) appColors.primaryText else appColors.textPrimary,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            maxLines = 1,
+                            modifier = Modifier.align(Alignment.Center).padding(horizontal = dimen_6)
+                        )
                     }
                 }
-                if (row.size == 1) Spacer(modifier = Modifier.weight(1f))
+                // keep the last row's tiles the same width as the others
+                repeat(3 - row.size) { Spacer(modifier = Modifier.weight(1f)) }
             }
         }
         NotSureRow()

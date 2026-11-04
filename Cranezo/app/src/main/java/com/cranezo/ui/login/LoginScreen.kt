@@ -53,7 +53,8 @@ import com.cranezo.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    vm: LoginViewModel? = null
+    vm: LoginViewModel? = null,
+    onBack: () -> Unit = {}
 ) {
     val uiState = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: LoginUiState()
 
@@ -72,11 +73,8 @@ fun LoginScreen(
                 .imePadding()
                 .verticalScroll(rememberImeScrollState())
         ) {
-            // Common Circular Back Button
-            CommonBackButton(
-                onClick = {
-                },
-            )
+            // Back to language selection
+            CommonBackButton(onClick = onBack)
 
             Spacer(modifier = Modifier.height(dimen_30))
 

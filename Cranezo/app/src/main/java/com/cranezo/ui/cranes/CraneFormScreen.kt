@@ -168,7 +168,7 @@ fun CraneFormScreen(
             val fix = fetchCurrentLocation(context)
             isLocating = false
             if (fix == null) {
-                android.widget.Toast.makeText(context, R.string.crane_msg_location_unavailable, android.widget.Toast.LENGTH_SHORT).show()
+                com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_location_unavailable))
             } else {
                 onIntent(CranesIntent.GpsLocationFound(fix.address, fix.latitude, fix.longitude))
             }
@@ -176,7 +176,7 @@ fun CraneFormScreen(
     }
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
         if (granted.values.any { it }) findLocation()
-        else android.widget.Toast.makeText(context, R.string.crane_msg_location_denied, android.widget.Toast.LENGTH_SHORT).show()
+        else com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_location_denied))
     }
 
     var showOperatorSheet by rememberSaveable { mutableStateOf(false) }
@@ -225,7 +225,8 @@ fun CraneFormScreen(
                 // 1. Crane information
                 NumberedSection(1, stringResource(R.string.crane_section_info)) {
                     Column(verticalArrangement = Arrangement.spacedBy(dimen_12)) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
+                        // bottom-aligned so both boxes line up even when one label wraps
+                        Row(horizontalArrangement = Arrangement.spacedBy(dimen_10), verticalAlignment = Alignment.Bottom) {
                             GlassSelectField(
                                 label = stringResource(R.string.crane_field_type),
                                 value = nameOf(options?.crane_types, form.craneTypeId, state.original?.crane_type_name),
@@ -358,7 +359,7 @@ fun CraneFormScreen(
 
                 // 5. Rate
                 NumberedSection(5, stringResource(R.string.crane_section_rate)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(dimen_10), verticalAlignment = Alignment.Bottom) {
                         GlassInputField(
                             label = stringResource(R.string.crane_field_rate),
                             value = form.hourlyRate,

@@ -1,5 +1,7 @@
 package com.cranezo.ui.ownerjobs
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import android.content.Context
 import android.content.Intent
 import androidx.activity.compose.BackHandler
@@ -124,7 +126,7 @@ private val previewDetail = OwnerJob(
 
 @Composable
 private fun Tile(label: String, value: String, modifier: Modifier = Modifier) {
-    GlassCard(modifier = modifier, contentPadding = dimen_10) {
+    GlassCard(modifier = modifier.fillMaxHeight(), contentPadding = dimen_10) {
         Textview(label, size = font_10, color = appColors.textSecondary)
         Textview(value, size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
     }
@@ -260,13 +262,13 @@ fun OwnerJobDetailsScreen(
         }
 
         if (completed) {
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+            Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
                 Tile(stringResource(R.string.oj_scheduled), formatServerDateTime(job.completion?.scheduled_at ?: job.schedule?.start_at), Modifier.weight(1f))
                 Tile(stringResource(R.string.oj_actual_duration), formatSeconds(job.completion?.actual_duration_seconds ?: job.actual_duration_seconds), Modifier.weight(1f))
                 if ((job.completion?.extra_seconds ?: 0L) > 0) Tile(stringResource(R.string.op_extra_time), formatSeconds(job.completion?.extra_seconds), Modifier.weight(1f))
             }
         } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+            Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
                 Tile(stringResource(R.string.bk_required_date_time), formatServerDateTime(job.schedule?.start_at), Modifier.weight(1f))
                 Tile(stringResource(R.string.bk_duration), job.duration?.label ?: job.duration_label.orEmpty(), Modifier.weight(1f))
                 Tile(stringResource(R.string.bk_distance), stringResource(R.string.bk_km_away, String.format(Locale.US, "%.0f", location?.distance_km ?: 0.0)), Modifier.weight(1f))

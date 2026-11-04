@@ -1,5 +1,7 @@
 package com.cranezo.ui.operator
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -407,7 +409,7 @@ private fun Modifier.clickableTab(onClick: () -> Unit): Modifier = this.then(
 
 @Composable
 private fun EarningTile(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier = Modifier, tint: Color = AmberPrimary) {
-    GlassCard(modifier = modifier, contentPadding = dimen_12, minHeight = dimen_96) {
+    GlassCard(modifier = modifier.fillMaxHeight(), contentPadding = dimen_12, minHeight = dimen_96) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBadge(icon = icon, accent = tint, size = dimen_36)
             Spacer(modifier = Modifier.width(dimen_10))
@@ -441,11 +443,11 @@ fun OperatorEarningsTab(
         verticalArrangement = Arrangement.spacedBy(dimen_12)
     ) {
         Textview(stringResource(R.string.op_earnings_title), size = font_24, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
             EarningTile(Icons.Default.Work, stringResource(R.string.op_todays_jobs), (summary?.today_jobs ?: 0).toString(), Modifier.weight(1f))
             EarningTile(Icons.Default.AccountBalanceWallet, stringResource(R.string.op_todays_earnings), rupees(summary?.today_earnings ?: 0.0), Modifier.weight(1f))
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
             EarningTile(Icons.Default.Schedule, stringResource(R.string.op_pending_settlement), rupees(summary?.pending_settlement ?: 0.0), Modifier.weight(1f))
             EarningTile(Icons.Default.CheckCircle, stringResource(R.string.op_completed_settlement), rupees(summary?.completed_settlement ?: 0.0), Modifier.weight(1f), SuccessGreen)
         }

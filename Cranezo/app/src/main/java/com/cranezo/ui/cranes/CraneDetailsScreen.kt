@@ -1,9 +1,10 @@
 package com.cranezo.ui.cranes
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -81,13 +82,13 @@ import kotlinx.coroutines.launch
 fun openFile(context: Context, path: String?) {
     val url = fileUrl(path)
     if (url == null) {
-        Toast.makeText(context, R.string.crane_msg_no_file, Toast.LENGTH_SHORT).show()
+        com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_no_file))
         return
     }
     try {
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     } catch (e: Exception) {
-        Toast.makeText(context, R.string.crane_msg_no_file_app, Toast.LENGTH_SHORT).show()
+        com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_no_file_app))
     }
 }
 
@@ -202,7 +203,7 @@ private fun DetailsContent(crane: Crane, onManageDocuments: () -> Unit) {
         CraneStatusBanner(crane)
 
         // Four quick facts
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
             InfoTile(Icons.Default.PrecisionManufacturing, stringResource(R.string.crane_tile_capacity), crane.capacity_name, Modifier.weight(1f))
             InfoTile(Icons.Default.LocationOn, stringResource(R.string.crane_tile_location), crane.location, Modifier.weight(1f))
             InfoTile(Icons.Default.CheckCircle, stringResource(R.string.crane_tile_availability), crane.availability_label, Modifier.weight(1f))
@@ -363,6 +364,7 @@ private fun InfoTile(
 ) {
     Column(
         modifier = modifier
+            .fillMaxHeight()
             .glassEffect(RoundedCornerShape(dimen_12), inset = true)
             .padding(horizontal = dimen_6, vertical = dimen_10),
         horizontalAlignment = Alignment.CenterHorizontally

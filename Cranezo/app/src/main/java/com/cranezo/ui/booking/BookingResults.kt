@@ -1,5 +1,7 @@
 package com.cranezo.ui.booking
 
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -235,7 +237,7 @@ private fun AvailableCraneCard(crane: AvailableCrane, onSelect: () -> Unit) {
 
 @Composable
 private fun StatTile(icon: ImageVector, value: String, label: String, modifier: Modifier = Modifier) {
-    GlassCard(modifier = modifier, contentPadding = dimen_10) {
+    GlassCard(modifier = modifier.fillMaxHeight(), contentPadding = dimen_10) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBadge(icon = icon, accent = AmberPrimary, size = dimen_28)
             Spacer(modifier = Modifier.width(dimen_8))
@@ -307,7 +309,7 @@ fun BookableCraneScreen(
             )
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+        Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
             StatTile(Icons.Default.Anchor, crane.capacity_name.orEmpty(), stringResource(R.string.mp_crane_capacity), Modifier.weight(1f))
             StatTile(Icons.Default.Navigation, "${km(crane.distance_km)} km", stringResource(R.string.bk_distance), Modifier.weight(1f))
             StatTile(Icons.Default.Schedule, stringResource(R.string.bk_eta_min, crane.eta_minutes ?: 0), stringResource(R.string.bk_eta), Modifier.weight(1f))

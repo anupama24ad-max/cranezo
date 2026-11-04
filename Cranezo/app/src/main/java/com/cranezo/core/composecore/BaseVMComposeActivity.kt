@@ -12,11 +12,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.layout.padding
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
@@ -169,6 +169,12 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                         }
                     }
                 }
+                // messages from screens without a view model (they used to be Android toasts)
+                LaunchedEffect(Unit) {
+                    com.cranezo.ui.components.AppMessages.events.collect { m ->
+                        launch { bannerHost.show(m.message, m.status, 2500L) }
+                    }
+                }
 
                 val netNoticeHost = rememberNetNoticeHostState()
 
@@ -195,40 +201,29 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                         Content(viewModel)
                         if (isLoading) LoadingOverlay()
 
+                        // No internet / slow internet: a small card at the bottom of the page, not a popup
                         if (showDialog) {
-                            AlertDialog(
-                                onDismissRequest = {
+                            com.cranezo.ui.components.InlineConfirm(
+                                message = stringResource(
+                                    if (netState is NetworkState.NoConnection) R.string.net_disconnected_message
+                                    else R.string.net_slow_message
+                                ),
+                                confirmText = stringResource(R.string.common_retry),
+                                danger = false,
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .navigationBarsPadding()
+                                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                                onConfirm = {
+                                    // Retry: close now, then start a fresh check; if still poor, the card comes back
                                     snoozed = true
-                                    viewModel.cancelNetworkRequest = true   // stop checking
+                                    viewModel.cancelNetworkRequest = false
+                                    viewModel.validateNetwork(onNetworkConnected = null)
                                 },
-                                title = { Text(
-                                    stringResource(
-                                        if (netState is NetworkState.NoConnection) R.string.net_disconnected_title
-                                        else R.string.net_slow_title
-                                    )
-                                ) },
-                                text = {
-                                    Text(
-                                        stringResource(
-                                            if (netState is NetworkState.NoConnection) R.string.net_disconnected_message
-                                            else R.string.net_slow_message
-                                        )
-                                    )
-                                },
-                                confirmButton = {
-                                    TextButton(onClick = {
-                                        // Retry: close now, then start a fresh check; if still poor on next emission, dialog re-opens
-                                        snoozed = true
-                                        viewModel.cancelNetworkRequest = false
-                                        viewModel.validateNetwork(onNetworkConnected = null)
-                                    }) { Text(stringResource(R.string.common_retry)) }
-                                },
-                                dismissButton = {
-                                    TextButton(onClick = {
-                                        // Cancel: close now and stop checks (dialog won’t re-open)
-                                        snoozed = true
-                                        viewModel.cancelNetworkRequest = true
-                                    }) { Text(stringResource(R.string.common_cancel)) }
+                                onCancel = {
+                                    // Cancel: close now and stop checks
+                                    snoozed = true
+                                    viewModel.cancelNetworkRequest = true
                                 }
                             )
                         }
@@ -242,10 +237,10 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                                     .pointerInput(Unit) {} // absorbs clicks & touches
                             )
                         }
-                        // ---- Always pinned to TOP for all screens ----
+                        // ---- One message bar for all screens, near the bottom ----
                         TopBannerHost(
                             hostState = bannerHost,
-                            modifier = Modifier.align(Alignment.TopCenter)
+                            modifier = Modifier.align(Alignment.BottomCenter)
                         )
                         NetNoticeHost(
                             hostState = netNoticeHost,

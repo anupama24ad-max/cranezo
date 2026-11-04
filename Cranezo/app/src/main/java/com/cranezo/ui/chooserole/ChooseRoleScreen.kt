@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.cranezo.R
-import com.cranezo.ui.components.CommonBackButton
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassRoleCard
 import com.cranezo.ui.components.ScreenBackground
@@ -59,11 +58,7 @@ fun ChooseRoleScreen(
                 .statusBarsPadding()
                 .navigationBarsPadding()
         ) {
-            // Common Circular Back Button
-            CommonBackButton(
-                onClick = onBackClick,
-            )
-
+            // No back button: the user has just verified the OTP and must pick a role to continue
             Spacer(modifier = Modifier.height(dimen_30))
 
             // Header Texts
