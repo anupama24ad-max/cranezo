@@ -1,4 +1,6 @@
+import java.util.Properties
 import org.gradle.kotlin.dsl.implementation
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -14,7 +16,7 @@ val defaultToken = project.findProperty("defaultToken") ?: "default_value_if_not
 // Google Maps key (Maps SDK for Android) from local.properties: MAPS_API_KEY=...  Never committed.
 val mapsApiKey: String = run {
     val f = rootProject.file("local.properties")
-    if (!f.exists()) "" else java.util.Properties().apply { f.inputStream().use { load(it) } }.getProperty("MAPS_API_KEY", "")
+    if (!f.exists()) "" else Properties().apply { f.inputStream().use { load(it) } }.getProperty("MAPS_API_KEY", "")
 }
 
 android {
@@ -67,12 +69,15 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 
