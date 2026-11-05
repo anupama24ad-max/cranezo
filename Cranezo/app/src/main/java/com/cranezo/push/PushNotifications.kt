@@ -39,6 +39,13 @@ object PushNotifications {
     /** Normal: everything else (payments, receipts, announcements, support). */
     const val CHANNEL_UPDATES = "cranezo_updates"
 
+    /** Owner buzzer: a new crane / booking request rings with buzzer_tone (res/raw) for up to 30 seconds */
+    const val CHANNEL_BUZZER = "cranezo_buzzer"
+    private const val BUZZER_RING_MS = 30_000L
+
+    private fun buzzerUri(context: Context): android.net.Uri =
+        android.net.Uri.parse("android.resource://${context.packageName}/${R.raw.buzzer_tone}")
+
     private val URGENT_TYPES = setOf(
         "booking_request", "job_assigned", "operator_arrived", "completion_requested",
         "extension_requested", "breakdown_reported", "emergency"
@@ -57,7 +64,22 @@ object PushNotifications {
         val updates = NotificationChannel(
             CHANNEL_UPDATES, context.getString(R.string.push_channel_updates), NotificationManager.IMPORTANCE_DEFAULT
         ).apply { description = context.getString(R.string.push_channel_updates_desc) }
-        manager.createNotificationChannels(listOf(urgent, updates))
+        // a channel's sound cannot change after it is created, so the buzzer has its own channel
+        val buzzer = NotificationChannel(
+            CHANNEL_BUZZER, context.getString(R.string.push_channel_buzzer), NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = context.getString(R.string.push_channel_buzzer_desc)
+            enableVibration(true)
+            vibrationPattern = longArrayOf(0, 800, 400, 800, 400, 800)
+            setSound(
+                buzzerUri(context),
+                android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
+        }
+        manager.createNotificationChannels(listOf(urgent, updates, buzzer))
     }
 
     fun canPost(context: Context): Boolean =
@@ -68,7 +90,12 @@ object PushNotifications {
     fun show(context: Context, title: String, body: String, data: Map<String, String>) {
         if (!canPost(context)) return
         val type = data["type"].orEmpty()
-        val channel = if (type in URGENT_TYPES) CHANNEL_URGENT else CHANNEL_UPDATES
+        val buzzer = data["buzzer"] == "true"
+        val channel = when {
+            buzzer -> CHANNEL_BUZZER
+            type in URGENT_TYPES -> CHANNEL_URGENT
+            else -> CHANNEL_UPDATES
+        }
         val requestCode = (data["booking_id"] ?: type).hashCode()
         val extras = Bundle().apply { data.forEach { (k, v) -> putString(k, v) } }
 
@@ -76,17 +103,24 @@ object PushNotifications {
             .apply { targetIntents(context, extras).forEach { addNextIntent(it) } }
             .getPendingIntent(requestCode, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-        val notification = NotificationCompat.Builder(context, channel)
+        val builder = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setColor(ContextCompat.getColor(context, R.color.push_accent))
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setPriority(if (channel == CHANNEL_URGENT) NotificationCompat.PRIORITY_HIGH else NotificationCompat.PRIORITY_DEFAULT)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setPriority(if (channel == CHANNEL_URGENT || buzzer) NotificationCompat.PRIORITY_MAX else NotificationCompat.PRIORITY_DEFAULT)
+            .setSound(if (buzzer) buzzerUri(context) else RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
             .setAutoCancel(true)
             .setContentIntent(pending)
-            .build()
+        if (buzzer) {
+            // rings like a call until the owner opens it, for at most 30 seconds
+            builder.setCategory(NotificationCompat.CATEGORY_CALL)
+                .setTimeoutAfter(BUZZER_RING_MS)
+                .setVibrate(longArrayOf(0, 800, 400, 800, 400, 800))
+        }
+        val notification = builder.build()
+        if (buzzer) notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
         runCatching { NotificationManagerCompat.from(context).notify(requestCode, notification) }
     }
 

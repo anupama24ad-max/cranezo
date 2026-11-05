@@ -78,18 +78,16 @@ import com.cranezo.utils.formatDisplayDate
 import com.cranezo.utils.isDateExpired
 import kotlinx.coroutines.launch
 
-/** Opens a document or image url in whatever app can show it. */
-fun openFile(context: Context, path: String?) {
+/** Opens a document or image inside the app (zoomable image, or the PDF's pages). */
+fun openFile(context: Context, path: String?, title: String? = null) {
     val url = fileUrl(path)
     if (url == null) {
         com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_no_file))
         return
     }
-    try {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    } catch (e: Exception) {
-        com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_no_file_app))
-    }
+    context.startActivity(
+        com.cranezo.ui.preview.FilePreviewActivity.intent(context, url, title).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -282,6 +280,26 @@ private fun DetailsContent(crane: Crane, onManageDocuments: () -> Unit) {
             }
         }
 
+        // GPS status: live location is shared by the operator during jobs, once the crane is verified
+        val verified = crane.approval_status == 1
+        GlassCard(contentPadding = dimen_14) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.LocationOn, null, tint = if (verified) SuccessGreen else AmberPrimary, modifier = Modifier.size(dimen_22))
+                Spacer(modifier = Modifier.width(dimen_10))
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.crane_gps_status), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(
+                        stringResource(if (verified) R.string.crane_gps_active else R.string.crane_gps_inactive),
+                        size = font_12, color = appColors.textSecondary
+                    )
+                }
+                com.cranezo.ui.booking.components.BookingTag(
+                    stringResource(if (verified) R.string.crane_gps_on else R.string.crane_gps_off),
+                    if (verified) SuccessGreen else AmberPrimary
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(dimen_16))
     }
 }
@@ -430,7 +448,9 @@ private fun DocumentChip(document: CraneDocument, onClick: () -> Unit) {
     val expired = isDateExpired(document.expiry_date)
     Column(
         modifier = Modifier
-            .width(dimen_110)
+            .width(dimen_120)
+            // every tile the same height, whatever the text length
+            .height(dimen_104)
             .glassEffect(
                 shape = RoundedCornerShape(dimen_12),
                 borderColor = if (expired) Red.copy(alpha = 0.8f) else Color.Unspecified,

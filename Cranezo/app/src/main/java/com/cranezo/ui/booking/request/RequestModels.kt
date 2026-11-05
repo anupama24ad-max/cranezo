@@ -22,7 +22,7 @@ data class RequestEstimate(
     val note: String? = null
 )
 
-data class RequestSite(val name: String? = null, val address: String? = null)
+data class RequestSite(val name: String? = null, val address: String? = null, val latitude: Double? = null, val longitude: Double? = null)
 data class RequestDuration(val label: String? = null, val hours: Int? = null)
 data class RequestSchedule(val start_type: String? = null, val start_at: String? = null, val end_at: String? = null)
 data class RequestCrane(val title: String? = null, val model_name: String? = null, val primary_photo: String? = null, val rating: Double? = null)

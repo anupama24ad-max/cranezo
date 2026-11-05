@@ -89,4 +89,15 @@
     <string name="rq_usual_operator">नियमित ऑपरेटर</string>
     <string name="rq_jobs_need_operator">%1$d काम को ऑपरेटर चाहिए</string>
     <string name="rq_jobs_need_operator_sub">Jobs खोलें और काम के समय से पहले ऑपरेटर दें।</string>
+    <string name="rq_owners_not_yet">%1$d में से 0 क्रेन मालिकों ने अभी स्वीकार किया</string>
+    <string name="push_channel_buzzer">नए क्रेन अनुरोध (बज़र)</string>
+    <string name="push_channel_buzzer_desc">जब पास का ग्राहक क्रेन माँगे तब बजता है</string>
+    <string name="pv_document">दस्तावेज़</string>
+    <string name="pv_open_with">दूसरे ऐप में खोलें</string>
+    <string name="pv_pdf_failed">यह फ़ाइल यहाँ नहीं दिखाई जा सकी।</string>
+    <string name="crane_gps_status">GPS स्थिति</string>
+    <string name="crane_gps_active">काम के दौरान ऑपरेटर लाइव लोकेशन साझा करता है</string>
+    <string name="crane_gps_inactive">सत्यापन के बाद चालू होगा</string>
+    <string name="crane_gps_on">चालू</string>
+    <string name="crane_gps_off">चालू नहीं</string>
 </resources>

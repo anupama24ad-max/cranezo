@@ -56,6 +56,7 @@ fun LoginScreen(
     vm: LoginViewModel? = null,
     onBack: () -> Unit = {}
 ) {
+    val emergencyContext = androidx.compose.ui.platform.LocalContext.current
     val uiState = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: LoginUiState()
 
     val mobileNumber = uiState.mobileNumber
@@ -154,7 +155,9 @@ fun LoginScreen(
                         leftImage = R.drawable.ambulance_ic,
                         leftIconTint = White,
                         iconSpacing = dimen_16,
-                        onClick = { }
+                        onClick = {
+                            runCatching { emergencyContext.startActivity(android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:112"))) }
+                        }
                     )
                 }
             }

@@ -11,6 +11,12 @@ plugins {
 
 val defaultToken = project.findProperty("defaultToken") ?: "default_value_if_not_found"
 
+// Google Maps key (Maps SDK for Android) from local.properties: MAPS_API_KEY=...  Never committed.
+val mapsApiKey: String = run {
+    val f = rootProject.file("local.properties")
+    if (!f.exists()) "" else java.util.Properties().apply { f.inputStream().use { load(it) } }.getProperty("MAPS_API_KEY", "")
+}
+
 android {
     namespace = "com.cranezo"
     compileSdk = 36
@@ -23,6 +29,10 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // the map screens show a plain location card until a key is set
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("Boolean", "HAS_MAPS_KEY", if (mapsApiKey.isNotBlank()) "true" else "false")
     }
 
     buildTypes {
@@ -119,6 +129,10 @@ dependencies {
 
     // Location
     implementation("com.google.android.gms:play-services-location:21.3.0")
+
+    // Google Maps in the app (Rapido-style booking screens)
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.maps.android:maps-compose:4.4.1")
 
     // Razorpay Checkout (customer online payments: advance and final balance)
     implementation("com.razorpay:checkout:1.6.33")

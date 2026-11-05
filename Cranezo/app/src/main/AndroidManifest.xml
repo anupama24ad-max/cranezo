@@ -96,6 +96,14 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.Cranezo" />
+        <!-- Google Maps key comes from local.properties (MAPS_API_KEY) -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+        <activity
+            android:name=".ui.preview.FilePreviewActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
         <activity
             android:name=".ui.finance.FinanceActivity"
             android:exported="false"

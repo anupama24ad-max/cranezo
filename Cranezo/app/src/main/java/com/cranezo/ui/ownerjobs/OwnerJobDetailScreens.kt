@@ -466,7 +466,7 @@ private fun PhotoGrid(title: String, photos: List<com.cranezo.ui.operator.model.
                     Column(modifier = Modifier.weight(1f)) {
                         Box(
                             modifier = Modifier.fillMaxWidth().height(dimen_88).clip(RoundedCornerShape(dimen_10))
-                                .clickable { fileUrl(photo.photo_url)?.let { context.startActivity(Intent(Intent.ACTION_VIEW, android.net.Uri.parse(it))) } }
+                                .clickable { com.cranezo.ui.cranes.openFile(context, photo.photo_url) }
                         ) {
                             AsyncImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
                         }

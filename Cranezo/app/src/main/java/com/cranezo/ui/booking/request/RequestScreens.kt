@@ -58,6 +58,9 @@ import com.cranezo.ui.theme.*
 import com.cranezo.utils.formatServerDateTime
 import kotlinx.coroutines.delay
 
+/** Default request time (15 minutes) used for the progress bar */
+private const val REQUEST_SECONDS = 15 * 60
+
 private fun mmss(seconds: Long): String = String.format(java.util.Locale.US, "%02d:%02d", seconds / 60, seconds % 60)
 
 /** Counts down locally between server refreshes */
@@ -99,17 +102,33 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
     val minOffer = e?.min_offer ?: 0.0
     val step = e?.raise_step ?: 100.0
 
-    FinPage(stringResource(R.string.rq_review_title), onBack, subtitle = listOf(capacityName, typeName).filter { it.isNotBlank() }.joinToString(" ")) {
+    val booking by bookingVm.uiState.collectAsStateWithLifecycle()
+    val showFind = e != null && (e.found ?: 0) > 0
+    MapSheetPage(
+        map = { m -> SiteMap(booking.latitude, booking.longitude, booking.siteAddress, m, radiusKm = e?.search_radius_km) },
+        onBack = onBack,
+        bottom = {
+            if (showFind) {
+                CommonGradientButton(
+                    text = if (state.busy) stringResource(R.string.rq_sending) else stringResource(R.string.rq_find_crane),
+                    enabled = !state.busy && (offer ?: 0.0) >= minOffer,
+                    onClick = { vm.create(body, offer ?: minOffer, autoRaise, autoMax.toDoubleOrNull(), onSent) }
+                )
+            }
+        }
+    ) {
+        Textview(stringResource(R.string.rq_review_title), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        Textview(listOf(capacityName, typeName).filter { it.isNotBlank() }.joinToString(" "), size = font_13, color = appColors.textSecondary)
         if (state.estimating || (e == null && !state.estimateFailed)) {
             Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = AmberPrimary, strokeWidth = dimen_3)
             }
-            return@FinPage
+            return@MapSheetPage
         }
         if (e == null) {
             EmptyText(stringResource(R.string.crane_msg_generic_error))
             CommonGradientButton(text = stringResource(R.string.rq_try_again), onClick = { vm.estimate(body) })
-            return@FinPage
+            return@MapSheetPage
         }
 
         // ---- no crane within the radius: send to the team ----
@@ -119,7 +138,7 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
                     Textview(stringResource(R.string.rq_sent_team_body), size = font_14, color = appColors.textPrimary)
                 }
                 CommonGradientButton(text = stringResource(R.string.rq_done), onClick = onClose)
-                return@FinPage
+                return@MapSheetPage
             }
             FinSection(stringResource(R.string.rq_none_title)) {
                 Textview(
@@ -137,7 +156,7 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
                 text = stringResource(R.string.rq_change_details), onClick = onEdit,
                 gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
             )
-            return@FinPage
+            return@MapSheetPage
         }
 
         // ---- price ----
@@ -192,12 +211,6 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
         }
 
         Textview(stringResource(R.string.rq_send_note, trimNumber(e.payment_window_minutes ?: 10.0)), size = font_12, color = appColors.textSecondary)
-        CommonGradientButton(
-            text = if (state.busy) stringResource(R.string.rq_sending) else stringResource(R.string.rq_find_crane),
-            enabled = !state.busy && (offer ?: 0.0) >= minOffer,
-            onClick = { vm.create(body, offer ?: minOffer, autoRaise, autoMax.toDoubleOrNull(), onSent) }
-        )
-        Spacer(modifier = Modifier.height(dimen_16))
     }
 }
 
@@ -235,12 +248,16 @@ fun RequestStatusScreen(
     var confirmCancel by rememberSaveable { mutableStateOf(false) }
     var note by rememberSaveable { mutableStateOf("") }
 
-    FinPage(stringResource(R.string.rq_status_title), onClose, subtitle = r?.request_code) {
+    MapSheetPage(
+        map = { m -> SiteMap(r?.site?.latitude, r?.site?.longitude, r?.site?.address, m, radiusKm = if (r?.status == "searching") 20.0 else null) },
+        overlay = { if (r?.status == "searching") RadarPulse(Modifier.size(dimen_220)) },
+        onBack = onClose
+    ) {
         if (r == null) {
             Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = AmberPrimary, strokeWidth = dimen_3)
             }
-            return@FinPage
+            return@MapSheetPage
         }
         // what was asked
         FinSection(r.crane_title) {
@@ -312,16 +329,14 @@ fun RequestStatusScreen(
 @Composable
 private fun SearchingBlock(vm: RequestViewModel, r: CraneRequestView, busy: Boolean) {
     val left = rememberCountdown(r.seconds_left)
-    GlassCard(contentPadding = dimen_16, borderColor = AmberPrimary) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CircularProgressIndicator(color = AmberPrimary, strokeWidth = dimen_3, modifier = Modifier.size(dimen_32))
-            Spacer(modifier = Modifier.width(dimen_12))
-            Column(modifier = Modifier.weight(1f)) {
-                Textview(stringResource(R.string.rq_searching_title), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                Textview(stringResource(R.string.rq_searching_sub, r.owners_notified ?: 0), size = font_12, color = appColors.textSecondary)
-            }
-            Textview(mmss(left), size = font_18, color = AmberPrimary, fontWeight = FontWeight.Bold)
-        }
+    // Rapido style: "0 of 12 owners accepted yet" with a bar that fills as the request time runs out
+    SearchingHeader(
+        title = stringResource(R.string.rq_owners_not_yet, r.owners_notified ?: 0),
+        progress = 1f - (left.toFloat() / (REQUEST_SECONDS).toFloat())
+    )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Textview(stringResource(R.string.rq_searching_title), size = font_13, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+        Textview(mmss(left), size = font_16, color = AmberPrimary, fontWeight = FontWeight.Bold)
     }
     FinSection(stringResource(R.string.rq_no_answer_yet)) {
         if (r.auto_raise == true) {

@@ -90,4 +90,15 @@
     <string name="rq_usual_operator">Usual operator</string>
     <string name="rq_jobs_need_operator">%1$d job(s) need an operator</string>
     <string name="rq_jobs_need_operator_sub">Open Jobs and assign an operator before the job time.</string>
+    <string name="rq_owners_not_yet">0 of %1$d crane owners accepted yet</string>
+    <string name="push_channel_buzzer">New crane requests (buzzer)</string>
+    <string name="push_channel_buzzer_desc">Rings when a customer near you asks for a crane</string>
+    <string name="pv_document">Document</string>
+    <string name="pv_open_with">Open with another app</string>
+    <string name="pv_pdf_failed">This file could not be shown here.</string>
+    <string name="crane_gps_status">GPS Status</string>
+    <string name="crane_gps_active">Live location is shared by the operator during jobs</string>
+    <string name="crane_gps_inactive">Will be active after verification</string>
+    <string name="crane_gps_on">Active</string>
+    <string name="crane_gps_off">Not active</string>
 </resources>

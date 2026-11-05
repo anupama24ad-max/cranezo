@@ -622,7 +622,7 @@ private fun MessageBubble(m: TicketMessage) {
                         AsyncImage(
                             model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop,
                             modifier = Modifier.padding(top = dimen_6).size(dimen_100).clip(RoundedCornerShape(dimen_8))
-                                .clickable { fileUrl(path)?.let { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it))) } }
+                                .clickable { com.cranezo.ui.cranes.openFile(context, path) }
                         )
                     }
                     Textview(formatServerTime(m.created_at), size = font_10, color = if (mine) Color.Black.copy(alpha = 0.6f) else appColors.textHint, modifier = Modifier.align(Alignment.End))
