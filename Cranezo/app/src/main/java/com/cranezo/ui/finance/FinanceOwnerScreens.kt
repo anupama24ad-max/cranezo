@@ -206,8 +206,8 @@ fun SettlementRow(s: SettlementItem) {
 }
 
 @Composable
-fun TransactionRow(t: TransactionItem) {
-    GlassCard(contentPadding = dimen_12, minHeight = dimen_40) {
+fun TransactionRow(t: TransactionItem, onOpen: ((TransactionItem) -> Unit)? = null) {
+    GlassCard(contentPadding = dimen_12, minHeight = dimen_40, onClick = onOpen?.let { open -> { open(t) } }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Textview(t.booking_code ?: t.transaction_code.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
@@ -581,12 +581,13 @@ fun OwnerPlatformScreen(vm: FinanceViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-fun TransactionsScreen(vm: FinanceViewModel, onBack: () -> Unit) {
+fun TransactionsScreen(vm: FinanceViewModel, onBack: () -> Unit, onOpen: (TransactionItem) -> Unit = {}) {
     val state by vm.ui.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) { vm.loadTransactions() }
     FinPage(stringResource(R.string.fin_payments_title), onBack, subtitle = stringResource(R.string.fin_payments_sub)) {
         if ("transactions" in state.loaded && state.transactions.isEmpty()) EmptyText(stringResource(R.string.fin_no_payments))
-        state.transactions.forEach { TransactionRow(it) }
+        // tap a payment for all its details
+        state.transactions.forEach { TransactionRow(it, onOpen) }
         Spacer(modifier = Modifier.height(dimen_16))
     }
 }
@@ -675,4 +676,51 @@ fun dialIntent(number: String) = android.content.Intent(android.content.Intent.A
 fun rememberDialer(): (String) -> Unit {
     val context = LocalContext.current
     return { number -> runCatching { context.startActivity(dialIntent(number)) } }
+}
+
+/** One payment in full: amount, status, what it was for, ids (to quote to support or the bank) and the booking */
+@Composable
+fun TransactionDetailScreen(t: TransactionItem?, isOwner: Boolean, onBack: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    FinPage(stringResource(R.string.tx_title), onBack, subtitle = t?.transaction_code) {
+        if (t == null) {
+            EmptyText(stringResource(R.string.fin_no_payments))
+            return@FinPage
+        }
+        GlassCard(contentPadding = dimen_16) {
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Textview(amountText(t.amount), size = font_26, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(dimen_6))
+                BookingTag(t.status_label.orEmpty(), statusTone(t.status))
+                Spacer(modifier = Modifier.height(dimen_6))
+                Textview(formatServerDateTime(t.created_at), size = font_12, color = appColors.textSecondary)
+            }
+        }
+        FinSection(stringResource(R.string.tx_section_payment)) {
+            TextRow(stringResource(R.string.tx_for), t.kind_label)
+            TextRow(stringResource(R.string.tx_booking), t.booking_code)
+            TextRow(stringResource(R.string.tx_method), t.method_name)
+            TextRow(stringResource(R.string.tx_received_by), t.collected_by_label)
+            if (isOwner) TextRow(stringResource(R.string.tx_customer), t.customer?.name) else TextRow(stringResource(R.string.tx_owner), t.owner?.name)
+            if (!t.failure_reason.isNullOrBlank()) TextRow(stringResource(R.string.tx_reason), t.failure_reason)
+        }
+        FinSection(stringResource(R.string.tx_section_ids)) {
+            TextRow(stringResource(R.string.tx_id), t.transaction_code)
+            TextRow(stringResource(R.string.tx_gateway_id), t.gateway_payment_id)
+            TextRow(stringResource(R.string.tx_order_id), t.gateway_order_id)
+            Textview(stringResource(R.string.tx_ids_note), size = font_11, color = appColors.textHint, modifier = Modifier.padding(top = dimen_4))
+        }
+        t.booking_id?.let { id ->
+            CommonGradientButton(
+                text = stringResource(R.string.tx_view_booking),
+                onClick = {
+                    context.startActivity(
+                        if (isOwner) com.cranezo.ui.ownerjobs.OwnerJobActivity.intent(context, id)
+                        else com.cranezo.ui.booking.BookingActivity.bookingIntent(context, id)
+                    )
+                }
+            )
+        }
+        Spacer(modifier = Modifier.height(dimen_16))
+    }
 }

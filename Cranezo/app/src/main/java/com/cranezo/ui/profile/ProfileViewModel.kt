@@ -289,17 +289,7 @@ class ProfileViewModel @Inject constructor(
 
                     else -> null
                 }
-            } else {
-                when {
-                    !ProfileValidation.isValidAadhar(state.value(ProfileField.AADHAR)) ->
-                        string(R.string.msg_invalid_aadhar)
-
-                    !ProfileValidation.isValidPan(state.value(ProfileField.PAN)) ->
-                        string(R.string.msg_invalid_pan)
-
-                    else -> null
-                }
-            }
+            } else null // individual customer: no Aadhaar / PAN
 
             UserRole.OPERATOR ->
                 if (!ProfileValidation.isNotInPast(state.value(ProfileField.LICENSE_EXPIRY))) {

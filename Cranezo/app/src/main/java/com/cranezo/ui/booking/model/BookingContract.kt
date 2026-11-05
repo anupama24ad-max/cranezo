@@ -44,7 +44,8 @@ data class BookingUiState(
     // My Jobs
     val counts: JobCounts? = null,
     val jobs: List<MyJobItem> = emptyList(),
-    val jobsTab: String = "upcoming",
+    // My Jobs opens on every booking, newest first; the dropdown narrows it
+    val jobsTab: String = "all",
     val jobsLoaded: Boolean = false,
     val jobsHasMore: Boolean = false,
     val jobsNextMin: Int = 0,

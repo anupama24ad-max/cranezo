@@ -235,12 +235,40 @@ fun NewComplaintScreen(vm: FinanceViewModel, presetBookingId: String?, onBack: (
     var category by rememberSaveable { mutableStateOf("") }
     var bookingId by rememberSaveable { mutableStateOf(presetBookingId) }
     var description by rememberSaveable { mutableStateOf("") }
+    // ticked reasons, one per line (a String so it survives rotation)
+    var tickedRaw by rememberSaveable { mutableStateOf("") }
+    val ticked = tickedRaw.split("\n").filter { it.isNotBlank() }
+    val chosen = state.categories.firstOrNull { it.id == category }
 
     FinPage(stringResource(R.string.fin_new_complaint), onBack, subtitle = stringResource(R.string.fin_new_complaint_sub)) {
         FinSection(stringResource(R.string.fin_step_what_wrong)) {
-            ChoiceChips(state.categories.map { IdName(it.id, it.name) }, category) { category = it }
-            state.categories.firstOrNull { it.id == category }?.description?.let {
+            ChoiceChips(state.categories.map { IdName(it.id, it.name) }, category) {
+                if (it != category) tickedRaw = ""
+                category = it
+            }
+            chosen?.description?.let {
                 Textview(it, size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_6))
+            }
+            // ready-made reasons: tick all that apply
+            val issues = chosen?.issues.orEmpty()
+            if (issues.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(dimen_8))
+                Textview(stringResource(R.string.cp_tick_all), size = font_12, color = appColors.textSecondary, fontWeight = FontWeight.SemiBold)
+                issues.forEach { issue ->
+                    val on = issue in ticked
+                    val toggle = { tickedRaw = (if (on) ticked - issue else ticked + issue).joinToString("\n") }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable { toggle() }.padding(vertical = dimen_2),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.Checkbox(
+                            checked = on,
+                            onCheckedChange = { toggle() },
+                            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = AmberPrimary, checkmarkColor = androidx.compose.ui.graphics.Color.Black)
+                        )
+                        Textview(issue, size = font_13, color = appColors.textPrimary, modifier = Modifier.weight(1f))
+                    }
+                }
             }
         }
         FinSection(stringResource(R.string.fin_step_which_booking)) {
@@ -251,14 +279,16 @@ fun NewComplaintScreen(vm: FinanceViewModel, presetBookingId: String?, onBack: (
         }
         FinSection(stringResource(R.string.fin_step_tell_us)) {
             GlassInputField(
-                label = stringResource(R.string.fin_describe), value = description, onValueChange = { description = it.take(2000) },
+                label = stringResource(if (ticked.isEmpty()) R.string.fin_describe else R.string.cp_anything_else),
+                value = description, onValueChange = { description = it.take(2000) },
                 placeholder = stringResource(R.string.fin_describe_hint), singleLine = false, minHeight = dimen_100
             )
         }
         CommonGradientButton(
             text = if (state.saving) stringResource(R.string.fin_sending) else stringResource(R.string.fin_submit_complaint),
             enabled = !state.saving,
-            onClick = { vm.createComplaint(bookingId, category, description) }
+            // the ticked reasons first, then what the customer typed
+            onClick = { vm.createComplaint(bookingId, category, (ticked.map { "• $it" } + listOfNotNull(description.trim().ifBlank { null })).joinToString("\n")) }
         )
         Spacer(modifier = Modifier.height(dimen_16))
     }

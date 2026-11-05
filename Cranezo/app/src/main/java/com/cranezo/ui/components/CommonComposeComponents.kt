@@ -939,7 +939,9 @@ fun ProfileAvatarPicker(
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     photoUri: String? = null,
-    isUploading: Boolean = false
+    isUploading: Boolean = false,
+    // tapping a photo that is set shows it full screen; the + badge still changes it
+    onPhotoClick: (() -> Unit)? = null
 ) {
     val dashColor = appColors.textSecondary.copy(alpha = 0.6f)
     Box(
@@ -962,7 +964,7 @@ fun ProfileAvatarPicker(
             modifier = Modifier
                 .size(dimen_88)
                 .glassEffect(CircleShape)
-                .clickable { onAddPhotoClick() },
+                .clickable { if (photoUri != null && onPhotoClick != null) onPhotoClick() else onAddPhotoClick() },
             contentAlignment = Alignment.Center
         ) {
             if (photoUri != null) {

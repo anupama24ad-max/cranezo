@@ -287,14 +287,7 @@ object ProfileFormSchema {
         } else {
             listOf(
                 userTypeChoice,
-                ProfileFormItem.Input(
-                    ProfileField.AADHAR, R.string.field_aadhar, R.string.field_aadhar_hint,
-                    Icons.Default.Badge, FieldKind.NUMBER, required = true, verifiable = true
-                ),
-                ProfileFormItem.Input(
-                    ProfileField.PAN, R.string.field_pan, R.string.field_pan_hint,
-                    Icons.Default.Description, required = true, verifiable = true
-                ),
+                // Aadhaar and PAN are not asked from individual customers any more
                 ProfileFormItem.Input(
                     ProfileField.CITY, R.string.field_city, R.string.field_city_hint,
                     Icons.Default.LocationOn, required = true

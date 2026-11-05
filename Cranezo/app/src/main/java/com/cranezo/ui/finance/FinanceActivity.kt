@@ -27,6 +27,7 @@ object FinanceRoutes {
     const val CRANE_REQUESTS = "crane_requests"
     // owner and customer
     const val TRANSACTIONS = "transactions"
+    const val TRANSACTION = "transaction"
     const val COMPLAINTS = "complaints"
     const val COMPLAINT = "complaint"
     const val COMPLAINT_NEW = "complaint_new"
@@ -60,6 +61,8 @@ class FinanceActivity : BaseVMComposeActivity<FinanceViewModel>(FinanceViewModel
         var operatorId by rememberSaveable { mutableStateOf("") }
         var operatorName by rememberSaveable { mutableStateOf("") }
         var complaintId by rememberSaveable { mutableStateOf(if (start == FinanceRoutes.COMPLAINT) startId.orEmpty() else "") }
+        // the payment opened from Payments (its details page)
+        var openTransaction by androidx.compose.runtime.remember { mutableStateOf<com.cranezo.ui.finance.model.TransactionItem?>(null) }
         val role = vm.role
         val isOwner = role == "CRANE_OWNER"
         val dial = rememberDialer()
@@ -105,7 +108,13 @@ class FinanceActivity : BaseVMComposeActivity<FinanceViewModel>(FinanceViewModel
                 )
             }
 
-            composable(FinanceRoutes.TRANSACTIONS) { TransactionsScreen(vm, leave) }
+            composable(FinanceRoutes.TRANSACTIONS) {
+                TransactionsScreen(vm, leave, onOpen = { t ->
+                    openTransaction = t
+                    open(FinanceRoutes.TRANSACTION)
+                })
+            }
+            composable(FinanceRoutes.TRANSACTION) { TransactionDetailScreen(openTransaction, isOwner, leave) }
             composable(FinanceRoutes.COMPLAINTS) {
                 ComplaintsScreen(
                     vm, leave,

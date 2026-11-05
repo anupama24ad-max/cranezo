@@ -133,8 +133,18 @@ data class TransactionItem(
     val status: String? = null,
     val status_label: String? = null,
     val collected_by_label: String? = null,
-    val created_at: String? = null
+    val created_at: String? = null,
+    // details page
+    val booking_id: String? = null,
+    val kind_label: String? = null,
+    val gateway_payment_id: String? = null,
+    val gateway_order_id: String? = null,
+    val failure_reason: String? = null,
+    val customer: TxPerson? = null,
+    val owner: TxPerson? = null
 )
+
+data class TxPerson(val id: String? = null, val name: String? = null)
 
 /** Operator earnings summary (operator/earnings/summary) */
 data class OperatorEarnings(
@@ -204,7 +214,14 @@ data class AvailableJob(
 
 // ---------------------------------------------------------------- complaints
 
-data class ComplaintCategory(val id: String? = null, val name: String? = null, val group: String? = null, val description: String? = null)
+data class ComplaintCategory(
+    val id: String? = null,
+    val name: String? = null,
+    val group: String? = null,
+    val description: String? = null,
+    // ready-made reasons shown as checkboxes
+    val issues: List<String>? = null
+)
 
 data class ComplaintOptions(val categories: List<ComplaintCategory>? = null)
 

@@ -161,24 +161,6 @@ fun CustomerHomeTab(
 
         BannerCarousel(home?.banners.orEmpty().sortedBy { it.sort_order ?: 0 }) { runBannerAction(context, it, onProfile) }
 
-        // Quick links, minus the ones the bottom bar already has (Track, My Jobs). One full-width row each,
-        // so long titles in Hindi or Telugu never squeeze into narrow columns.
-        val quick = home?.quick_access.orEmpty().filterNot { it.screen == "track" || it.screen == "my_jobs" }
-        quick.forEach { item ->
-            GlassCard(contentPadding = dimen_14, minHeight = dimen_56, onClick = { openScreen(context, item.screen, onProfile) }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconBadge(icon = quickIcon(item.icon), accent = AmberPrimary, size = dimen_36)
-                    Spacer(modifier = Modifier.width(dimen_12))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Textview(item.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                        Textview(item.subtitle.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
-                    }
-                    if ((item.badge ?: 0) > 0) BookingTag(item.badge.toString(), Red)
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
-                }
-            }
-        }
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             Textview(stringResource(R.string.home_recent_booking), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             Textview(
@@ -212,6 +194,24 @@ fun CustomerHomeTab(
                         }
                         if (booking.can_rate == true) BookingTag(stringResource(R.string.cj_rate), AmberPrimary)
                     }
+                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
+                }
+            }
+        }
+        // Need help and other links at the bottom, after the bookings
+        // Quick links, minus the ones the bottom bar already has (Track, My Jobs). One full-width row each,
+        // so long titles in Hindi or Telugu never squeeze into narrow columns.
+        val quick = home?.quick_access.orEmpty().filterNot { it.screen == "track" || it.screen == "my_jobs" }
+        quick.forEach { item ->
+            GlassCard(contentPadding = dimen_14, minHeight = dimen_56, onClick = { openScreen(context, item.screen, onProfile) }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBadge(icon = quickIcon(item.icon), accent = AmberPrimary, size = dimen_36)
+                    Spacer(modifier = Modifier.width(dimen_12))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(item.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                        Textview(item.subtitle.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
+                    }
+                    if ((item.badge ?: 0) > 0) BookingTag(item.badge.toString(), Red)
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
                 }
             }

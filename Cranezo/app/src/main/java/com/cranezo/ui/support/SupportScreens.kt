@@ -356,18 +356,7 @@ fun HelpSupportHomeScreen(
                 }
             }
         }
-        home?.team?.let { t ->
-            GlassCard(contentPadding = dimen_12) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconBadge(icon = Icons.Default.SupportAgent, accent = AmberPrimary, size = dimen_36)
-                    Spacer(modifier = Modifier.width(dimen_12))
-                    Column {
-                        Textview(t.title.orEmpty(), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                        Textview(t.message.orEmpty(), size = font_10, color = appColors.textSecondary)
-                    }
-                }
-            }
-        }
+        // ("Our Support Team is Available" card removed)
         Spacer(modifier = Modifier.height(dimen_8))
     }
 }

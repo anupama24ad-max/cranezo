@@ -247,6 +247,8 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                             modifier = Modifier.align(Alignment.TopCenter),
                             onDismiss = { viewModel.onUserDismissNetNotice() }
                         )
+                        // job updates (crane arrived, completion code, ...) as a bottom sheet over this screen
+                        com.cranezo.push.JobAlertHost()
                     }
                 }
             }

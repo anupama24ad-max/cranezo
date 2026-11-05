@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -96,26 +97,48 @@ fun MyJobsScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
     LaunchedEffect(Unit) { vm?.onIntent(BookingIntent.LoadJobs(state.jobsTab)) }
 
     BookingScaffold(onBack = onBack, title = stringResource(R.string.bk_my_jobs), subtitle = stringResource(R.string.cj_my_jobs_sub)) {
-        Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
-            val c = state.counts
-            listOf(
-                Triple("upcoming", R.string.oj_tab_upcoming, c?.upcoming),
-                Triple("active", R.string.oj_tab_active, c?.active),
-                Triple("completed", R.string.op_tab_completed, c?.completed),
-                Triple("cancelled", R.string.cj_tab_cancelled, c?.cancelled)
-            ).forEach { (key, label, count) ->
-                val selected = key == state.jobsTab
+        // One filter dropdown (All by default) instead of a row of chips
+        val c = state.counts
+        val filters = listOf(
+            Triple("all", R.string.jf_all, c?.let { (it.upcoming ?: 0) + (it.active ?: 0) + (it.completed ?: 0) + (it.cancelled ?: 0) }),
+            Triple("upcoming", R.string.oj_tab_upcoming, c?.upcoming),
+            Triple("active", R.string.oj_tab_active, c?.active),
+            Triple("completed", R.string.op_tab_completed, c?.completed),
+            Triple("cancelled", R.string.cj_tab_cancelled, c?.cancelled)
+        )
+        var filterOpen by remember { mutableStateOf(false) }
+        val current = filters.firstOrNull { it.first == state.jobsTab } ?: filters.first()
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Textview(stringResource(R.string.jf_showing), size = font_12, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+            Box {
                 Row(
                     modifier = Modifier.clip(RoundedCornerShape(dimen_16))
-                        .background(if (selected) AmberPrimary.copy(alpha = 0.18f) else appColors.subtleFill)
-                        .clickable { vm?.onIntent(BookingIntent.LoadJobs(key)) }
-                        .padding(horizontal = dimen_12, vertical = dimen_6),
+                        .background(AmberPrimary.copy(alpha = 0.16f))
+                        .clickable { filterOpen = true }
+                        .padding(horizontal = dimen_12, vertical = dimen_8),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Textview(stringResource(label), size = font_11, color = if (selected) appColors.primaryText else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
-                    if (count != null) {
-                        Spacer(modifier = Modifier.width(dimen_6))
-                        Textview(count.toString(), size = font_10, color = appColors.textSecondary)
+                    Textview(
+                        stringResource(current.second) + (current.third?.let { " ($it)" } ?: ""),
+                        size = font_12, color = appColors.primaryText, fontWeight = FontWeight.Bold
+                    )
+                    Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = appColors.primaryText, modifier = Modifier.size(dimen_18))
+                }
+                androidx.compose.material3.DropdownMenu(expanded = filterOpen, onDismissRequest = { filterOpen = false }) {
+                    filters.forEach { (key, label, count) ->
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = {
+                                Textview(
+                                    stringResource(label) + (count?.let { " ($it)" } ?: ""), size = font_13,
+                                    color = if (key == state.jobsTab) appColors.primaryText else appColors.textPrimary,
+                                    fontWeight = if (key == state.jobsTab) FontWeight.Bold else FontWeight.Normal
+                                )
+                            },
+                            onClick = {
+                                filterOpen = false
+                                vm?.onIntent(BookingIntent.LoadJobs(key))
+                            }
+                        )
                     }
                 }
             }
@@ -309,6 +332,9 @@ fun JobDetailsScreen(
             }
         }
 
+        // how much is paid and how much is left (advance now, balance after the job)
+        if (!closed) PaymentProgressCard(booking.payment)
+
         when {
             closed -> CancellationBlock(booking.cancellation)
             booking.timeline != null && (booking.tab == "active" || completed) -> TimelineBlock(booking)
@@ -449,5 +475,52 @@ fun TrackMyCranesScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
+    }
+}
+
+/** "₹8,000 paid of ₹40,000" with a bar, then advance paid and balance still to pay */
+@Composable
+private fun PaymentProgressCard(p: com.cranezo.ui.booking.model.BookingPayment?) {
+    val total = p?.final_total ?: return
+    if (total <= 0.0) return
+    val paid = (p.paid_amount ?: 0.0).coerceAtLeast(0.0)
+    val balance = (p.balance_due ?: (total - paid)).coerceAtLeast(0.0)
+    val fraction = (paid / total).toFloat().coerceIn(0f, 1f)
+    val green = SuccessGreen
+    GlassCard(contentPadding = dimen_14) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Textview(stringResource(R.string.pp_title), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            if (balance <= 0.0) BookingTag(stringResource(R.string.pp_fully_paid), green)
+        }
+        Spacer(modifier = Modifier.height(dimen_8))
+        Textview(stringResource(R.string.pp_paid_of, rupees(paid), rupees(total)), size = font_13, color = appColors.textSecondary)
+        Spacer(modifier = Modifier.height(dimen_8))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimen_10)
+                .clip(RoundedCornerShape(dimen_8))
+                .background(appColors.subtleFill)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction)
+                    .height(dimen_10)
+                    .clip(RoundedCornerShape(dimen_8))
+                    .background(green)
+            )
+        }
+        Spacer(modifier = Modifier.height(dimen_10))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.size(dimen_8).clip(CircleShape).background(green))
+            Textview("  " + stringResource(R.string.pp_advance_paid), size = font_12, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+            Textview(rupees(paid), size = font_13, color = green, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(dimen_4))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.size(dimen_8).clip(CircleShape).background(AmberPrimary))
+            Textview("  " + stringResource(R.string.pp_balance), size = font_12, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+            Textview(rupees(balance), size = font_13, color = AmberPrimary, fontWeight = FontWeight.Bold)
+        }
     }
 }

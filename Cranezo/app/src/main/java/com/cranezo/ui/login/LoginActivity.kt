@@ -14,6 +14,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : BaseVMComposeActivity<LoginViewModel>(LoginViewModel::class.java) {
+    /** Sign-in and sign-up screens are always dark, whatever the app theme is (also after logout) */
+    override val forceDarkTheme: Boolean? = true
+
 
     @Inject
     lateinit var sm: SessionManager

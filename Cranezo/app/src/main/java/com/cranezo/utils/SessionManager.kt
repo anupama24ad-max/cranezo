@@ -68,7 +68,8 @@ class SessionManager(context: Context) {
     }
 
     fun getAppTheme(): String {
-        return sharedPreferences.getString(KEY_APP_THEME, "system") ?: "system"
+        // light by default after sign-in; the user can change it in Appearance
+        return sharedPreferences.getString(KEY_APP_THEME, "light") ?: "light"
     }
 
     fun setAppTheme(theme: String) {

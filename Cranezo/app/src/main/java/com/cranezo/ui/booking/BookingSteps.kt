@@ -564,6 +564,7 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                 modifier = Modifier.padding(top = dimen_6)
             )
             DurationChoices(state, vm)
+            StepEstimateCard(vm, state)
         }
     }
 }
@@ -700,6 +701,69 @@ fun DurationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                             text = stringResource(R.string.bk_per_hour, rupees(price.hourly_rate)),
                             size = font_11,
                             color = appColors.textSecondary
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Unwraps the activity behind a (locale-wrapped) context */
+private fun android.content.Context.hostActivity(): androidx.activity.ComponentActivity? {
+    var c: android.content.Context? = this
+    while (c is android.content.ContextWrapper) {
+        if (c is androidx.activity.ComponentActivity) return c
+        c = c.baseContext
+    }
+    return null
+}
+
+/**
+ * Step 4: a live estimate that follows the start time and duration. Crane hire for the hours chosen plus the
+ * travel charge for the distance from the nearby cranes (first km free), from the same server estimate the
+ * offer screen uses.
+ */
+@Composable
+private fun StepEstimateCard(vm: BookingViewModel?, state: BookingUiState) {
+    if (vm == null) return
+    val activity = LocalContext.current.hostActivity() ?: return
+    val rvm = remember(activity) {
+        androidx.lifecycle.ViewModelProvider(activity)[com.cranezo.ui.booking.request.RequestViewModel::class.java]
+    }
+    val rs by rvm.ui.collectAsStateWithLifecycle()
+    androidx.compose.runtime.LaunchedEffect(state.startType, state.date, state.time, state.durationType, state.hours, state.days) {
+        kotlinx.coroutines.delay(400) // wait for the stepper to settle
+        vm.requestBody()?.let { rvm.estimate(it) }
+    }
+    val e = rs.estimate
+    GlassCard(contentPadding = dimen_14) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBadge(icon = Icons.Default.CurrencyRupee, accent = AmberPrimary, size = dimen_36, filled = true)
+            Spacer(modifier = Modifier.width(dimen_12))
+            Column(modifier = Modifier.weight(1f)) {
+                Textview(stringResource(R.string.est_title), size = font_11, color = appColors.textSecondary)
+                when {
+                    rs.estimating || (e == null && !rs.estimateFailed) ->
+                        Textview(stringResource(R.string.est_calculating), size = font_14, color = appColors.textPrimary)
+                    e == null -> Textview(stringResource(R.string.est_unavailable), size = font_12, color = appColors.textSecondary)
+                    (e.found ?: 0) == 0 -> Textview(stringResource(R.string.est_none), size = font_12, color = appColors.textSecondary)
+                    else -> {
+                        val range = e.total_range ?: e.price_range
+                        val min = range?.min ?: 0.0
+                        val max = range?.max ?: min
+                        Textview(
+                            if (max > min) stringResource(R.string.est_range, rupees(min), rupees(max)) else rupees(min),
+                            size = font_20, color = AmberPrimary, fontWeight = FontWeight.Bold
+                        )
+                        Textview(
+                            stringResource(
+                                R.string.est_detail,
+                                e.hours ?: state.hours,
+                                com.cranezo.ui.finance.trimNumber(e.nearest_km ?: 0.0),
+                                com.cranezo.ui.finance.trimNumber(e.free_km ?: 7.0)
+                            ),
+                            size = font_11, color = appColors.textSecondary
                         )
                     }
                 }

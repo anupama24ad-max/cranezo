@@ -127,10 +127,14 @@ fun PersonalInfoScreen(
         val role = UserRole.fromId(profile?.role_id) ?: UserRole.CUSTOMER
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            val previewContext = androidx.compose.ui.platform.LocalContext.current
             ProfileAvatarPicker(
                 onAddPhotoClick = photoPicker::openChooser,
                 photoUri = state.photoUri,
-                isUploading = state.isPhotoUploading
+                isUploading = state.isPhotoUploading,
+                onPhotoClick = {
+                    state.photoUri?.let { previewContext.startActivity(com.cranezo.ui.preview.FilePreviewActivity.intent(previewContext, it)) }
+                }
             )
         }
 
@@ -141,8 +145,8 @@ fun PersonalInfoScreen(
         }
 
         when (role) {
+            // individual customers: no Aadhaar / PAN section any more
             UserRole.CUSTOMER -> if (state.isBusiness) BusinessSection(state, onIntent)
-            else IndividualSection(state, profile, onIntent)
 
             UserRole.OPERATOR -> OperatorSection(state, onIntent)
             UserRole.CRANE_OWNER -> OwnerSection(profile)

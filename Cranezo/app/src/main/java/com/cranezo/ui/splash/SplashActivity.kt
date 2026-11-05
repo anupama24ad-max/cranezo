@@ -16,6 +16,9 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashActivity : BaseVMComposeActivity<SplashViewModel>(SplashViewModel::class.java) {
+    /** Sign-in and sign-up screens are always dark, whatever the app theme is (also after logout) */
+    override val forceDarkTheme: Boolean? = true
+
     @Composable
     override fun Content(vm: SplashViewModel) {
         return SplashScreen(vm)

@@ -87,6 +87,8 @@ private fun appearanceName(mode: AppThemeMode): String = stringResource(
 /** Round profile photo with a camera badge; the initial of the name while there is no photo. */
 @Composable
 private fun ProfileAvatar(profile: ProfileData?, fallbackName: String, onClick: () -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val photo = fileUrl(profile?.profile_image)
     Box(modifier = Modifier.size(dimen_70)) {
         Box(
             modifier = Modifier
@@ -94,7 +96,11 @@ private fun ProfileAvatar(profile: ProfileData?, fallbackName: String, onClick: 
                 .clip(CircleShape)
                 .background(AmberPrimary.copy(alpha = 0.18f))
                 .border(dimen_1, AmberPrimary, CircleShape)
-                .clickable { onClick() },
+                // a photo opens full screen; no photo opens the profile to add one (camera badge: always edit)
+                .clickable {
+                    if (photo != null) context.startActivity(com.cranezo.ui.preview.FilePreviewActivity.intent(context, photo, profile?.full_name))
+                    else onClick()
+                },
             contentAlignment = Alignment.Center
         ) {
             val url = fileUrl(profile?.profile_image)
@@ -293,11 +299,17 @@ fun HomeProfileScreen(
 
             GroupLabel(stringResource(R.string.mp_group_support))
             MenuGroup {
+                // notification settings removed (every notification is always on): the user's support requests instead
+                val supportContext = androidx.compose.ui.platform.LocalContext.current
                 MenuRow(
                     icon = Icons.Default.Notifications,
-                    title = stringResource(R.string.mp_notification_settings),
-                    subtitle = stringResource(R.string.mp_notification_row_subtitle),
-                    onClick = { onOpen(ProfileRoutes.NOTIFICATIONS) }
+                    title = stringResource(R.string.sp_my_requests),
+                    subtitle = stringResource(R.string.mp_my_requests_row_subtitle),
+                    onClick = {
+                        supportContext.startActivity(
+                            com.cranezo.ui.support.SupportActivity.intent(supportContext, com.cranezo.ui.support.SupportRoutes.TICKETS)
+                        )
+                    }
                 )
                 MenuRow(
                     icon = Icons.Default.SupportAgent,

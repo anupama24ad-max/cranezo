@@ -15,6 +15,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class VerifyOtpActivity :
     BaseVMComposeActivity<VerifyOtpViewModel>(VerifyOtpViewModel::class.java) {
+    /** Sign-in and sign-up screens are always dark, whatever the app theme is (also after logout) */
+    override val forceDarkTheme: Boolean? = true
+
 
     @Composable
     override fun Content(vm: VerifyOtpViewModel) {

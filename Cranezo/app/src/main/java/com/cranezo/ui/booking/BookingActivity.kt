@@ -34,6 +34,7 @@ object BookingRoutes {
     const val EXTRA_STATUS = "extra_status"
     const val PAY = "pay"
     const val PAID = "paid"
+    const val RECEIPT = "receipt"
     const val ACTIVE_TRACKING = "active_tracking"
     // Rapido style: review & price, then the request (searching / pay advance)
     const val OFFER = "offer"
@@ -150,6 +151,19 @@ class BookingActivity :
         // Back to an earlier step of the same flow
         val backTo: (String) -> Unit = { route -> nav.popBackStack(route, inclusive = false) }
 
+        // From a request (cancelled, expired or left): back to step 4 "When" with the earlier choices kept.
+        // The steps are rebuilt so Back keeps working; with nothing chosen (app reopened) it starts at step 1.
+        val toWhenStep: () -> Unit = {
+            requestVm.clearRequest()
+            val s = vm.uiState.value
+            nav.navigate(BookingRoutes.TYPE) { popUpTo(BookingRoutes.REQUEST) { inclusive = true } }
+            if (s.craneType != null && s.capacity != null && s.latitude != null) {
+                nav.navigate(BookingRoutes.CAPACITY)
+                nav.navigate(BookingRoutes.LOCATION)
+                nav.navigate(BookingRoutes.DATETIME)
+            }
+        }
+
         NavHost(navController = nav, startDestination = start) {
             composable(BookingRoutes.TYPE) {
                 CraneTypeStep(vm, onBack = leave, onNext = { nav.navigate(BookingRoutes.CAPACITY) })
@@ -182,12 +196,13 @@ class BookingActivity :
                 com.cranezo.ui.booking.request.RequestStatusScreen(
                     vm = requestVm,
                     onClose = { finish() },
+                    onEditBooking = toWhenStep,
                     onBooked = { id ->
                         requestVm.clearRequest()
                         vm.onIntent(BookingIntent.OpenBooking(id))
                     },
-                    // start again from the type step with a fresh offer
-                    onTryAgain = { nav.navigate(BookingRoutes.TYPE) { popUpTo(BookingRoutes.REQUEST) { inclusive = true } } }
+                    // start again from step 4 with a fresh offer
+                    onTryAgain = toWhenStep
                 )
             }
             composable(BookingRoutes.RESULTS) {
@@ -239,7 +254,7 @@ class BookingActivity :
                     onExtra = { nav.navigate(BookingRoutes.EXTRA) },
                     onExtraStatus = { nav.navigate(BookingRoutes.EXTRA_STATUS) },
                     onPay = { nav.navigate(BookingRoutes.PAY) },
-                    onReceipt = { nav.navigate(BookingRoutes.PAID) }
+                    onReceipt = { nav.navigate(BookingRoutes.RECEIPT) }
                 )
             }
             composable(BookingRoutes.EXTRA) { ExtraTimeRequestScreen(vm, onBack = leave) }
@@ -251,6 +266,7 @@ class BookingActivity :
                 })
             }
             composable(BookingRoutes.PAID) { PaymentSuccessfulScreen(vm, onBack = leave) }
+            composable(BookingRoutes.RECEIPT) { ReceiptScreen(vm, onBack = leave) }
             composable(BookingRoutes.ACTIVE_TRACKING) { TrackMyCranesScreen(vm, onBack = leave) }
         }
     }

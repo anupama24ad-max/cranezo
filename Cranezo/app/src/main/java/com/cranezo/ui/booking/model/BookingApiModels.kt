@@ -375,7 +375,32 @@ data class ExtensionResult(val extension: ExtensionRequest? = null, val booking:
 
 data class JobSummaryInfo(val started_at: String? = null, val completed_at: String? = null, val total_usage_seconds: Long? = null)
 
+data class ReceiptParty(val name: String? = null, val phone: String? = null, val gst_number: String? = null)
+
+data class ReceiptService(
+    val crane: String? = null,
+    val registration_number: String? = null,
+    val site: String? = null,
+    val started_at: String? = null,
+    val completed_at: String? = null,
+    val booked_hours: Double? = null,
+    val worked_seconds: Long? = null,
+    val extra_minutes: Int? = null,
+    val operator: String? = null
+)
+
+data class ReceiptPayment(val label: String? = null, val amount: Double? = null, val method: String? = null, val reference: String? = null, val paid_at: String? = null)
+
 data class ReceiptInfo(
+    // full receipt
+    val receipt_no: String? = null,
+    val booking_code: String? = null,
+    val issued_at: String? = null,
+    val billed_to: ReceiptParty? = null,
+    val billed_by: ReceiptParty? = null,
+    val service: ReceiptService? = null,
+    val lines: List<com.cranezo.ui.finance.model.BillLine>? = null,
+    val payments: List<ReceiptPayment>? = null,
     val payment_id: String? = null,
     val paid_at: String? = null,
     val booking_amount: Double? = null,

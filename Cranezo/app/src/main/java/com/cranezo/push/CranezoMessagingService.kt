@@ -34,7 +34,8 @@ class CranezoMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         val title = message.notification?.title ?: message.data["title"] ?: return
         val body = message.notification?.body ?: message.data["body"].orEmpty()
-        PushNotifications.show(applicationContext, title, body, message.data)
+        // app open: job updates slide up as a sheet on the current screen instead of a system notification
+        if (!InAppAlerts.tryShow(title, body, message.data)) PushNotifications.show(applicationContext, title, body, message.data)
     }
 
     override fun onDestroy() {

@@ -233,7 +233,8 @@ fun RequestStatusScreen(
     vm: RequestViewModel,
     onClose: () -> Unit,
     onBooked: (String) -> Unit,
-    onTryAgain: () -> Unit
+    onTryAgain: () -> Unit,
+    onEditBooking: () -> Unit = onTryAgain
 ) {
     val state by vm.ui.collectAsStateWithLifecycle()
     val r = state.request
@@ -248,10 +249,19 @@ fun RequestStatusScreen(
     var confirmCancel by rememberSaveable { mutableStateOf(false) }
     var note by rememberSaveable { mutableStateOf("") }
 
+    // Back: booked -> close; still running -> ask to cancel first; finished -> step 4 to book again
+    val goBack: () -> Unit = {
+        when {
+            r == null || r.status == "confirmed" -> onClose()
+            r.can_cancel == true -> confirmCancel = true
+            else -> onEditBooking()
+        }
+    }
+    androidx.activity.compose.BackHandler { goBack() }
     MapSheetPage(
         map = { m -> SiteMap(r?.site?.latitude, r?.site?.longitude, r?.site?.address, m, radiusKm = if (r?.status == "searching") 20.0 else null) },
         overlay = { if (r?.status == "searching") RadarPulse(Modifier.size(dimen_220)) },
-        onBack = onClose
+        onBack = goBack
     ) {
         if (r == null) {
             Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
@@ -311,7 +321,7 @@ fun RequestStatusScreen(
                 InlineConfirm(
                     message = stringResource(R.string.rq_cancel_confirm),
                     confirmText = stringResource(R.string.rq_cancel_yes),
-                    onConfirm = { confirmCancel = false; vm.cancel() },
+                    onConfirm = { confirmCancel = false; vm.cancel(onEditBooking) },
                     onCancel = { confirmCancel = false }
                 )
             } else {

@@ -12,6 +12,9 @@ data class RequestEstimate(
     val hours: Int? = null,
     val price_range: AmountRange? = null,
     val distance_charge_range: AmountRange? = null,
+    // crane hire + travel charge, and how far the nearest free crane is
+    val total_range: AmountRange? = null,
+    val nearest_km: Double? = null,
     val free_km: Double? = null,
     val min_offer: Double? = null,
     val suggested_offer: Double? = null,
@@ -128,7 +131,7 @@ data class PayOrder(
 )
 
 /** customer/payments/verify: the request (advance) or the booking (final) after the payment */
-data class PayResult(val kind: String? = null, val request: CraneRequestView? = null)
+data class PayResult(val kind: String? = null, val request: CraneRequestView? = null, val paid: Boolean? = null)
 
 /** Accepting returns the new booking (owner view); only its id is needed */
 data class AcceptedBooking(val booking_id: String? = null, val booking_code: String? = null)

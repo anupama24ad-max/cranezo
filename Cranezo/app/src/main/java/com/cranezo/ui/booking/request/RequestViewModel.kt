@@ -118,9 +118,35 @@ class RequestViewModel @Inject constructor(
         }
     }
 
+    /** Last time the server was asked to check Razorpay for this screen (at most every 15 s) */
+    private var lastPaySync = 0L
+
     fun refresh() {
-        val id = _ui.value.request?.request_id ?: return loadActive()
-        post("customer/crane-requests/get", JSONObject().put("request_id", id), busy = false, quiet = true) { setRequest(it) }
+        val req = _ui.value.request ?: return loadActive()
+        val id = req.request_id ?: return loadActive()
+        val pending = req.booking
+        val payBookingId = pending?.booking_id
+        val syncDue = System.currentTimeMillis() - lastPaySync > 15_000L
+        if (syncDue && pending != null && payBookingId != null && pending.status == 8 && pending.advance_paid_at == null) {
+            lastPaySync = System.currentTimeMillis()
+            // a payment the app never heard back about (UPI app switch): the server asks Razorpay
+            post("customer/payments/sync", JSONObject().put("booking_id", payBookingId), busy = false, quiet = true) { d ->
+                val r = parse(d, PayResult::class.java)
+                if (r?.paid == true) applyPaid(payBookingId, r)
+                else post("customer/crane-requests/get", JSONObject().put("request_id", id), busy = false, quiet = true) { setRequest(it) }
+            }
+        } else {
+            post("customer/crane-requests/get", JSONObject().put("request_id", id), busy = false, quiet = true) { setRequest(it) }
+        }
+    }
+
+    /** A verified payment: advance -> the request shows the confirmed booking; final -> the paid screen */
+    private fun applyPaid(bookingId: String, result: PayResult?) {
+        if (result?.kind == "final") {
+            _ui.update { it.copy(finalPaidBookingId = bookingId, payingBookingId = null) }
+        } else {
+            result?.request?.let { r -> _ui.update { it.copy(request = r, payingBookingId = null) } }
+        }
     }
 
     private fun act(path: String, extra: JSONObject.() -> Unit = {}) {
@@ -136,7 +162,14 @@ class RequestViewModel @Inject constructor(
         if (on && max != null) put("auto_raise_max", max)
     }
 
-    fun cancel() = act("customer/crane-requests/cancel")
+    /** Cancel the request; [onDone] runs once the server has cancelled it (back to step 4) */
+    fun cancel(onDone: () -> Unit = {}) {
+        val id = _ui.value.request?.request_id ?: return
+        post("customer/crane-requests/cancel", JSONObject().put("request_id", id), success = true) { d ->
+            setRequest(d)
+            onDone()
+        }
+    }
 
     /** Advance: online through Razorpay; the test payment only while the server has no gateway */
     fun payAdvance() {
@@ -171,25 +204,22 @@ class RequestViewModel @Inject constructor(
             .put("razorpay_order_id", orderId.orEmpty())
             .put("razorpay_payment_id", paymentId.orEmpty())
             .put("razorpay_signature", signature.orEmpty())
-        post("customer/payments/verify", body, success = true) { d ->
-            val result = parse(d, PayResult::class.java)
-            if (result?.kind == "final") {
-                _ui.update { it.copy(finalPaidBookingId = bookingId, payingBookingId = null) }
-            } else {
-                result?.request?.let { r -> _ui.update { it.copy(request = r, payingBookingId = null) } }
-            }
-        }
+        post("customer/payments/verify", body, success = true) { d -> applyPaid(bookingId, parse(d, PayResult::class.java)) }
     }
 
     /** Cancelled or failed in Checkout: logged on the server, nothing changes for the booking */
     fun onPaymentError(orderId: String?, message: String?) {
         val bookingId = _ui.value.payingBookingId ?: return
+        // Checkout can report an error although the money went through (UPI): the server asks Razorpay first
         post(
             "customer/payments/failed",
             JSONObject().put("booking_id", bookingId).put("razorpay_order_id", orderId.orEmpty()).put("reason", message.orEmpty().take(300)),
-            busy = false, quiet = true
-        ) {}
-        fail(string(R.string.rq_payment_not_done))
+            busy = true, quiet = true,
+            onFail = { fail(string(R.string.rq_payment_not_done)) }
+        ) { d ->
+            val r = parse(d, PayResult::class.java)
+            if (r?.paid == true) applyPaid(bookingId, r) else fail(string(R.string.rq_payment_not_done))
+        }
     }
 
     fun consumeFinalPaid(): String? {

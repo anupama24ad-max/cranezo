@@ -11,6 +11,9 @@ import javax.inject.Inject
 class ChooseRoleActivity : BaseVMComposeActivity<ChooseRoleViewModel>(
     ChooseRoleViewModel::class.java
 ) {
+    /** Sign-in and sign-up screens are always dark, whatever the app theme is (also after logout) */
+    override val forceDarkTheme: Boolean? = true
+
 
     @Inject
     lateinit var sm: SessionManager
