@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -66,9 +67,23 @@ fun MyProfileScaffold(
     bottom: (@Composable () -> Unit)? = null,
     topContent: (@Composable () -> Unit)? = null,
     action: (@Composable () -> Unit)? = null,
+    success: Boolean = false,
     content: @Composable ColumnScope.() -> Unit
 ) {
     ScreenBackground(darkImageRes = R.drawable.app_bg) {
+        // Success screens: soft green shade from the top fading into the page
+        if (success) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            listOf(Color(0xFF22C55E).copy(alpha = if (appColors.isDark) 0.30f else 0.26f), Color(0xFF22C55E).copy(alpha = 0.08f), Color.Transparent)
+                        )
+                    )
+            )
+        }
         Column(
             modifier = modifier
                 .fillMaxSize()

@@ -2317,7 +2317,9 @@ fun Modifier.glassEffect(
     // Tiles nested in a card shine softer than the card itself, so the card stays the brighter level
     val shinePeak = colors.glassBorderTop.let { it.copy(alpha = it.alpha * if (inset) 0.5f else 1f) }
     val shine = remember(shinePeak) { shineBrush(shinePeak) }
+    // Light mode: a clear grey outline (the white shine edge disappears on white screens)
     val borderBrush = if (borderColor.isSpecified) SolidColor(borderColor)
+    else if (!colors.isDark) SolidColor(Color(0xFF0F172A).copy(alpha = if (inset) 0.14f else 0.18f))
     else Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
 
     this

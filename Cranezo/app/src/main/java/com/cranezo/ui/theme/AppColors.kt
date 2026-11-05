@@ -108,7 +108,7 @@ val LightAppColors = AppColors(
     glassShadow = Color(0xFF0F172A).copy(alpha = 0.08f),
     glassInset = Color(0xFF0F172A).copy(alpha = 0.04f),
     subtleFill = Color(0xFFF1F4F9),
-    subtleBorder = Color(0xFFCBD5E1),
+    subtleBorder = Color(0xFFB8C2D0),
     imageVeil = Color(0xFFFFFFFF),
     screenTop = Color(0xFFEAF1FB),
     screenBottom = Color(0xFFF9FBFE),

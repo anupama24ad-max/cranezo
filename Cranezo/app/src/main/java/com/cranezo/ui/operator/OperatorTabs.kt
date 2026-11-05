@@ -187,14 +187,17 @@ fun OperatorHomeTab(
                         size = font_11, color = appColors.textSecondary
                     )
                 }
-                CommonGradientButton(
-                    text = stringResource(if (home?.online == true) R.string.op_go_offline else R.string.op_go_online),
-                    onClick = { vm?.onIntent(OperatorTabsIntent.ToggleOnline) },
-                    height = dimen_40,
-                    textSize = font_12,
-                    modifier = Modifier.width(dimen_120),
-                    gradientColors = if (home?.online == true) listOf(appColors.subtleFill, appColors.subtleFill) else listOf(SuccessGreen, SuccessGreen),
-                    textColor = if (home?.online == true) appColors.textPrimary else Color.Black
+                androidx.compose.material3.Switch(
+                    checked = home?.online == true,
+                    onCheckedChange = { vm?.onIntent(OperatorTabsIntent.ToggleOnline) },
+                    colors = androidx.compose.material3.SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = SuccessGreen,
+                        checkedBorderColor = SuccessGreen,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = appColors.textHint,
+                        uncheckedBorderColor = appColors.textHint
+                    )
                 )
             }
         }
@@ -215,16 +218,29 @@ fun OperatorHomeTab(
                     CraneImage(path = crane.primary_photo, modifier = Modifier.size(dimen_70))
                     Spacer(modifier = Modifier.width(dimen_12))
                     Column(modifier = Modifier.weight(1f)) {
-                        Textview(crane.model_name ?: crane.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                        Textview(crane.registration_number.orEmpty(), size = font_11, color = appColors.textSecondary)
-                        Textview(crane.crane_type_name.orEmpty(), size = font_11, color = appColors.textSecondary)
-                    }
-                    Column(horizontalAlignment = Alignment.End) {
-                        if (!crane.owner_name.isNullOrBlank()) {
-                            Textview(stringResource(R.string.op_assigned_owner), size = font_10, color = appColors.textSecondary)
-                            Textview(crane.owner_name, size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 2, textAlign = TextAlign.End)
+                        // name on the left, availability tag pinned top-right
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Textview(
+                                crane.model_name ?: crane.title.orEmpty(), size = font_15, color = appColors.textPrimary,
+                                fontWeight = FontWeight.Bold, maxLines = 1, modifier = Modifier.weight(1f)
+                            )
+                            crane.availability_label?.let {
+                                Spacer(modifier = Modifier.width(dimen_8))
+                                BookingTag(it, SuccessGreen)
+                            }
                         }
-                        crane.availability_label?.let { BookingTag(it, SuccessGreen) }
+                        Spacer(modifier = Modifier.height(dimen_2))
+                        Textview(
+                            listOf(crane.registration_number, crane.crane_type_name).filter { !it.isNullOrBlank() }.joinToString(" · "),
+                            size = font_11, color = appColors.textSecondary, maxLines = 1
+                        )
+                        if (!crane.owner_name.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(dimen_6))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Textview(stringResource(R.string.op_assigned_owner) + ": ", size = font_11, color = appColors.textSecondary)
+                                Textview(crane.owner_name, size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
+                            }
+                        }
                     }
                 }
             }

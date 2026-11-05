@@ -114,22 +114,21 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
+    /**
+     * Runs [block] once the network is up, and again if the connection drops mid-call.
+     * Each call has its own job: two loads started together (e.g. a summary and a list)
+     * must not cancel each other, which validateNetwork() does to its previous run.
+     */
     fun runWhenOnline(block: suspend () -> Unit) {
-        validateNetwork {
-            viewModelScope.launch {
-                while (isActive) {
-                    try {
-                        block()
-                        break // success
-                    } catch (e: java.io.IOException) {
-                        // network dropped mid-call → show offline and wait again
-                        showNetNoticeOffline()
-                        // wait again for connection
-                        val waiter = CompletableDeferred<Unit>()
-                        validateNetwork { waiter.complete(Unit) }
-                        waiter.await()
-                        // loop continues
-                    }
+        viewModelScope.launch {
+            while (isActive) {
+                if (pollNetworkUntilGoodOrCanceled() !is NetworkState.GoodConnection) return@launch
+                try {
+                    block()
+                    break // success
+                } catch (e: java.io.IOException) {
+                    // network dropped mid-call → show offline, wait for the connection and try again
+                    showNetNoticeOffline()
                 }
             }
         }

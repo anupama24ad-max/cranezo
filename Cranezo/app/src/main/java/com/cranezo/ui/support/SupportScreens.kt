@@ -480,6 +480,7 @@ fun CreateTicketScreen(
 
     BookingScaffold(
         onBack = onBack,
+        success = created != null,
         title = stringResource(if (category == "issue") R.string.sp_report_issue else R.string.sp_contact_support),
         bottom = {
             if (created == null) {

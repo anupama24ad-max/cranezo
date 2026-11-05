@@ -77,7 +77,7 @@ fun FinSection(title: String? = null, content: @Composable ColumnScope.() -> Uni
     GlassCard(contentPadding = dimen_14, minHeight = dimen_40) {
         if (title != null) {
             Textview(title, size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(dimen_8))
+            Spacer(modifier = Modifier.height(dimen_12))
         }
         content()
     }

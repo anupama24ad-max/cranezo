@@ -187,7 +187,7 @@ fun MyPaymentsScreen(vm: FinanceViewModel, onBack: () -> Unit) {
                 Textview(stringResource(R.string.fin_jobs_waiting_commission, e?.jobs_without_commission ?: 0), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_4))
             }
         }
-        Textview(stringResource(R.string.fin_payments_received), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        Textview(stringResource(R.string.fin_payments_received), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = dimen_8))
         if ("settlements" in state.loaded && state.settlements.isEmpty()) EmptyText(stringResource(R.string.fin_no_payments_yet))
         state.settlements.forEach { SettlementRow(it) }
         Spacer(modifier = Modifier.height(dimen_16))

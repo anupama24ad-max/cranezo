@@ -975,13 +975,14 @@ private fun OtpScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, o
 private fun CompletedScreen(job: OperatorJob, onClose: () -> Unit) {
     BookingScaffold(
         onBack = onClose,
+        success = true,
         title = stringResource(R.string.op_job_title),
         bottom = { CommonGradientButton(text = stringResource(R.string.op_view_earnings), onClick = onClose) }
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_16), horizontalAlignment = Alignment.CenterHorizontally) {
             IconBadge(icon = Icons.Default.CheckCircle, accent = SuccessGreen, size = dimen_70, filled = true)
             Spacer(modifier = Modifier.height(dimen_8))
-            Textview(stringResource(R.string.op_completed_title), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Textview(stringResource(R.string.op_completed_title), size = font_20, color = SuccessGreen, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.op_completed_sub), size = font_12, color = SuccessGreen)
         }
         CraneHeaderCard(job.assigned_crane, job.customer?.name)

@@ -601,6 +601,7 @@ fun JobCompletedScreen(
 
     BookingScaffold(
         onBack = onBack,
+        success = true,
         title = stringResource(R.string.cj_job_completed_title),
         bottom = {
             Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
@@ -759,6 +760,7 @@ fun PaymentSuccessfulScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {
 
     BookingScaffold(
         onBack = onBack,
+        success = true,
         title = stringResource(R.string.cj_payment_successful),
         bottom = {
             Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
