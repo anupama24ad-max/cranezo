@@ -153,19 +153,22 @@ fun OperatorHomeTab(
             }
         }
 
-        // Open jobs from owners: the operator can ask for one
+        // Owners give a job by this ID (one job at a time, then the operator is free for other work)
         val context = androidx.compose.ui.platform.LocalContext.current
-        GlassCard(contentPadding = dimen_12, onClick = {
-            context.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.FIND_JOBS))
-        }) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
-                Spacer(modifier = Modifier.width(dimen_12))
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.fin_find_jobs), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Textview(stringResource(R.string.fin_find_jobs_sub), size = font_11, color = appColors.textSecondary)
+        val memberId = androidx.compose.runtime.remember {
+            com.cranezo.utils.SessionManager(context).getData(com.cranezo.utils.AppStrings.SessionValues.memberId, "")
+        }
+        if (memberId.isNotBlank()) {
+            GlassCard(contentPadding = dimen_12) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
+                    Spacer(modifier = Modifier.width(dimen_12))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.rq_your_operator_id), size = font_12, color = appColors.textSecondary)
+                        Textview(memberId, size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.rq_your_operator_id_sub), size = font_11, color = appColors.textSecondary)
+                    }
                 }
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary)
             }
         }
 

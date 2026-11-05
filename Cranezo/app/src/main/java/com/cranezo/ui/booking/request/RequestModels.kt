@@ -41,6 +41,7 @@ data class RequestBooking(
     val payment_due_at: String? = null,
     val payment_seconds_left: Long? = null,
     val advance_paid_at: String? = null,
+    val online_payment: Boolean? = null,
     val test_payment: Boolean? = null
 )
 
@@ -108,6 +109,26 @@ data class OwnerRequestList(
     val advance_percent: Int? = null,
     val payment_window_minutes: Double? = null
 )
+
+// ---- Razorpay ----
+
+data class PayPrefill(val name: String? = null, val contact: String? = null)
+
+/** customer/payments/order: what Razorpay Checkout needs. The amount comes from the server, never the app. */
+data class PayOrder(
+    val key_id: String? = null,
+    val order_id: String? = null,
+    val amount_paise: Long? = null,
+    val amount: Double? = null,
+    val currency: String? = null,
+    val kind: String? = null,
+    val name: String? = null,
+    val description: String? = null,
+    val prefill: PayPrefill? = null
+)
+
+/** customer/payments/verify: the request (advance) or the booking (final) after the payment */
+data class PayResult(val kind: String? = null, val request: CraneRequestView? = null)
 
 /** Accepting returns the new booking (owner view); only its id is needed */
 data class AcceptedBooking(val booking_id: String? = null, val booking_code: String? = null)

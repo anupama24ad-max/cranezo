@@ -384,38 +384,9 @@ fun CraneFormScreen(
                     }
                 }
 
-                // 6. Operator
-                NumberedSection(6, stringResource(R.string.crane_section_operator)) {
-                    Column {
-                        Textview(
-                            text = stringResource(R.string.crane_field_operator),
-                            size = font_14,
-                            color = appColors.textPrimary,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(bottom = dimen_8)
-                        )
-                        GlassFieldBox(onClick = { showOperatorSheet = true }) {
-                            Icon(Icons.Default.Person, null, tint = appColors.textHint, modifier = Modifier.size(dimen_20))
-                            Spacer(modifier = Modifier.width(dimen_12))
-                            val name = form.operator?.full_name.orEmpty()
-                            Textview(
-                                text = name.ifEmpty { stringResource(R.string.crane_field_operator_hint) },
-                                size = if (name.isEmpty()) font_14 else font_15,
-                                color = if (name.isEmpty()) appColors.textHint else appColors.textPrimary,
-                                fontWeight = if (name.isEmpty()) FontWeight.Normal else FontWeight.Medium,
-                                maxLines = 1,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                Icons.AutoMirrored.Filled.KeyboardArrowRight, null,
-                                tint = appColors.textSecondary, modifier = Modifier.size(dimen_20)
-                            )
-                        }
-                    }
-                }
-
-                // 7. Availability
-                NumberedSection(7, stringResource(R.string.crane_section_availability)) {
+                // No operator here: the owner chooses the operator for each job after a customer books
+                // 6. Availability
+                NumberedSection(6, stringResource(R.string.crane_section_availability)) {
                     AvailabilityChoice(
                         options = options,
                         selected = form.availability,

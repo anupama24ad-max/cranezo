@@ -77,7 +77,8 @@ fun BookingScaffold(
 fun StepIndicator(current: Int) {
     val labels = listOf(
         R.string.bk_step_type, R.string.bk_step_capacity, R.string.bk_step_location,
-        R.string.bk_step_date_time, R.string.bk_step_duration
+        // "When" includes how long: 4 steps
+        R.string.bk_step_date_time
     )
     Row(
         modifier = Modifier

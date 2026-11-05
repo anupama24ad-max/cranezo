@@ -28,7 +28,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -156,33 +155,6 @@ fun OwnerJobDetailsScreen(
 
     if (pickOperator) {
         LaunchedEffect(Unit) { vm?.onIntent(OwnerJobDetailIntent.LoadOperators) }
-        ModalBottomSheet(
-            onDismissRequest = { pickOperator = false },
-            shape = RoundedCornerShape(topStart = dimen_28, topEnd = dimen_28),
-            containerColor = appColors.screenBottom
-        ) {
-            Column(modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = dimen_20).padding(bottom = dimen_16), verticalArrangement = Arrangement.spacedBy(dimen_8)) {
-                Textview(stringResource(R.string.oj_assign_operator), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                if (state.operatorsLoaded && state.operators.isEmpty()) {
-                    Textview(stringResource(R.string.oj_no_operators), size = font_13, color = appColors.textSecondary)
-                }
-                state.operators.forEach { operator ->
-                    GlassCard(contentPadding = dimen_12, onClick = {
-                        operator.id?.let { vm?.onIntent(OwnerJobDetailIntent.AssignOperator(it)) }
-                        pickOperator = false
-                    }) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconBadge(icon = Icons.Default.Person, accent = AmberPrimary, size = dimen_36)
-                            Spacer(modifier = Modifier.width(dimen_12))
-                            Column {
-                                Textview(operator.full_name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                                Textview(operator.member_id.orEmpty(), size = font_11, color = appColors.textSecondary)
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     BookingScaffold(
@@ -292,13 +264,40 @@ fun OwnerJobDetailsScreen(
                     Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_22).clickable { openDialer(context, operator.country_code, operator.mobile_number) })
                 }
             }
-            if (job.tab == "upcoming") {
+            if (job.tab == "upcoming" && !pickOperator) {
                 Spacer(modifier = Modifier.height(dimen_8))
                 CommonGradientButton(
                     text = stringResource(if (operator == null) R.string.oj_assign_operator else R.string.oj_change_operator),
                     onClick = { pickOperator = true }, height = dimen_40, textSize = font_12,
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
                 )
+            }
+            // Choose the operator for THIS job, right here on the page (no popup)
+            if (job.tab == "upcoming" && pickOperator) {
+                Spacer(modifier = Modifier.height(dimen_10))
+                OperatorChooser(
+                    suggested = job.suggested_operator,
+                    operators = state.operators,
+                    loaded = state.operatorsLoaded,
+                    onPick = { id, byCode ->
+                        vm?.onIntent(OwnerJobDetailIntent.AssignOperator(id, byCode))
+                        pickOperator = false
+                    },
+                    onCancel = { pickOperator = false }
+                )
+            }
+            // booking for someone else: the person at the site
+            job.site_contact?.let { c ->
+                Spacer(modifier = Modifier.height(dimen_8))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.rq_site_contact).uppercase(), size = font_10, color = appColors.textSecondary)
+                        Textview(listOfNotNull(c.name, c.phone).joinToString(" · "), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                    }
+                    if (!c.phone.isNullOrBlank()) {
+                        Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_22).clickable { openDialer(context, "+91", c.phone) })
+                    }
+                }
             }
             // full bill (GST, charges, platform fee) and what the operator earns on this job
             if (operator != null && job.booking_id != null) {
@@ -528,5 +527,60 @@ fun EvidenceScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
+    }
+}
+
+/**
+ * Choose the operator for this one job: the crane's usual operator first, then the owner's operators,
+ * or any operator by their ID (OP...) - an outside operator works this job only, then is free again.
+ */
+@Composable
+private fun OperatorChooser(
+    suggested: com.cranezo.ui.ownerjobs.model.SuggestedOperator?,
+    operators: List<com.cranezo.ui.cranes.model.Operator>,
+    loaded: Boolean,
+    onPick: (String, Boolean) -> Unit,
+    onCancel: () -> Unit
+) {
+    var code by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
+    Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
+        Textview(stringResource(R.string.rq_operator_by_id), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+            com.cranezo.ui.components.GlassInputField(
+                label = "", value = code, onValueChange = { code = it.uppercase().filter { c -> c.isLetterOrDigit() }.take(14) },
+                placeholder = "OP497309", modifier = Modifier.weight(1f)
+            )
+            CommonGradientButton(
+                text = stringResource(R.string.rq_assign), modifier = Modifier.width(dimen_100), height = dimen_52,
+                enabled = code.length >= 4, onClick = { onPick(code, true) }
+            )
+        }
+        Textview(stringResource(R.string.rq_operator_by_id_hint), size = font_11, color = appColors.textSecondary)
+
+        val list = buildList {
+            suggested?.let { s -> s.id?.let { id -> add(Triple(id, s.full_name.orEmpty(), s.member_id.orEmpty()) to true) } }
+            operators.filter { it.id != suggested?.id }.forEach { o -> o.id?.let { add(Triple(it, o.full_name.orEmpty(), o.member_id.orEmpty()) to false) } }
+        }
+        if (list.isNotEmpty()) Textview(stringResource(R.string.rq_your_operators), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+        if (loaded && list.isEmpty()) Textview(stringResource(R.string.oj_no_operators), size = font_12, color = appColors.textSecondary)
+        list.forEach { (o, isSuggested) ->
+            Row(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_12)).background(appColors.subtleFill)
+                    .clickable { onPick(o.first, false) }.padding(dimen_10),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconBadge(icon = Icons.Default.Person, accent = AmberPrimary, size = dimen_32)
+                Spacer(modifier = Modifier.width(dimen_10))
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(o.second, size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                    Textview(o.third, size = font_11, color = appColors.textSecondary)
+                }
+                if (isSuggested) BookingTag(stringResource(R.string.rq_usual_operator), SuccessGreen)
+            }
+        }
+        Textview(
+            stringResource(R.string.fin_cancel), size = font_13, color = appColors.textSecondary,
+            modifier = Modifier.clickable { onCancel() }.padding(vertical = dimen_6)
+        )
     }
 }

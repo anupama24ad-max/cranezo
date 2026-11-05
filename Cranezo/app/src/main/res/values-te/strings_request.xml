@@ -68,4 +68,25 @@
     <string name="rq_advance_percent_label">కస్టమర్ చెల్లించే అడ్వాన్స్ (%)</string>
     <string name="rq_per_km_label">ఉచిత దూరం తర్వాత మీ కిమీ ఛార్జ్ (₹)</string>
     <string name="rq_advance_hint">అభ్యర్థన అంగీకరించినప్పుడు అడ్వాన్స్ Cranezoకి ఆన్‌లైన్‌లో వస్తుంది, తర్వాత మీకు ఇస్తారు. కిమీ ఛార్జ్ Cranezo కనీసం కంటే తక్కువ ఉండకూడదు.</string>
+
+    <string name="rq_pay_online">%1$s ఆన్‌లైన్‌లో చెల్లించండి</string>
+    <string name="rq_pay_online_note">UPI, డెబిట్ / క్రెడిట్ కార్డ్ లేదా నెట్ బ్యాంకింగ్‌తో సురక్షితంగా చెల్లించండి (Razorpay).</string>
+    <string name="rq_payment_not_done">చెల్లింపు పూర్తి కాలేదు. మళ్లీ ప్రయత్నించవచ్చు.</string>
+    <string name="rq_rating_comment">ఇంకా చెప్పండి (అవసరం లేదు)</string>
+    <string name="rq_rating_comment_hint">ఏది బాగుంది, లేదా ఏది మెరుగుపడాలి?</string>
+    <string name="rq_for_someone_else">వేరొకరి కోసం బుకింగ్?</string>
+    <string name="rq_for_someone_else_sub">ఆపరేటర్ సైట్‌లో ఈ వ్యక్తికి కాల్ చేస్తారు</string>
+    <string name="rq_contact_name">సైట్‌లో ఉన్న వ్యక్తి పేరు</string>
+    <string name="rq_contact_name_hint">ఉదా: రవి</string>
+    <string name="rq_contact_phone">వారి ఫోన్ నంబర్</string>
+    <string name="rq_your_operator_id">మీ ఆపరేటర్ ID</string>
+    <string name="rq_your_operator_id_sub">పని కోసం ఈ IDని క్రేన్ యజమానికి ఇవ్వండి. ఒకసారి ఒక పని.</string>
+    <string name="rq_site_contact">సైట్‌లో ఉన్న వ్యక్తి</string>
+    <string name="rq_operator_by_id">ఆపరేటర్ ID</string>
+    <string name="rq_operator_by_id_hint">ఏ ఆపరేటర్ అయినా ఈ ఒక్క పని చేయవచ్చు: వారి ID అడగండి (వారి యాప్ హోమ్‌లో ఉంటుంది).</string>
+    <string name="rq_assign">ఇవ్వండి</string>
+    <string name="rq_your_operators">మీ ఆపరేటర్లు</string>
+    <string name="rq_usual_operator">సాధారణ ఆపరేటర్</string>
+    <string name="rq_jobs_need_operator">%1$d పని(ల)కు ఆపరేటర్ కావాలి</string>
+    <string name="rq_jobs_need_operator_sub">Jobs తెరిచి పని సమయానికి ముందే ఆపరేటర్‌ను ఇవ్వండి.</string>
 </resources>

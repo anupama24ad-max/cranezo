@@ -106,6 +106,10 @@ data class OwnerJob(
     val job_location: OwnerLocation? = null,
     val duration: BookingDuration? = null,
     val assigned_operator: AssignedOperator? = null,
+    // operators are per job; the crane's usual operator is offered first
+    val suggested_operator: SuggestedOperator? = null,
+    // booking for someone else: the person at the site
+    val site_contact: SiteContact? = null,
     val customer: JobCustomer? = null,
     val special_requirements: String? = null,
     val payment: BookingPayment? = null,
@@ -206,3 +210,9 @@ data class OwnerEarningJob(
     val settlement_status: String? = null,
     val settlement_label: String? = null
 )
+
+/** The crane's usual operator, offered first when assigning a job */
+data class SuggestedOperator(val id: String? = null, val full_name: String? = null, val member_id: String? = null)
+
+/** Booking for someone else: who to call at the site */
+data class SiteContact(val name: String? = null, val phone: String? = null)

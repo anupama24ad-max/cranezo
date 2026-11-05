@@ -15,11 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
-import androidx.compose.material.icons.automirrored.filled.SendToMobile
 import androidx.compose.material.icons.filled.ReportProblem
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Percent
-import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,7 +51,6 @@ fun FinanceHubScreen(role: String, onBack: () -> Unit, onOpen: (String) -> Unit)
     when (role) {
         "CRANE_OWNER" -> FinPage(stringResource(R.string.fin_hub_owner), onBack) {
             FinMenuRow(Icons.Filled.Search, stringResource(R.string.rq_owner_title), stringResource(R.string.rq_owner_card_sub)) { onOpen(FinanceRoutes.CRANE_REQUESTS) }
-            FinMenuRow(Icons.Filled.PersonSearch, stringResource(R.string.fin_job_requests_title), stringResource(R.string.fin_job_requests_sub)) { onOpen(FinanceRoutes.JOB_REQUESTS) }
             FinMenuRow(Icons.Filled.Groups, stringResource(R.string.fin_pay_operators), stringResource(R.string.fin_pay_operators_sub)) { onOpen(FinanceRoutes.OPERATOR_DUES) }
             FinMenuRow(Icons.Filled.AccountBalance, stringResource(R.string.fin_platform_title), stringResource(R.string.fin_platform_sub)) { onOpen(FinanceRoutes.PLATFORM) }
             FinMenuRow(Icons.Filled.Payments, stringResource(R.string.fin_payments_title), stringResource(R.string.fin_payments_sub)) { onOpen(FinanceRoutes.TRANSACTIONS) }
@@ -61,8 +58,7 @@ fun FinanceHubScreen(role: String, onBack: () -> Unit, onOpen: (String) -> Unit)
             FinMenuRow(Icons.Filled.ReportProblem, stringResource(R.string.fin_complaints_title), stringResource(R.string.fin_complaints_owner_sub)) { onOpen(FinanceRoutes.COMPLAINTS) }
         }
         "OPERATOR" -> FinPage(stringResource(R.string.fin_hub_operator), onBack) {
-            FinMenuRow(Icons.Filled.Search, stringResource(R.string.fin_find_jobs), stringResource(R.string.fin_find_jobs_sub)) { onOpen(FinanceRoutes.FIND_JOBS) }
-            FinMenuRow(Icons.AutoMirrored.Filled.SendToMobile, stringResource(R.string.fin_my_requests), stringResource(R.string.fin_my_requests_sub)) { onOpen(FinanceRoutes.MY_REQUESTS) }
+            // operators no longer browse jobs: owners give a job by the operator's ID
             FinMenuRow(Icons.Filled.Payments, stringResource(R.string.fin_my_payments), stringResource(R.string.fin_my_payments_sub)) { onOpen(FinanceRoutes.MY_PAYMENTS) }
         }
         else -> FinPage(stringResource(R.string.fin_hub_customer), onBack) {

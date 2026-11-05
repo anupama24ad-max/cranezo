@@ -240,8 +240,8 @@ fun HomeProfileScreen(
                 // find open jobs, job requests and the payments the owner made
                 MenuRow(
                     icon = Icons.Default.AccountBalanceWallet,
-                    title = stringResource(R.string.fin_entry_operator),
-                    subtitle = stringResource(R.string.fin_find_jobs_sub),
+                    title = stringResource(R.string.fin_my_payments),
+                    subtitle = stringResource(R.string.fin_my_payments_sub),
                     onClick = { context.startActivity(FinanceActivity.intent(context)) }
                 )
                 MenuRow(

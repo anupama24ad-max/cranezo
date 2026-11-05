@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
@@ -168,6 +169,18 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
             ) {
                 tabs.forEach { tab ->
                     composable(tab.dest.route) {
+                        // Fresh data every time a tab is opened (not only when the app starts)
+                        LaunchedEffect(Unit) {
+                            when (tab.dest) {
+                                Dest.Home -> when {
+                                    customerHomeVm != null -> customerHomeVm.refresh()
+                                    opVm == null && state.role == UserRole.CRANE_OWNER -> onIntent(MainHomeIntent.RefreshOwnerHome)
+                                    else -> Unit
+                                }
+                                Dest.MyCranes -> onIntent(MainHomeIntent.RefreshCranes)
+                                else -> Unit
+                            }
+                        }
                         when (tab.dest) {
                             Dest.Home -> if (opVm != null) OperatorHomeTab(
                                 vm = opVm,

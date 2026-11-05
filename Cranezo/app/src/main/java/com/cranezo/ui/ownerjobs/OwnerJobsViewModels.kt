@@ -177,7 +177,10 @@ class OwnerJobDetailViewModel @Inject constructor(
             }
             is OwnerJobDetailIntent.AssignOperator -> runWhenOnline {
                 setIsLoading(true)
-                repo.ownerAssignOperator(headers(), body().put("operator_id", intent.operatorId)).isRequestCallSuspendSuccess(
+                // own operator by id, or any operator by their ID code (OP...) for this job only
+                val payload = if (intent.byCode) body().put("operator_code", intent.operatorId.trim().uppercase())
+                else body().put("operator_id", intent.operatorId)
+                repo.ownerAssignOperator(headers(), payload).isRequestCallSuspendSuccess(
                     success = { showSuccess(string(R.string.oj_msg_operator_assigned), autoHideMs = 2000L) },
                     failure = { _, _, m -> fail(m) }
                 )

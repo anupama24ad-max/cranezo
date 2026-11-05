@@ -23,6 +23,10 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -157,15 +161,30 @@ fun OwnerEarningsTab(
             }
         }
 
-        // Four period cards (net amounts)
-        Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
-            listOf("today" to R.string.oe_today, "week" to R.string.oe_this_week, "month" to R.string.oe_this_month, "all" to R.string.oe_total).forEach { (key, label) ->
-                val card = summary?.cards?.get(key)
-                GlassCard(modifier = Modifier.weight(1f), contentPadding = dimen_8, onClick = { onIntent(OwnerEarningsIntent.SelectPeriod(key)) }) {
-                    Textview(stringResource(label), size = font_10, color = appColors.textSecondary, maxLines = 1)
-                    Textview(rupees(card?.net ?: 0.0), size = font_11, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
-                    Textview(stringResource(R.string.oe_n_jobs, card?.jobs ?: 0), size = font_10, color = appColors.textSecondary)
+        // Four period tiles in a 2 x 2 grid, the same panel and tiles as the owner dashboard (Fleet Overview)
+        GlassCard(contentPadding = dimen_14, backgroundColor = DarkBluish, isGlassy = false) {
+            val tile: @Composable (String, Int, androidx.compose.ui.graphics.vector.ImageVector, androidx.compose.ui.graphics.Color, Modifier) -> Unit =
+                { key, label, icon, accent, mod ->
+                    val card = summary?.cards?.get(key)
+                    com.cranezo.ui.mainhome.components.StatTile(
+                        value = rupees(card?.net ?: 0.0),
+                        label = "${stringResource(label)} · ${stringResource(R.string.oe_n_jobs, card?.jobs ?: 0)}",
+                        icon = icon,
+                        accent = accent,
+                        modifier = mod.fillMaxHeight().clickable { onIntent(OwnerEarningsIntent.SelectPeriod(key)) }
+                    )
                 }
+            Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
+                com.cranezo.ui.mainhome.components.TwoColumnRow(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    left = { tile("today", R.string.oe_today, Icons.Default.Schedule, AmberPrimary, it) },
+                    right = { tile("week", R.string.oe_this_week, Icons.Default.DateRange, com.cranezo.ui.mainhome.components.InfoBlue, it) }
+                )
+                com.cranezo.ui.mainhome.components.TwoColumnRow(
+                    modifier = Modifier.height(IntrinsicSize.Min),
+                    left = { tile("month", R.string.oe_this_month, Icons.Default.CalendarMonth, SuccessGreen, it) },
+                    right = { tile("all", R.string.oe_total, Icons.Default.CheckCircle, com.cranezo.ui.mainhome.components.InfoBlue, it) }
+                )
             }
         }
 

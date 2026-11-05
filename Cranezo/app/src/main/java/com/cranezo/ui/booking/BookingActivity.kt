@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,7 +46,43 @@ object BookingRoutes {
  */
 @AndroidEntryPoint
 class BookingActivity :
-    BaseVMComposeActivity<BookingViewModel>(BookingViewModel::class.java) {
+    BaseVMComposeActivity<BookingViewModel>(BookingViewModel::class.java),
+    com.razorpay.PaymentResultWithDataListener {
+
+    /** Crane requests and online payments (Razorpay) */
+    private val requestVm by lazy {
+        androidx.lifecycle.ViewModelProvider(this)[com.cranezo.ui.booking.request.RequestViewModel::class.java]
+    }
+
+    // ---- Razorpay Checkout results: the server verifies the signature before anything changes ----
+    override fun onPaymentSuccess(razorpayPaymentId: String?, paymentData: com.razorpay.PaymentData?) {
+        requestVm.onPaymentSuccess(paymentData?.orderId, paymentData?.paymentId ?: razorpayPaymentId, paymentData?.signature)
+    }
+
+    override fun onPaymentError(code: Int, response: String?, paymentData: com.razorpay.PaymentData?) {
+        requestVm.onPaymentError(paymentData?.orderId, response)
+    }
+
+    /** Opens Razorpay Checkout for an order made by the server (UPI, cards, net banking) */
+    private fun openCheckout(order: com.cranezo.ui.booking.request.PayOrder) {
+        val options = org.json.JSONObject()
+            .put("name", order.name ?: "Cranezo")
+            .put("description", order.description.orEmpty())
+            .put("order_id", order.order_id)
+            .put("currency", order.currency ?: "INR")
+            .put("amount", order.amount_paise ?: 0L)
+            .put("theme", org.json.JSONObject().put("color", "#FFA000"))
+            .put(
+                "prefill",
+                org.json.JSONObject().apply {
+                    order.prefill?.name?.let { put("name", it) }
+                    order.prefill?.contact?.let { put("contact", it) }
+                }
+            )
+        runCatching {
+            com.razorpay.Checkout().apply { setKeyID(order.key_id) }.open(this, options)
+        }.onFailure { requestVm.onPaymentError(order.order_id, it.message) }
+    }
 
     companion object {
         private const val EXTRA_ROUTE = "route"
@@ -87,8 +125,18 @@ class BookingActivity :
         BackHandler { leave() }
 
         // Crane requests (send to every nearby owner, pay the advance) have their own view model
-        val requestVm = androidx.compose.runtime.remember {
-            androidx.lifecycle.ViewModelProvider(this@BookingActivity)[com.cranezo.ui.booking.request.RequestViewModel::class.java]
+        val requestVm = this@BookingActivity.requestVm
+        val payState by requestVm.ui.collectAsStateWithLifecycle()
+        // a Razorpay order is ready: open Checkout once
+        LaunchedEffect(payState.pendingOrder) {
+            if (payState.pendingOrder != null) requestVm.consumeOrder()?.let { openCheckout(it) }
+        }
+        // final balance paid online: show Payment Successful
+        LaunchedEffect(payState.finalPaidBookingId) {
+            if (payState.finalPaidBookingId != null) {
+                requestVm.consumeFinalPaid()
+                vm.showPaidOnline()
+            }
         }
         // "Book a crane" while a request is still running reopens it (resume)
         LaunchedEffect(Unit) {
@@ -113,7 +161,8 @@ class BookingActivity :
                 LocationStep(vm, onBack = leave, onNext = { nav.navigate(BookingRoutes.DATETIME) })
             }
             composable(BookingRoutes.DATETIME) {
-                DateTimeStep(vm, onBack = leave, onNext = { nav.navigate(BookingRoutes.DURATION) })
+                // "When" now includes how long: straight to the price screen
+                DateTimeStep(vm, onBack = leave, onNext = { nav.navigate(BookingRoutes.OFFER) })
             }
             composable(BookingRoutes.DURATION) {
                 // No list of cranes: the customer sees the price and makes an offer to every owner nearby
@@ -195,7 +244,12 @@ class BookingActivity :
             }
             composable(BookingRoutes.EXTRA) { ExtraTimeRequestScreen(vm, onBack = leave) }
             composable(BookingRoutes.EXTRA_STATUS) { ExtraTimeStatusScreen(vm, onBack = leave) }
-            composable(BookingRoutes.PAY) { FinalPaymentScreen(vm, onBack = leave) }
+            composable(BookingRoutes.PAY) {
+                // final balance: online only (Razorpay)
+                FinalPaymentScreen(vm, onBack = leave, onPayOnline = {
+                    vm.currentBookingId()?.let { requestVm.startOnlinePayment(it, "final") }
+                })
+            }
             composable(BookingRoutes.PAID) { PaymentSuccessfulScreen(vm, onBack = leave) }
             composable(BookingRoutes.ACTIVE_TRACKING) { TrackMyCranesScreen(vm, onBack = leave) }
         }

@@ -178,6 +178,8 @@ data class OperatorJob(
     val requested_crane: JobCrane? = null,
     val assigned_crane: JobCrane? = null,
     val customer: JobCustomer? = null,
+    // booking for someone else: call this person at the site
+    val site_contact: com.cranezo.ui.ownerjobs.model.SiteContact? = null,
     val job_site: JobSite? = null,
     val schedule: BookingSchedule? = null,
     val duration: BookingDuration? = null,

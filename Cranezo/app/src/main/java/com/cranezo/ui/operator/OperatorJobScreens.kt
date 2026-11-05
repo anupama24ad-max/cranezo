@@ -416,6 +416,22 @@ private fun JourneyScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Uni
         GlassCard(contentPadding = dimen_14) {
             InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
             InfoRow(Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address)
+            // booking for someone else: tap to call the person at the site
+            job.site_contact?.let { c ->
+                InfoRow(
+                    Icons.Default.Call, stringResource(R.string.rq_site_contact), c.name.orEmpty(), sub = c.phone,
+                    trailing = {
+                        if (!c.phone.isNullOrBlank()) {
+                            Icon(
+                                Icons.Default.Call, contentDescription = null, tint = SuccessGreen,
+                                modifier = Modifier.size(dimen_32).clickable {
+                                    runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:${c.phone}"))) }
+                                }.padding(dimen_4)
+                            )
+                        }
+                    }
+                )
+            }
             if (job.job_site?.distance_km != null) {
                 InfoRow(
                     Icons.Default.Navigation, stringResource(R.string.op_en_route),
