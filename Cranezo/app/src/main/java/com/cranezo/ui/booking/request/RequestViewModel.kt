@@ -25,6 +25,11 @@ data class RequestUiState(
     val busy: Boolean = false,
     // "No crane found" was sent to the team
     val sentToTeam: Boolean = false,
+    // Razorpay: an order waiting to be opened in Checkout, and which booking it is for
+    val pendingOrder: PayOrder? = null,
+    val payingBookingId: String? = null,
+    // the final payment went through: the booking screens show "Payment Successful"
+    val finalPaidBookingId: String? = null,
     // owner side
     val ownerList: OwnerRequestList? = null,
     val ownerLoaded: Boolean = false,
@@ -133,9 +138,64 @@ class RequestViewModel @Inject constructor(
 
     fun cancel() = act("customer/crane-requests/cancel")
 
+    /** Advance: online through Razorpay; the test payment only while the server has no gateway */
     fun payAdvance() {
-        val bookingId = _ui.value.request?.booking?.booking_id ?: return
-        post("customer/crane-requests/pay-advance", JSONObject().put("booking_id", bookingId), success = true) { setRequest(it) }
+        val b = _ui.value.request?.booking ?: return
+        val bookingId = b.booking_id ?: return
+        if (b.online_payment == true) {
+            startOnlinePayment(bookingId, "advance")
+        } else {
+            post("customer/crane-requests/pay-advance", JSONObject().put("booking_id", bookingId), success = true) { setRequest(it) }
+        }
+    }
+
+    /** 1. ask the server for a Razorpay order; the activity then opens Checkout with it */
+    fun startOnlinePayment(bookingId: String, kind: String) {
+        post("customer/payments/order", JSONObject().put("booking_id", bookingId).put("kind", kind)) { d ->
+            parse(d, PayOrder::class.java)?.let { order -> _ui.update { it.copy(pendingOrder = order, payingBookingId = bookingId) } }
+        }
+    }
+
+    /** Checkout is open: forget the order so it is not opened twice */
+    fun consumeOrder(): PayOrder? {
+        val order = _ui.value.pendingOrder
+        _ui.update { it.copy(pendingOrder = null) }
+        return order
+    }
+
+    /** 2. Razorpay says paid: the server checks the signature before anything changes */
+    fun onPaymentSuccess(orderId: String?, paymentId: String?, signature: String?) {
+        val bookingId = _ui.value.payingBookingId ?: return
+        val body = JSONObject()
+            .put("booking_id", bookingId)
+            .put("razorpay_order_id", orderId.orEmpty())
+            .put("razorpay_payment_id", paymentId.orEmpty())
+            .put("razorpay_signature", signature.orEmpty())
+        post("customer/payments/verify", body, success = true) { d ->
+            val result = parse(d, PayResult::class.java)
+            if (result?.kind == "final") {
+                _ui.update { it.copy(finalPaidBookingId = bookingId, payingBookingId = null) }
+            } else {
+                result?.request?.let { r -> _ui.update { it.copy(request = r, payingBookingId = null) } }
+            }
+        }
+    }
+
+    /** Cancelled or failed in Checkout: logged on the server, nothing changes for the booking */
+    fun onPaymentError(orderId: String?, message: String?) {
+        val bookingId = _ui.value.payingBookingId ?: return
+        post(
+            "customer/payments/failed",
+            JSONObject().put("booking_id", bookingId).put("razorpay_order_id", orderId.orEmpty()).put("reason", message.orEmpty().take(300)),
+            busy = false, quiet = true
+        ) {}
+        fail(string(R.string.rq_payment_not_done))
+    }
+
+    fun consumeFinalPaid(): String? {
+        val id = _ui.value.finalPaidBookingId
+        _ui.update { it.copy(finalPaidBookingId = null) }
+        return id
     }
 
     /** "No crane found": from an expired request, or straight from the review screen (with the 5 steps) */

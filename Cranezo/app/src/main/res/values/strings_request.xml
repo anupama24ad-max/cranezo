@@ -69,4 +69,25 @@
     <string name="rq_advance_percent_label">Advance the customer pays (%)</string>
     <string name="rq_per_km_label">Your charge per km after the free distance (₹)</string>
     <string name="rq_advance_hint">The advance is paid online to Cranezo when you accept a request, and settled to you. ₹ per km cannot be less than the Cranezo minimum.</string>
+
+    <string name="rq_pay_online">Pay %1$s online</string>
+    <string name="rq_pay_online_note">Pay safely with UPI, debit / credit card or net banking (Razorpay).</string>
+    <string name="rq_payment_not_done">Payment not completed. You can try again.</string>
+    <string name="rq_rating_comment">Tell us more (optional)</string>
+    <string name="rq_rating_comment_hint">What went well, or what can be better?</string>
+    <string name="rq_for_someone_else">Booking for someone else?</string>
+    <string name="rq_for_someone_else_sub">The operator will call this person at the site</string>
+    <string name="rq_contact_name">Name of the person at the site</string>
+    <string name="rq_contact_name_hint">For example: Ravi</string>
+    <string name="rq_contact_phone">Their phone number</string>
+    <string name="rq_your_operator_id">Your operator ID</string>
+    <string name="rq_your_operator_id_sub">Give this ID to a crane owner to get a job. One job at a time.</string>
+    <string name="rq_site_contact">Person at the site</string>
+    <string name="rq_operator_by_id">Operator ID</string>
+    <string name="rq_operator_by_id_hint">Any operator can do this one job: ask them for their ID (shown on their app home).</string>
+    <string name="rq_assign">Assign</string>
+    <string name="rq_your_operators">Your operators</string>
+    <string name="rq_usual_operator">Usual operator</string>
+    <string name="rq_jobs_need_operator">%1$d job(s) need an operator</string>
+    <string name="rq_jobs_need_operator_sub">Open Jobs and assign an operator before the job time.</string>
 </resources>

@@ -27,3 +27,12 @@
 -keepattributes Signature, *Annotation*, InnerClasses, EnclosingMethod
 -keep class * extends com.google.gson.reflect.TypeToken
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+
+# Razorpay Checkout
+-keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
+-keepattributes JavascriptInterface
+-keepattributes *Annotation*
+-dontwarn com.razorpay.**
+-keep class com.razorpay.** { *; }
+-optimizations !method/inlining/*
+-keepclasseswithmembers class * { public void onPayment*(...); }

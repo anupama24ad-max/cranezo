@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -133,18 +134,24 @@ private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
         Row {
             CraneImage(path = booking.crane?.primary_photo, modifier = Modifier.size(dimen_80))
             Spacer(modifier = Modifier.width(dimen_12))
-            Column(modifier = Modifier.weight(1f)) {
-                Textview(booking.crane?.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(dimen_4)) {
+                // title on the left, "Verified" in the top-right corner
+                Row(verticalAlignment = Alignment.Top) {
+                    Textview(
+                        booking.crane?.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold,
+                        maxLines = 2, modifier = Modifier.weight(1f).padding(end = dimen_8)
+                    )
+                    if (booking.crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
+                }
                 booking.crane?.rating?.let {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Star, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_14))
-                        Textview(" ${String.format(Locale.US, "%.1f", it)} (${booking.crane.reviews_count ?: 0})", size = font_11, color = appColors.textPrimary)
+                        Textview(" ${String.format(Locale.US, "%.1f", it)} (${booking.crane.reviews_count ?: 0})", size = font_12, color = appColors.textPrimary)
                     }
                 }
-                if (booking.crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
                 Textview(
                     listOfNotNull(booking.crane?.capacity_name, booking.crane?.fuel_type_name, booking.duration?.label).joinToString("  •  "),
-                    size = font_10, color = appColors.textSecondary
+                    size = font_12, color = appColors.textSecondary
                 )
             }
         }
@@ -162,6 +169,29 @@ private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
                     Textview(" ${String.format(Locale.US, "%.1f", it)}", size = font_11, color = appColors.textPrimary)
                 }
             }
+        }
+    }
+}
+
+/** Green success mark (Job Completed, Payment Successful): green check in a green ring with a soft glow */
+@Composable
+private fun SuccessMark() {
+    val green = androidx.compose.ui.graphics.Color(0xFF22C55E)
+    Box(
+        modifier = Modifier
+            .size(dimen_100)
+            .background(androidx.compose.ui.graphics.Brush.radialGradient(listOf(green.copy(alpha = 0.28f), androidx.compose.ui.graphics.Color.Transparent))),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(dimen_64)
+                .clip(CircleShape)
+                .background(green.copy(alpha = 0.16f))
+                .border(dimen_2, green.copy(alpha = 0.7f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Default.Check, contentDescription = null, tint = green, modifier = Modifier.size(dimen_32))
         }
     }
 }
@@ -200,7 +230,7 @@ fun CraneArrivedScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
         }
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_8), horizontalAlignment = Alignment.CenterHorizontally) {
-            IconBadge(icon = Icons.Default.Check, accent = SuccessGreen, size = dimen_56, filled = true)
+            SuccessMark()
             Spacer(modifier = Modifier.height(dimen_8))
             Textview(stringResource(R.string.cj_arrived_heading), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.cj_arrived_sub), size = font_12, color = appColors.textSecondary)
@@ -597,7 +627,7 @@ fun JobCompletedScreen(
         }
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_8), horizontalAlignment = Alignment.CenterHorizontally) {
-            IconBadge(icon = Icons.Default.Check, accent = SuccessGreen, size = dimen_56, filled = true)
+            SuccessMark()
             Spacer(modifier = Modifier.height(dimen_8))
             Textview(stringResource(R.string.op_job_completed), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.cj_completed_sub), size = font_12, color = appColors.textSecondary)
@@ -626,21 +656,21 @@ fun JobCompletedScreen(
 
 @Preview(showBackground = true, heightDp = 1000)
 @Composable
-fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
+fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onPayOnline: () -> Unit = {}) {
     val state = rememberBooking(vm)
     val booking = state.booking ?: return
     val payment = booking.payment
     val balance = rupees(payment?.balance_due)
 
-    // No popup: the button already says "Confirm Cash Payment ₹X"; one line above it says when to tap
+    // Online only (Razorpay: UPI, card, net banking). Cash is not taken from customers.
     BookingScaffold(
         onBack = onBack,
         title = stringResource(R.string.cj_final_payment_title),
         subtitle = stringResource(R.string.cj_final_payment_sub),
         bottom = {
             Column {
-                Textview(stringResource(R.string.fin_cash_note), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(bottom = dimen_8))
-                CommonGradientButton(text = stringResource(R.string.cj_confirm_cash_payment, balance), onClick = { vm?.onIntent(BookingIntent.Pay("COD")) })
+                Textview(stringResource(R.string.rq_pay_online_note), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(bottom = dimen_8))
+                CommonGradientButton(text = stringResource(R.string.rq_pay_online, balance), onClick = onPayOnline)
             }
         }
     ) {
@@ -661,20 +691,18 @@ fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                 Textview(balance, size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
             }
         }
-        Textview(stringResource(R.string.bk_select_payment_method), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-        payment?.payment_methods.orEmpty().forEach { method ->
-            val enabled = method.enabled == true
-            GlassCard(contentPadding = dimen_12, borderColor = if (enabled) AmberPrimary else Color.Unspecified) {
+        // only the ways that work today (no "coming soon" rows)
+        payment?.payment_methods.orEmpty().filter { it.enabled == true }.forEach { method ->
+            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Textview(method.name.orEmpty(), size = font_14, color = if (enabled) appColors.textPrimary else appColors.textHint, fontWeight = FontWeight.Bold)
-                        Textview(if (enabled) method.description.orEmpty() else stringResource(R.string.bk_coming_soon), size = font_11, color = appColors.textSecondary)
+                        Textview(method.name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                        Textview(method.description.orEmpty(), size = font_11, color = appColors.textSecondary)
                     }
-                    if (enabled) Icon(Icons.Default.CheckCircle, contentDescription = null, tint = AmberPrimary)
+                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = AmberPrimary)
                 }
             }
         }
-        Textview(stringResource(R.string.cj_cod_note), size = font_11, color = appColors.textHint)
     }
 }
 
@@ -683,6 +711,7 @@ fun FinalPaymentScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
 private fun RatingSheet(visible: Boolean, onDismiss: () -> Unit, onSubmit: (Int, String) -> Unit) {
     if (!visible) return
     var stars by remember { mutableIntStateOf(0) }
+    var comment by remember { mutableStateOf("") }
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(topStart = dimen_28, topEnd = dimen_28),
@@ -705,7 +734,12 @@ private fun RatingSheet(visible: Boolean, onDismiss: () -> Unit, onSubmit: (Int,
                     )
                 }
             }
-            CommonGradientButton(text = stringResource(R.string.cj_submit_rating), enabled = stars > 0, onClick = { onSubmit(stars, "") })
+            // optional: what went well or what to improve
+            com.cranezo.ui.components.GlassInputField(
+                label = stringResource(R.string.rq_rating_comment), value = comment, onValueChange = { comment = it.take(500) },
+                placeholder = stringResource(R.string.rq_rating_comment_hint), singleLine = false, minHeight = dimen_88
+            )
+            CommonGradientButton(text = stringResource(R.string.cj_submit_rating), enabled = stars > 0, onClick = { onSubmit(stars, comment.trim()) })
             Textview(stringResource(R.string.cj_skip), size = font_13, color = appColors.textSecondary, modifier = Modifier.clickable { onDismiss() })
         }
     }
@@ -737,7 +771,7 @@ fun PaymentSuccessfulScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {
         }
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_8), horizontalAlignment = Alignment.CenterHorizontally) {
-            IconBadge(icon = Icons.Default.Check, accent = SuccessGreen, size = dimen_56, filled = true)
+            SuccessMark()
             Spacer(modifier = Modifier.height(dimen_8))
             Textview(stringResource(R.string.cj_payment_successful), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.cj_payment_successful_sub), size = font_12, color = appColors.textSecondary, textAlign = TextAlign.Center)

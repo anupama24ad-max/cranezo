@@ -53,7 +53,7 @@ sealed interface OwnerJobDetailIntent {
     data object PollTrack : OwnerJobDetailIntent
     data object LoadEvidence : OwnerJobDetailIntent
     data object LoadOperators : OwnerJobDetailIntent
-    data class AssignOperator(val operatorId: String) : OwnerJobDetailIntent
+    data class AssignOperator(val operatorId: String, val byCode: Boolean = false) : OwnerJobDetailIntent
 }
 
 // ---------------------------------------------------------------------------------------------

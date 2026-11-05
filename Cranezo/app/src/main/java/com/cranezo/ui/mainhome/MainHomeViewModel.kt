@@ -91,9 +91,41 @@ class MainHomeViewModel @Inject constructor(
         }
     }
 
+    /** Owner Home dashboard: live numbers from POST /owner/home */
+    private fun loadOwnerHome() {
+        runWhenOnline {
+            repo.financePost("owner/home", AppMethods.getToken(sm)).isRequestCallSuspendSuccess(
+                success = { r ->
+                    val d = r?.data?.takeIf { it.isJsonObject }?.asJsonObject ?: return@isRequestCallSuspendSuccess
+                    val fleet = d.getAsJsonObject("fleet")
+                    fun int(o: com.google.gson.JsonObject?, k: String) = o?.get(k)?.takeIf { !it.isJsonNull }?.asInt ?: 0
+                    val earnings = d.get("todays_earnings")?.takeIf { !it.isJsonNull }?.asDouble ?: 0.0
+                    _uiState.update {
+                        it.copy(
+                            owner = it.owner.copy(
+                                fleet = com.cranezo.ui.mainhome.model.FleetOverview(
+                                    totalCranes = int(fleet, "total_cranes"),
+                                    availableCranes = int(fleet, "available_cranes"),
+                                    busyCranes = int(fleet, "busy_cranes"),
+                                    pendingVerification = int(fleet, "pending_verification")
+                                ),
+                                todaysJobs = int(d, "todays_jobs"),
+                                todaysEarnings = com.cranezo.utils.rupees(earnings),
+                                craneRequests = int(d, "crane_requests"),
+                                jobsNeedingOperator = int(d, "jobs_needing_operator")
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
+
     fun onIntent(intent: MainHomeIntent) {
         when (intent) {
             MainHomeIntent.RefreshCranes -> loadCranes(reset = true)
+
+            MainHomeIntent.RefreshOwnerHome -> loadOwnerHome()
 
             MainHomeIntent.LoadMoreCranes -> loadCranes(reset = false)
 

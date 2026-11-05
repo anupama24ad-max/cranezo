@@ -3,6 +3,7 @@ package com.cranezo.ui.mainhome.tabs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -119,9 +120,24 @@ fun OwnerHomeScreen(
                     Textview(stringResource(R.string.rq_owner_title), size = font_16, color = appColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
                     Textview(stringResource(R.string.rq_owner_card_sub), size = font_12, color = appColors.textSecondary)
                 }
+                if (state.owner.craneRequests > 0) {
+                    com.cranezo.ui.booking.components.BookingTag(state.owner.craneRequests.toString(), AmberPrimary)
+                    Spacer(modifier = Modifier.width(dimen_8))
+                }
                 androidx.compose.material3.Icon(
                     androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary
                 )
+            }
+        }
+
+        // Paid bookings still waiting for an operator: open Jobs to assign one
+        if (state.owner.jobsNeedingOperator > 0) {
+            GlassCard(contentPadding = dimen_14, borderColor = androidx.compose.ui.graphics.Color(0xFFEF4444), onClick = { onNavigate(Dest.Jobs.route) }) {
+                Textview(
+                    stringResource(R.string.rq_jobs_need_operator, state.owner.jobsNeedingOperator), size = font_14,
+                    color = appColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+                Textview(stringResource(R.string.rq_jobs_need_operator_sub), size = font_12, color = appColors.textSecondary)
             }
         }
 

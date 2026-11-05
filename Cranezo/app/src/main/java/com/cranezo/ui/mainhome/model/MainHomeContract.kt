@@ -73,21 +73,23 @@ object MainHomeTabs {
 
 // ---------------------------------------------------------------------------------------------
 // Home data
-// There are no home / dashboard APIs yet, so these defaults are the sample values from the design.
-// Replace them with API data in MainHomeViewModel when the endpoints exist.
+// Owner home comes from POST /owner/home (live numbers), loaded every time the Home tab opens.
 // ---------------------------------------------------------------------------------------------
 
 data class FleetOverview(
-    val totalCranes: Int = 5,
-    val availableCranes: Int = 3,
-    val busyCranes: Int = 2,
-    val pendingVerification: Int = 1
+    val totalCranes: Int = 0,
+    val availableCranes: Int = 0,
+    val busyCranes: Int = 0,
+    val pendingVerification: Int = 0
 )
 
 data class OwnerHomeData(
     val fleet: FleetOverview = FleetOverview(),
-    val todaysJobs: Int = 3,
-    val todaysEarnings: String = "₹24,500"
+    val todaysJobs: Int = 0,
+    val todaysEarnings: String = "₹0",
+    // customers asking for a crane like the owner's, and jobs still without an operator
+    val craneRequests: Int = 0,
+    val jobsNeedingOperator: Int = 0
 )
 
 data class BookingItem(
@@ -158,6 +160,7 @@ data class MyCranesState(
 
 sealed interface MainHomeIntent {
     data object RefreshCranes : MainHomeIntent
+    data object RefreshOwnerHome : MainHomeIntent
     data object RefreshProfile : MainHomeIntent
     data object AcceptRequest : MainHomeIntent
     data object DeclineRequest : MainHomeIntent

@@ -120,6 +120,9 @@ dependencies {
     // Location
     implementation("com.google.android.gms:play-services-location:21.3.0")
 
+    // Razorpay Checkout (customer online payments: advance and final balance)
+    implementation("com.razorpay:checkout:1.6.33")
+
     // Firebase Cloud Messaging (push notifications)
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-messaging")

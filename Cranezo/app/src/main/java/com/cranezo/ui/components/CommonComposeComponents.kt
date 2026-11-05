@@ -2462,6 +2462,21 @@ fun ScreenBackground(
                 .fillMaxSize()
                 .background(colors.bgBase)
                 .drawBehind {
+                    // Light mode (Blinkit style): a soft orange tint at the top that fades to plain white
+                    if (!colors.isDark) {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colorStops = arrayOf(
+                                    0f to Color(0xFFFFD9AE),
+                                    0.14f to Color(0xFFFFE8CF),
+                                    0.32f to Color(0xFFFFF5EA),
+                                    0.5f to Color.White,
+                                    1f to Color.White
+                                )
+                            )
+                        )
+                        return@drawBehind
+                    }
                     // Centre darkness (dark mode only): the middle of the screen feels black
                     if (colors.isDark) {
                         drawRect(

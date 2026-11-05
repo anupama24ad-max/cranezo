@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Today
@@ -70,6 +71,7 @@ import com.cranezo.ui.booking.model.BookingChoice
 import com.cranezo.ui.booking.model.BookingIntent
 import com.cranezo.ui.booking.model.BookingOptions
 import com.cranezo.ui.booking.model.BookingUiState
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.cranezo.ui.booking.model.DurationTypeOption
 import com.cranezo.ui.booking.model.StartTypeOption
 import com.cranezo.ui.components.GlassCard
@@ -315,6 +317,9 @@ fun CapacityStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
 fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: () -> Unit = {}) {
     val state = rememberState(vm)
     var query by remember { mutableStateOf("") }
+    val suggestions = vm?.suggestions?.collectAsStateWithLifecycle()?.value.orEmpty()
+    val contact = vm?.siteContact?.collectAsStateWithLifecycle()?.value ?: Triple(false, "", "")
+    val (forOther, contactName, contactPhone) = contact
 
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) vm?.onIntent(BookingIntent.LocateMe)
@@ -328,7 +333,9 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                 mainText = stringResource(R.string.common_continue),
                 onMain = onNext,
                 onBack = onBack,
-                enabled = state.latitude != null && state.siteAddress.isNotBlank()
+                // recomputed whenever the place or the contact changes (both are read above)
+                enabled = state.latitude != null && state.siteAddress.isNotBlank() &&
+                    (!forOther || (contactName.isNotBlank() && contactPhone.length == 10))
             )
         }
     ) {
@@ -336,11 +343,32 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
 
         SearchInput(
             value = query,
-            onValueChange = { query = it },
+            onValueChange = {
+                query = it
+                vm?.suggestAddresses(it)
+            },
             placeholder = stringResource(R.string.bk_search_location),
             isLoading = state.isLocating,
             onSearch = { vm?.onIntent(BookingIntent.SearchAddress(it)) }
         )
+        // suggestions while typing: tap one to set the place
+        if (suggestions.isNotEmpty()) {
+            GlassCard(contentPadding = dimen_4, minHeight = dimen_40) {
+                suggestions.forEach { s ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            vm?.pickSuggestion(s)
+                            query = ""
+                        }.padding(horizontal = dimen_12, vertical = dimen_10),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_18))
+                        Spacer(modifier = Modifier.width(dimen_10))
+                        Textview(s.label, size = font_13, color = appColors.textPrimary, maxLines = 2)
+                    }
+                }
+            }
+        }
 
         GlassCard(
             contentPadding = dimen_12,
@@ -379,6 +407,36 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                 size = font_11,
                 color = appColors.textHint
             )
+        }
+
+        // Booking for someone else: the operator calls this person at the site
+        GlassCard(contentPadding = dimen_12) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.rq_for_someone_else), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(stringResource(R.string.rq_for_someone_else_sub), size = font_11, color = appColors.textSecondary)
+                }
+                androidx.compose.material3.Switch(
+                    checked = forOther,
+                    onCheckedChange = { vm?.setSiteContact(it, contactName, contactPhone) },
+                    colors = androidx.compose.material3.SwitchDefaults.colors(checkedTrackColor = AmberPrimary)
+                )
+            }
+            if (forOther) {
+                Spacer(modifier = Modifier.height(dimen_10))
+                GlassInputField(
+                    label = stringResource(R.string.rq_contact_name), value = contactName,
+                    onValueChange = { vm?.setSiteContact(true, it, contactPhone) },
+                    placeholder = stringResource(R.string.rq_contact_name_hint), leftIcon = Icons.Default.Person, isRequired = true
+                )
+                Spacer(modifier = Modifier.height(dimen_10))
+                GlassInputField(
+                    label = stringResource(R.string.rq_contact_phone), value = contactPhone,
+                    onValueChange = { vm?.setSiteContact(true, contactName, it) },
+                    placeholder = "9876543210", leftIcon = Icons.Default.Phone, isRequired = true,
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Phone
+                )
+            }
         }
     }
 }
@@ -428,6 +486,8 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
     val state = rememberState(vm)
     val context = LocalContext.current
     val scheduled = state.startType == "scheduled"
+    // "When" and "How long" are one step: the hours / days appear once Now or Schedule is tapped
+    var picked by rememberSaveable { mutableStateOf(false) }
 
     BookingScaffold(
         onBack = onBack,
@@ -437,7 +497,7 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                 mainText = stringResource(R.string.common_continue),
                 onMain = onNext,
                 onBack = onBack,
-                enabled = !scheduled || (state.date.isNotEmpty() && state.time.isNotEmpty())
+                enabled = picked && (!scheduled || (state.date.isNotEmpty() && state.time.isNotEmpty()))
             )
         }
     ) {
@@ -448,12 +508,15 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                 icon = if (type.id == "now") Icons.Default.Bolt else Icons.Default.CalendarMonth,
                 title = type.name.orEmpty(),
                 subtitle = type.description.orEmpty(),
-                selected = type.id == state.startType,
-                onClick = { type.id?.let { vm?.onIntent(BookingIntent.StartTypeChanged(it)) } }
+                selected = picked && type.id == state.startType,
+                onClick = {
+                    picked = true
+                    type.id?.let { vm?.onIntent(BookingIntent.StartTypeChanged(it)) }
+                }
             )
         }
 
-        if (scheduled) {
+        if (picked && scheduled) {
             Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                 GlassDateField(
                     label = stringResource(R.string.bk_date),
@@ -493,11 +556,52 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
             }
             Textview(stringResource(R.string.bk_schedule_rule), size = font_11, color = appColors.textHint)
         }
+
+        // How long (was step 5)
+        if (picked) {
+            Textview(
+                stringResource(R.string.bk_duration_title), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = dimen_6)
+            )
+            DurationChoices(state, vm)
+        }
+    }
+}
+
+/** Hours (stepper), Full day, or Multiple days (stepper) */
+@Composable
+private fun DurationChoices(state: BookingUiState, vm: BookingViewModel?) {
+    state.options?.duration_types.orEmpty().forEach { type ->
+        val selected = type.id == state.durationType
+        SelectableCard(
+            selected = selected,
+            onClick = { type.id?.let { vm?.onIntent(BookingIntent.DurationTypeChanged(it)) } },
+            modifier = Modifier.fillMaxWidth(),
+            minHeight = dimen_64
+        ) {
+            Row(modifier = Modifier.padding(horizontal = dimen_14, vertical = dimen_10), verticalAlignment = Alignment.CenterVertically) {
+                IconBadge(
+                    icon = if (type.id == "hours") Icons.Default.AccessTime else Icons.Default.Today,
+                    accent = AmberPrimary,
+                    size = dimen_32
+                )
+                Spacer(modifier = Modifier.width(dimen_12))
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(type.name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(type.description.orEmpty(), size = font_11, color = appColors.textSecondary, maxLines = 2)
+                }
+                when (type.id) {
+                    "hours" -> Stepper(state.hours, type.min ?: 4, type.max ?: 12) { vm?.onIntent(BookingIntent.HoursChanged(it)) }
+                    "days" -> Stepper(state.days, type.min ?: 1, type.max ?: 30) { vm?.onIntent(BookingIntent.DaysChanged(it)) }
+                    else -> RadioDot(selected)
+                }
+            }
+        }
     }
 }
 
 // ---------------------------------------------------------------------------------------------
-// Step 5: duration
+// Step 5: duration (no longer in the flow: merged into the "When" step above)
 // ---------------------------------------------------------------------------------------------
 
 @Composable

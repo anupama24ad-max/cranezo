@@ -159,6 +159,60 @@ class BookingViewModel @Inject constructor(
         }
     }
 
+    // ---- address suggestions while typing (free: the phone's own address search) ----
+
+    data class AddressSuggestion(val label: String, val latitude: Double, val longitude: Double)
+
+    private val _suggestions = MutableStateFlow<List<AddressSuggestion>>(emptyList())
+    val suggestions: StateFlow<List<AddressSuggestion>> = _suggestions.asStateFlow()
+    private var suggestJob: kotlinx.coroutines.Job? = null
+
+    /** Called on every key press; waits a moment so it does not search on each letter */
+    fun suggestAddresses(query: String) {
+        suggestJob?.cancel()
+        if (query.trim().length < 3) {
+            _suggestions.value = emptyList()
+            return
+        }
+        suggestJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(400)
+            val found = withContext(Dispatchers.IO) {
+                runCatching {
+                    @Suppress("DEPRECATION")
+                    Geocoder(app, Locale.getDefault()).getFromLocationName("$query, India", 5).orEmpty()
+                }.getOrDefault(emptyList())
+            }
+            _suggestions.value = found.mapNotNull { a ->
+                val line = a.getAddressLine(0) ?: return@mapNotNull null
+                AddressSuggestion(line, a.latitude, a.longitude)
+            }.distinctBy { it.label }
+        }
+    }
+
+    fun pickSuggestion(s: AddressSuggestion) {
+        _suggestions.value = emptyList()
+        _uiState.update {
+            it.copy(latitude = s.latitude, longitude = s.longitude, siteAddress = s.label, siteName = it.siteName.ifBlank { s.label.substringBefore(",") })
+        }
+    }
+
+    // ---- booking for someone else: the person at the site ----
+
+    private val _contact = MutableStateFlow(Triple(false, "", ""))
+    /** (for someone else?, name, phone) */
+    val siteContact: StateFlow<Triple<Boolean, String, String>> = _contact.asStateFlow()
+
+    fun setSiteContact(forOther: Boolean, name: String, phone: String) {
+        _contact.value = Triple(forOther, name.take(100), phone.filter { it.isDigit() }.take(10))
+    }
+
+    /** Location step is complete: a place, and a valid contact when booking for someone else */
+    fun locationReady(): Boolean {
+        val s = _uiState.value
+        val (other, name, phone) = _contact.value
+        return s.latitude != null && s.siteAddress.isNotBlank() && (!other || (name.isNotBlank() && phone.length == 10))
+    }
+
     private fun searchAddress(query: String) {
         if (query.isBlank()) return
         _uiState.update { it.copy(isLocating = true) }
@@ -223,11 +277,18 @@ class BookingViewModel @Inject constructor(
         val s = _uiState.value
         if (s.craneType == null || s.capacity == null || s.latitude == null || s.longitude == null) return null
         val address = s.siteAddress.ifBlank { String.format(Locale.US, "%.5f, %.5f", s.latitude, s.longitude) }
+        val (other, contactName, contactPhone) = _contact.value
         return requirement(s)
             .put("crane_type", s.craneType)
             .put("capacity", s.capacity)
             .put("site_address", address)
             .also { body -> if (s.siteName.isNotBlank()) body.put("site_name", s.siteName) }
+            .also { body ->
+                // booking for someone else: the operator calls this person
+                if (other && contactName.isNotBlank() && contactPhone.isNotBlank()) {
+                    body.put("contact_name", contactName.trim()).put("contact_phone", contactPhone)
+                }
+            }
     }
 
     /** Names shown on the review screen, e.g. "50 Ton" and "Mobile Crane" */
@@ -498,6 +559,16 @@ class BookingViewModel @Inject constructor(
     }
 
     /** pay (COD) and rate answer with the booking, which replaces the local copy. */
+    /** The final payment went through online (Razorpay, verified by the server): refresh and show Payment Successful */
+    fun showPaidOnline() {
+        val id = currentId() ?: return
+        pollBooking(id)
+        viewModelScope.launch { _effect.send(BookingEffect.Go(BookingRoutes.PAID, popUpTo = BookingRoutes.PAY)) }
+    }
+
+    /** Booking shown on the final payment screen */
+    fun currentBookingId(): String? = currentId()
+
     private fun payOrRate(action: String, extra: JSONObject, goTo: String?) {
         val id = currentId() ?: return
         runWhenOnline {

@@ -175,12 +175,15 @@ private fun CraneSummaryCard(booking: Booking) {
         Row {
             CraneImage(path = crane?.primary_photo, modifier = Modifier.size(dimen_80))
             Spacer(modifier = Modifier.width(dimen_12))
-            Column {
-                Textview(crane?.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                if (crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(dimen_4)) {
+                // title on the left, "Verified" in the top-right corner
+                Row(verticalAlignment = Alignment.Top) {
+                    Textview(crane?.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 2, modifier = Modifier.weight(1f).padding(end = dimen_8))
+                    if (crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
+                }
                 Textview(
                     listOfNotNull(crane?.capacity_name, crane?.fuel_type_name, booking.duration?.label).joinToString("  •  "),
-                    size = font_11, color = appColors.textSecondary
+                    size = font_12, color = appColors.textSecondary
                 )
                 if (crane?.operator_included == true) {
                     Textview(stringResource(R.string.bk_operator_included), size = font_11, color = appColors.textSecondary)
@@ -301,12 +304,14 @@ private fun CraneSummaryRow(booking: Booking) {
     Row {
         CraneImage(path = crane?.primary_photo, modifier = Modifier.size(dimen_80))
         Spacer(modifier = Modifier.width(dimen_12))
-        Column {
-            Textview(crane?.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            if (crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(dimen_4)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Textview(crane?.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 2, modifier = Modifier.weight(1f).padding(end = dimen_8))
+                if (crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
+            }
             Textview(
                 listOfNotNull(crane?.capacity_name, crane?.fuel_type_name, booking.duration?.label).joinToString("  •  "),
-                size = font_11, color = appColors.textSecondary
+                size = font_12, color = appColors.textSecondary
             )
             Textview(booking.site?.name.orEmpty(), size = font_11, color = appColors.textSecondary, maxLines = 1)
         }
