@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.border
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -86,31 +90,35 @@ fun HomeHeader(
                 }
             }
             val badge = unread ?: com.cranezo.push.UnreadBadge.count.value
-            Box(
-                modifier = Modifier
-                    .size(dimen_40)
-                    .glassEffect(CircleShape)
-                    .clickable { context.startActivity(com.cranezo.ui.support.SupportActivity.intent(context, com.cranezo.ui.support.SupportRoutes.NOTIFICATIONS)) },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = stringResource(R.string.common_notifications),
-                    tint = AmberPrimary,
-                    modifier = Modifier.size(dimen_20)
-                )
+            // outer box is not clipped, so the count sits on the edge of the round button, not inside it
+            Box {
+                Box(
+                    modifier = Modifier
+                        .size(dimen_40)
+                        .glassEffect(CircleShape)
+                        .clickable { context.startActivity(com.cranezo.ui.support.SupportActivity.intent(context, com.cranezo.ui.support.SupportRoutes.NOTIFICATIONS)) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = stringResource(R.string.common_notifications),
+                        tint = AmberPrimary,
+                        modifier = Modifier.size(dimen_20)
+                    )
+                }
                 // Unread count: hidden when there is nothing unread
                 if ((badge ?: 0) > 0) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(top = dimen_2, end = dimen_2)
-                            .size(dimen_16)
+                            .offset(x = dimen_6, y = (-6).dp)
+                            .size(dimen_18)
                             .clip(CircleShape)
-                            .background(androidx.compose.ui.graphics.Color(0xFFEF4444)),
+                            .background(androidx.compose.ui.graphics.Color(0xFFEF4444))
+                            .border(dimen_1, androidx.compose.ui.graphics.Color.White, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Textview(if ((badge ?: 0) > 9) "9+" else badge.toString(), size = font_10, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                        Textview(if ((badge ?: 0) > 9) "9+" else badge.toString(), size = 9.sp, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }
