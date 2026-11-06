@@ -42,6 +42,7 @@ import com.cranezo.R
 import com.cranezo.core.BaseViewModel
 import com.cranezo.core.NetworkState
 import com.cranezo.interfaces.BannerEvent
+import com.cranezo.push.JobAlertHost
 import com.cranezo.ui.components.TopBannerHost
 import com.cranezo.ui.components.dialogUtils.SessionExpiredDialog
 import com.cranezo.ui.components.rememberTopBannerHostState
@@ -248,7 +249,7 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                             onDismiss = { viewModel.onUserDismissNetNotice() }
                         )
                         // job updates (crane arrived, completion code, ...) as a bottom sheet over this screen
-                        com.cranezo.push.JobAlertHost()
+                        JobAlertHost()
                     }
                 }
             }
