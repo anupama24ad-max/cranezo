@@ -211,6 +211,8 @@ data class Booking(
     val extension: ExtensionInfo? = null,
     val job_summary: JobSummaryInfo? = null,
     val receipt: ReceiptInfo? = null,
+    // every payment of the booking (advance, final, failed attempts)
+    val transactions: List<com.cranezo.ui.finance.model.TransactionItem>? = null,
     val cancellation: CancellationInfo? = null,
     val rebook: RebookInfo? = null,
     @com.google.gson.annotations.SerializedName("rating") val rating_info: RatingInfo? = null,

@@ -682,6 +682,28 @@ private fun MonitorScreen(
         OperatorStepHeader(job.next_action)
         // Fixed hours: the booked window and the time left, no running clock
         FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration?.label)
+        // Hold / Resume: pauses the job (waiting for material, the site, the weather); the customer sees it
+        val onHold = job.timers?.is_waiting == true
+        GlassCard(contentPadding = dimen_14, borderColor = if (onHold) AmberPrimary else Color.Unspecified) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    if (onHold) {
+                        Textview(stringResource(R.string.op_on_hold_title), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.op_on_hold_sub, formatServerTime(job.timers?.waiting_since)), size = font_12, color = appColors.textSecondary)
+                    } else {
+                        Textview(stringResource(R.string.op_hold_hint), size = font_12, color = appColors.textSecondary)
+                    }
+                }
+                Spacer(modifier = Modifier.width(dimen_10))
+                CommonGradientButton(
+                    text = stringResource(if (onHold) R.string.op_resume else R.string.op_hold),
+                    onClick = { onIntent(OperatorJobIntent.ToggleWaiting(!onHold)) },
+                    modifier = Modifier.width(dimen_110), height = dimen_40, textSize = font_13,
+                    gradientColors = if (onHold) listOf(SuccessGreen, SuccessGreen) else listOf(appColors.subtleFill, appColors.subtleFill),
+                    textColor = if (onHold) Color.White else AmberPrimary
+                )
+            }
+        }
         if (pendingExtra != null) {
             GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = { extraOpen = true }) {
                 Textview(stringResource(R.string.op_extra_time_request), size = font_15, color = appColors.primaryText, fontWeight = FontWeight.Bold)

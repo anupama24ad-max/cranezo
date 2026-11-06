@@ -246,7 +246,7 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
             perKm = b.per_km_rate?.let { trimNumber(it) }.orEmpty()
             gst = b.gst_percent?.let { trimNumber(it) }.orEmpty()
             gstNumber = b.gst_number.orEmpty()
-            commissionType = b.default_commission_type ?: "percent"
+            commissionType = b.default_commission_type?.takeIf { it != "per_km" } ?: "percent"
             commissionValue = b.default_commission_value?.let { trimNumber(it) }.orEmpty()
             charges.clear()
             charges.addAll(b.charges.orEmpty())
@@ -337,9 +337,8 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-fun commissionOptions(server: List<IdName>?): List<IdName> = server?.takeIf { it.isNotEmpty() } ?: listOf(
+fun commissionOptions(@Suppress("UNUSED_PARAMETER") server: List<IdName>?): List<IdName> = listOf(
     IdName("percent", stringResource(R.string.fin_commission_percent)),
-    IdName("per_km", stringResource(R.string.fin_commission_per_km)),
     IdName("fixed", stringResource(R.string.fin_commission_fixed))
 )
 
@@ -368,7 +367,7 @@ fun OwnerCommissionScreen(vm: FinanceViewModel, bookingId: String, onBack: () ->
     var filled by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(c) {
         if (c != null && !filled) {
-            type = c.type ?: "percent"
+            type = c.type?.takeIf { it != "per_km" } ?: "percent"
             value = c.value?.let { trimNumber(it) }.orEmpty()
             filled = true
         }
@@ -403,14 +402,24 @@ fun OwnerCommissionScreen(vm: FinanceViewModel, bookingId: String, onBack: () ->
                     label = commissionValueLabel(type), value = value,
                     onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } }, placeholder = "0", keyboardType = KeyboardType.Decimal
                 )
-                if (type == "per_km") {
-                    Textview(stringResource(R.string.fin_distance_km, trimNumber(job.job_location?.distance_km ?: 0.0)), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_4))
+                // updates while typing: what the operator will get for this job
+                val entered = value.toDoubleOrNull()
+                val preview = when {
+                    entered == null -> null
+                    type == "percent" -> c.job_value?.let { Math.round(it * entered) / 100.0 }
+                    else -> entered
                 }
+                Spacer(modifier = Modifier.height(dimen_8))
+                if (type == "percent" && c.job_value != null) {
+                    TextRow(stringResource(R.string.cm_job_value), amountText(c.job_value))
+                }
+                MoneyRow(stringResource(R.string.cm_operator_will_get), preview, bold = true, color = FinGreen)
                 Spacer(modifier = Modifier.height(dimen_12))
                 CommonGradientButton(
                     text = if (state.saving) stringResource(R.string.fin_saving) else stringResource(R.string.fin_save_commission),
-                    enabled = !state.saving,
-                    onClick = { vm.saveCommission(bookingId, type, value) }
+                    enabled = !state.saving && entered != null,
+                    // saved: back to the job (it shows the operator payment)
+                    onClick = { vm.saveCommission(bookingId, type, value, onSaved = onBack) }
                 )
             } else if (job.assigned_operator == null) {
                 Textview(stringResource(R.string.fin_assign_first), size = font_13, color = appColors.textSecondary)

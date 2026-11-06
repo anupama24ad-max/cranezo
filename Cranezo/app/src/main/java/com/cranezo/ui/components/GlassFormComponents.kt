@@ -299,7 +299,7 @@ fun GlassDateField(
             onClick = {
                 val now = java.util.Calendar.getInstance()
                 android.app.DatePickerDialog(
-                    context,
+                    context, com.cranezo.R.style.Theme_Cranezo_Picker,
                     { _, year, month, day ->
                         onDateSelected(
                             String.format(java.util.Locale.US, "%04d-%02d-%02d", year, month + 1, day)

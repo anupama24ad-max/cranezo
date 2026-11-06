@@ -113,6 +113,12 @@ data class OwnerJob(
     val customer: JobCustomer? = null,
     val special_requirements: String? = null,
     val payment: BookingPayment? = null,
+    // waiting for the customer's advance: countdown
+    val advance_due: AdvanceDue? = null,
+    // every payment of this job
+    val transactions: List<com.cranezo.ui.finance.model.TransactionItem>? = null,
+    // what the operator gets and whether it is paid
+    val operator_commission: com.cranezo.ui.finance.model.Commission? = null,
     val timeline: List<TimelineStep>? = null,
     val monitoring: Monitoring? = null,
     val completion: OwnerCompletion? = null,
@@ -216,3 +222,5 @@ data class SuggestedOperator(val id: String? = null, val full_name: String? = nu
 
 /** Booking for someone else: who to call at the site */
 data class SiteContact(val name: String? = null, val phone: String? = null)
+
+data class AdvanceDue(val amount: Double? = null, val due_at: String? = null, val seconds_left: Long? = null, val extended: Boolean? = null)

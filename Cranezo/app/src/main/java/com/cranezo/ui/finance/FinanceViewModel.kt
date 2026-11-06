@@ -171,7 +171,7 @@ class FinanceViewModel @Inject constructor(
             _ui.update { it.copy(jobMoney = d) }
         }
 
-    fun saveCommission(bookingId: String, type: String, value: String) {
+    fun saveCommission(bookingId: String, type: String, value: String, onSaved: () -> Unit = {}) {
         val amount = value.toDoubleOrNull()
         if (amount == null) {
             fail(string(R.string.fin_enter_amount))
@@ -180,6 +180,7 @@ class FinanceViewModel @Inject constructor(
         val body = JSONObject().put("booking_id", bookingId).put("type", type).put("value", amount)
         call<OwnerJobMoney>("owner/jobs/commission", body, typeOf<OwnerJobMoney>(), saving = true) { d ->
             _ui.update { it.copy(jobMoney = d) }
+            onSaved()
         }
     }
 

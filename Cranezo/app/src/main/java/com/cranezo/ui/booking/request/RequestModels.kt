@@ -44,6 +44,9 @@ data class RequestBooking(
     val payment_due_at: String? = null,
     val payment_seconds_left: Long? = null,
     val advance_paid_at: String? = null,
+    // one 5-minute extension in the last 2 minutes
+    val can_extend_payment: Boolean? = null,
+    val payment_extended: Boolean? = null,
     val online_payment: Boolean? = null,
     val test_payment: Boolean? = null
 )
@@ -72,8 +75,12 @@ data class CraneRequestView(
     val seconds_left: Long? = null,
     val can_cancel: Boolean? = null,
     val can_send_to_team: Boolean? = null,
+    // why the customer cancels: 4 choices from the server
+    val cancel_reasons: List<CancelReason>? = null,
     val booking: RequestBooking? = null
 )
+
+data class CancelReason(val id: String? = null, val name: String? = null)
 
 // ---- owner side ----
 

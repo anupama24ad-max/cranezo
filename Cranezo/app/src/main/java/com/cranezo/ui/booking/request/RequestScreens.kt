@@ -318,11 +318,12 @@ fun RequestStatusScreen(
 
         if (r.can_cancel == true) {
             if (confirmCancel) {
-                InlineConfirm(
-                    message = stringResource(R.string.rq_cancel_confirm),
-                    confirmText = stringResource(R.string.rq_cancel_yes),
-                    onConfirm = { confirmCancel = false; vm.cancel(onEditBooking) },
-                    onCancel = { confirmCancel = false }
+                // why: one of 4 reasons, then cancel
+                CancelReasons(
+                    reasons = r.cancel_reasons.orEmpty(),
+                    busy = state.busy,
+                    onConfirm = { reason -> confirmCancel = false; vm.cancel(reason, onEditBooking) },
+                    onKeep = { confirmCancel = false }
                 )
             } else {
                 Textview(
@@ -387,6 +388,22 @@ private fun AcceptedBlock(vm: RequestViewModel, r: CraneRequestView, busy: Boole
             }
         }
     }
+    // last 2 minutes: "Need more time?" with +5 minutes, once
+    if (left in 1L..120L && b.payment_extended != true) {
+        GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.rq_more_time_title), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(stringResource(R.string.rq_more_time_sub), size = font_12, color = appColors.textSecondary)
+                }
+                Spacer(modifier = Modifier.width(dimen_8))
+                CommonGradientButton(
+                    text = stringResource(R.string.rq_more_time_button), enabled = !busy, onClick = { vm.extendPayment() },
+                    modifier = Modifier.width(dimen_110), height = dimen_40, textSize = font_12
+                )
+            }
+        }
+    }
     FinSection(stringResource(R.string.fin_bill_breakdown)) {
         BillLines(b.bill.orEmpty())
         MoneyRow(stringResource(R.string.rq_advance_now), b.advance_amount, color = AmberPrimary)
@@ -396,6 +413,10 @@ private fun AcceptedBlock(vm: RequestViewModel, r: CraneRequestView, busy: Boole
         Box(
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_10)).background(appColors.subtleFill).padding(dimen_10)
         ) { Textview(stringResource(R.string.rq_test_payment_note), size = font_12, color = appColors.textSecondary) }
+    }
+    // the bill includes the online payment fee (Razorpay)
+    if (b.bill.orEmpty().any { it.key == "gateway_fee" }) {
+        Textview(stringResource(R.string.rq_gateway_note), size = font_11, color = appColors.textSecondary)
     }
     CommonGradientButton(
         text = if (busy) stringResource(R.string.rq_paying) else stringResource(R.string.rq_pay_advance, amountText(b.advance_amount)),
@@ -476,5 +497,40 @@ fun OwnerCraneRequestsScreen(vm: RequestViewModel, onBack: () -> Unit, onAccepte
             }
         }
         Spacer(modifier = Modifier.height(dimen_16))
+    }
+}
+
+/** Cancel a request: pick one of the 4 reasons, then confirm (or keep the request) */
+@Composable
+private fun CancelReasons(reasons: List<CancelReason>, busy: Boolean, onConfirm: (String?) -> Unit, onKeep: () -> Unit) {
+    var picked by rememberSaveable { mutableStateOf<String?>(null) }
+    GlassCard(contentPadding = dimen_14, borderColor = FinRed) {
+        Textview(stringResource(R.string.rq_cancel_why), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(dimen_6))
+        reasons.forEach { r ->
+            Row(
+                modifier = Modifier.fillMaxWidth().clickable { picked = r.id }.padding(vertical = dimen_2),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.RadioButton(
+                    selected = picked == r.id, onClick = { picked = r.id },
+                    colors = androidx.compose.material3.RadioButtonDefaults.colors(selectedColor = AmberPrimary)
+                )
+                Textview(r.name.orEmpty(), size = font_13, color = appColors.textPrimary)
+            }
+        }
+        Spacer(modifier = Modifier.height(dimen_8))
+        Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
+            CommonGradientButton(
+                text = stringResource(R.string.rq_cancel_keep), modifier = Modifier.weight(1f), onClick = onKeep, height = dimen_44, textSize = font_13,
+                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
+            )
+            CommonGradientButton(
+                text = stringResource(R.string.rq_cancel_yes), modifier = Modifier.weight(1f), height = dimen_44, textSize = font_13,
+                enabled = !busy && (picked != null || reasons.isEmpty()),
+                gradientColors = listOf(FinRed, FinRed), textColor = androidx.compose.ui.graphics.Color.White,
+                onClick = { onConfirm(picked) }
+            )
+        }
     }
 }

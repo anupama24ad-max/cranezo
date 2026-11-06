@@ -8,4 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="push_accent">#FFB300</color>
+    <!-- date / time pickers -->
+    <color name="picker_amber">#FFA000</color>
+    <color name="picker_amber_dark">#B45309</color>
 </resources>

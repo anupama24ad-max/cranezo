@@ -36,6 +36,8 @@ data class Commission(
     val can_edit: Boolean? = null,
     val settlement_status: String? = null,
     val settled_at: String? = null,
+    // what a % commission is taken from (crane hire + extra time + distance)
+    val job_value: Double? = null,
     val types: List<IdName>? = null
 )
 

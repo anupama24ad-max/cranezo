@@ -77,6 +77,14 @@ fun HomeHeader(
         }
         if (showNotification) {
             val context = androidx.compose.ui.platform.LocalContext.current
+            // the bell keeps its own count fresh: when shown, every 30 seconds and when a push arrives
+            androidx.compose.runtime.LaunchedEffect(Unit) {
+                while (true) {
+                    com.cranezo.push.UnreadBadge.refresh(context)
+                    kotlinx.coroutines.delay(30_000)
+                }
+            }
+            val badge = unread ?: com.cranezo.push.UnreadBadge.count.value
             Box(
                 modifier = Modifier
                     .size(dimen_40)
@@ -90,15 +98,20 @@ fun HomeHeader(
                     tint = AmberPrimary,
                     modifier = Modifier.size(dimen_20)
                 )
-                // Unread dot
-                if (unread == null || unread > 0)                 Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = dimen_9, end = dimen_9)
-                        .size(dimen_8)
-                        .clip(CircleShape)
-                        .background(AmberPrimary)
-                )
+                // Unread count: hidden when there is nothing unread
+                if ((badge ?: 0) > 0) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = dimen_2, end = dimen_2)
+                            .size(dimen_16)
+                            .clip(CircleShape)
+                            .background(androidx.compose.ui.graphics.Color(0xFFEF4444)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Textview(if ((badge ?: 0) > 9) "9+" else badge.toString(), size = font_10, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
     }

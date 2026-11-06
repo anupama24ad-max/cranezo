@@ -94,7 +94,7 @@ private const val MAX_PHOTOS = 10
 fun showDatePicker(context: Context, onSelected: (String) -> Unit) {
     val now = Calendar.getInstance()
     DatePickerDialog(
-        context,
+        context, com.cranezo.R.style.Theme_Cranezo_Picker,
         { _, year, month, day ->
             onSelected(String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day))
         },

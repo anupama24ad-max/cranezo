@@ -163,13 +163,17 @@ class RequestViewModel @Inject constructor(
     }
 
     /** Cancel the request; [onDone] runs once the server has cancelled it (back to step 4) */
-    fun cancel(onDone: () -> Unit = {}) {
+    fun cancel(reason: String?, onDone: () -> Unit = {}) {
         val id = _ui.value.request?.request_id ?: return
-        post("customer/crane-requests/cancel", JSONObject().put("request_id", id), success = true) { d ->
+        val body = JSONObject().put("request_id", id).apply { if (!reason.isNullOrBlank()) put("reason", reason) }
+        post("customer/crane-requests/cancel", body, success = true) { d ->
             setRequest(d)
             onDone()
         }
     }
+
+    /** "Need more time?": 5 more minutes to pay the advance, once */
+    fun extendPayment() = act("customer/crane-requests/extend-payment")
 
     /** Advance: online through Razorpay; the test payment only while the server has no gateway */
     fun payAdvance() {

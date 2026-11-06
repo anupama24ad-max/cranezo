@@ -80,7 +80,15 @@ class OperatorJobViewModel @Inject constructor(
             is OperatorJobIntent.Decline -> decline(intent.reason)
 
             OperatorJobIntent.StartJourney -> act("jobs/start-journey")
-            OperatorJobIntent.Arrived -> act("jobs/arrived")
+            // the server checks the phone is at the site before telling the customer
+            OperatorJobIntent.Arrived -> viewModelScope.launch {
+                val fix = if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    fetchCurrentLocation(app)
+                } else null
+                val b = body()
+                fix?.let { b.put("latitude", it.latitude).put("longitude", it.longitude) }
+                act("jobs/arrived", b)
+            }
 
             is OperatorJobIntent.AddSitePhoto -> addPhoto(intent.uri, site = true)
             OperatorJobIntent.RemoveSitePhoto -> _uiState.update { it.copy(sitePhotos = emptyList()) }

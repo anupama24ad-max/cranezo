@@ -36,6 +36,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -93,6 +95,8 @@ fun MyProfileScaffold(
         ) {
             CraneScreenHeader(title = title, subtitle = subtitle, onBack = onBack, action = action)
             topContent?.invoke()
+            // breathing room between the header and the page on every screen
+            Spacer(modifier = Modifier.height(dimen_12))
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -129,8 +133,42 @@ fun GroupLabel(text: String) {
 /** A glass card that holds menu rows one under the other. */
 @Composable
 fun MenuGroup(content: @Composable ColumnScope.() -> Unit) {
-    GlassCard(contentPadding = dimen_4, content = content)
+    GlassCard(contentPadding = dimen_4) {
+        val scope = this
+        val lineColor = appColors.textHint.copy(alpha = 0.28f)
+        val lines = androidx.compose.runtime.remember { MenuLines() }
+        // rows stacked like a Column, with a thin line between every two rows (after the icon)
+        androidx.compose.ui.layout.Layout(
+            content = { scope.content() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .drawWithContent {
+                    drawContent()
+                    val start = dimen_58.toPx()
+                    lines.ys.forEach { y ->
+                        drawLine(lineColor, Offset(start, y.toFloat()), Offset(size.width - dimen_12.toPx(), y.toFloat()), strokeWidth = dimen_1.toPx())
+                    }
+                }
+        ) { measurables, constraints ->
+            val placeables = measurables.map { it.measure(constraints.copy(minHeight = 0)) }
+            val height = placeables.sumOf { it.height }
+            layout(constraints.maxWidth, height) {
+                var y = 0
+                val ys = mutableListOf<Int>()
+                val visible = placeables.filter { it.height > 0 }
+                visible.forEachIndexed { i, p ->
+                    p.placeRelative(0, y)
+                    y += p.height
+                    if (i < visible.size - 1) ys += y
+                }
+                lines.ys = ys
+            }
+        }
+    }
 }
+
+/** Where the lines between menu rows go (filled in during layout, read when drawing) */
+private class MenuLines { var ys: List<Int> = emptyList() }
 
 /** One row of a menu: icon, title, optional subtitle and a trailing value or chevron. */
 @Composable

@@ -66,7 +66,9 @@ object InAppAlerts {
     private val SHEET_TYPES = setOf(
         "operator_arrived", "completion_requested", "job_started", "job_completed", "operator_en_route",
         "request_accepted", "advance_paid", "booking_confirmed", "job_assigned", "job_accepted",
-        "extension_requested", "extension_approved", "extension_rejected", "payment_received"
+        "extension_requested", "extension_approved", "extension_rejected", "payment_received",
+        // 2 minutes left to pay the advance; owner: the customer took 5 more minutes
+        "payment_reminder", "payment_extended"
     )
 
     private val _events = MutableSharedFlow<Alert>(extraBufferCapacity = 4)

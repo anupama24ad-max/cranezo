@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Cranezo" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Cranezo" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- date / time pickers and other system dialogs use the app's amber instead of the default teal -->
+        <item name="android:colorAccent">@color/picker_amber</item>
+        <item name="android:colorPrimary">@color/picker_amber</item>
+        <item name="android:datePickerDialogTheme">@style/Theme.Cranezo.Picker</item>
+        <item name="android:timePickerDialogTheme">@style/Theme.Cranezo.Picker</item>
+    </style>
+
+    <style name="Theme.Cranezo.Picker" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">@color/picker_amber</item>
+        <item name="android:colorPrimary">@color/picker_amber</item>
+        <item name="android:colorControlActivated">@color/picker_amber</item>
+        <item name="android:textColorPrimaryInverse">@android:color/black</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/Cranezo.PickerButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/Cranezo.PickerButton</item>
+    </style>
+
+    <style name="Cranezo.PickerButton" parent="android:Widget.Material.Button.Borderless">
+        <item name="android:textColor">@color/picker_amber_dark</item>
+    </style>
 </resources>

@@ -36,6 +36,8 @@ class CranezoMessagingService : FirebaseMessagingService() {
         val body = message.notification?.body ?: message.data["body"].orEmpty()
         // app open: job updates slide up as a sheet on the current screen instead of a system notification
         if (!InAppAlerts.tryShow(title, body, message.data)) PushNotifications.show(applicationContext, title, body, message.data)
+        // the bell on the home screen shows the new unread count straight away
+        scope.launch { UnreadBadge.refresh(applicationContext) }
     }
 
     override fun onDestroy() {

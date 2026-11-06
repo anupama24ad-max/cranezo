@@ -12,6 +12,8 @@ data class OperatorHome(
     val greeting_name: String? = null,
     val profile_image: String? = null,
     val online: Boolean? = null,
+    // documents approved by the admin; until then no job actions
+    val verified: Boolean? = null,
     val online_label: String? = null,
     val online_message: String? = null,
     val assigned_crane: HomeCrane? = null,

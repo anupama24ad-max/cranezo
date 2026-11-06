@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Book
@@ -225,7 +226,22 @@ private fun NotificationRow(n: SupportNotification, today: Boolean, onClick: () 
                 }
                 Textview(n.body.orEmpty(), size = font_11, color = appColors.textSecondary, maxLines = 2)
             }
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
+            // a notification that opens something (e.g. the payment breakdown after an owner accepts) shows an eye
+            if (!n.target?.screen.isNullOrBlank()) {
+                Spacer(modifier = Modifier.width(dimen_8))
+                Box(
+                    modifier = Modifier.size(dimen_32).clip(CircleShape).background(AmberPrimary.copy(alpha = 0.16f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Visibility,
+                        contentDescription = stringResource(R.string.ia_view_details),
+                        tint = AmberPrimary, modifier = Modifier.size(dimen_18)
+                    )
+                }
+            } else {
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
+            }
         }
     }
 }

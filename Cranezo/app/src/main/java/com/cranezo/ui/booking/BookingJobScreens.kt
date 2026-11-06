@@ -318,6 +318,12 @@ fun JobInProgressScreen(
     ) {
         // Fixed hours: what was booked, until when, and how much is left. No running clock.
         FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label)
+        // the operator put the job on hold
+        if (booking.timers?.is_waiting == true) {
+            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
+                Textview(stringResource(R.string.cj_on_hold), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
+            }
+        }
 
         // The extra time that is waiting for the operator
         if (pending != null) {

@@ -334,6 +334,8 @@ fun JobDetailsScreen(
 
         // how much is paid and how much is left (advance now, balance after the job)
         if (!closed) PaymentProgressCard(booking.payment)
+        // transaction history
+        com.cranezo.ui.ownerjobs.TransactionHistory(booking.transactions?.takeIf { it.isNotEmpty() })
 
         when {
             closed -> CancellationBlock(booking.cancellation)

@@ -144,6 +144,25 @@ fun OwnerJobDetailsScreen(
     val job = state.job
     val context = LocalContext.current
     var pickOperator by remember { mutableStateOf(false) }
+    // after picking an operator, the payment settle screen opens by itself
+    var assigning by remember { mutableStateOf(false) }
+    val assignedName = job?.assigned_operator?.full_name
+    LaunchedEffect(assignedName) {
+        val id = job?.booking_id
+        if (assigning && assignedName != null && id != null) {
+            assigning = false
+            context.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMMISSION, id))
+        }
+    }
+    // back from the payment settle screen (or anywhere): show the latest
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OwnerJobDetailIntent.Poll) }
+    // the customer's advance countdown re-syncs every 15 seconds
+    LaunchedEffect(job?.advance_due?.due_at) {
+        while (job?.advance_due != null) {
+            delay(15_000)
+            vm?.onIntent(OwnerJobDetailIntent.Poll)
+        }
+    }
 
     // An active job is re-synced every 30 seconds
     LaunchedEffect(job?.tab) {
@@ -247,6 +266,9 @@ fun OwnerJobDetailsScreen(
             }
         }
 
+        // the customer still has to pay the advance: same countdown the customer sees
+        job.advance_due?.let { AdvanceCountdown(it) }
+
         // Operator: with Call, and a way to assign one before the journey starts
         val operator = job.assigned_operator
         GlassCard(contentPadding = dimen_12) {
@@ -280,6 +302,7 @@ fun OwnerJobDetailsScreen(
                     operators = state.operators,
                     loaded = state.operatorsLoaded,
                     onPick = { id, byCode ->
+                        assigning = true
                         vm?.onIntent(OwnerJobDetailIntent.AssignOperator(id, byCode))
                         pickOperator = false
                     },
@@ -299,11 +322,28 @@ fun OwnerJobDetailsScreen(
                     }
                 }
             }
-            // full bill (GST, charges, platform fee) and what the operator earns on this job
+            // what the operator gets on this job and whether it is paid; the settle screen has the full bill
             if (operator != null && job.booking_id != null) {
+                val c = job.operator_commission
+                Spacer(modifier = Modifier.height(dimen_10))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.ow_operator_payment).uppercase(), size = font_10, color = appColors.textSecondary)
+                        Textview(
+                            if (c?.isSet == true) listOfNotNull(rupees(c.amount), c.type_label).joinToString(" · ") else stringResource(R.string.ow_not_set),
+                            size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    if (c?.isSet == true) {
+                        BookingTag(
+                            stringResource(if (c.settlement_status == "settled") R.string.ow_paid else R.string.ow_pending),
+                            if (c.settlement_status == "settled") SuccessGreen else AmberPrimary
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(dimen_8))
                 CommonGradientButton(
-                    text = stringResource(R.string.fin_edit_commission),
+                    text = stringResource(R.string.ow_view_settle),
                     onClick = {
                         context.startActivity(
                             com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMMISSION, job.booking_id)
@@ -340,6 +380,8 @@ fun OwnerJobDetailsScreen(
                 }
             }
         }
+        // every payment of this job (advance, final, failed attempts)
+        TransactionHistory(job.transactions)
         if (job.can_download_invoice == true) {
             CommonGradientButton(text = stringResource(R.string.oj_download_invoice), onClick = {})
         }
@@ -582,5 +624,48 @@ private fun OperatorChooser(
             stringResource(R.string.fin_cancel), size = font_13, color = appColors.textSecondary,
             modifier = Modifier.clickable { onCancel() }.padding(vertical = dimen_6)
         )
+    }
+}
+
+/** Owner: the customer has an accepted booking but has not paid the advance yet */
+@Composable
+private fun AdvanceCountdown(due: AdvanceDue) {
+    var left by remember(due.due_at, due.seconds_left) { mutableStateOf(due.seconds_left ?: 0L) }
+    LaunchedEffect(due.due_at, due.seconds_left) {
+        while (left > 0) {
+            delay(1000)
+            left -= 1
+        }
+    }
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+        Textview(stringResource(R.string.ow_advance_wait, rupees(due.amount)), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(dimen_4))
+        Textview(String.format(Locale.US, "%02d:%02d", left / 60, left % 60), size = font_26, color = AmberPrimary, fontWeight = FontWeight.Bold)
+        Textview(stringResource(R.string.ow_time_left, String.format(Locale.US, "%02d:%02d", left / 60, left % 60)), size = font_12, color = appColors.textSecondary)
+        if (due.extended == true) Textview(stringResource(R.string.ow_extended), size = font_12, color = AmberPrimary, modifier = Modifier.padding(top = dimen_4))
+    }
+}
+
+/** Job details: every payment of the job */
+@Composable
+fun TransactionHistory(list: List<com.cranezo.ui.finance.model.TransactionItem>?) {
+    if (list == null) return
+    GlassCard(contentPadding = dimen_14) {
+        Textview(stringResource(R.string.tx_history), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        Spacer(modifier = Modifier.height(dimen_8))
+        if (list.isEmpty()) Textview(stringResource(R.string.tx_none), size = font_12, color = appColors.textSecondary)
+        list.forEach { t ->
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_6), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(t.kind_label ?: t.method_name.orEmpty(), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                    Textview(listOfNotNull(t.method_name, formatServerDateTime(t.created_at)).joinToString(" · "), size = font_11, color = appColors.textSecondary)
+                    (t.gateway_payment_id ?: t.transaction_code)?.let { Textview(it, size = font_10, color = appColors.textHint) }
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Textview(rupees(t.amount), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    BookingTag(t.status_label.orEmpty(), com.cranezo.ui.finance.statusTone(t.status))
+                }
+            }
+        }
     }
 }

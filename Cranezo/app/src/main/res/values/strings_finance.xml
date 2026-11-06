@@ -57,9 +57,9 @@
     <string name="fin_add_charge">Add a charge</string>
     <string name="fin_default_commission">Operator pay (default)</string>
     <string name="fin_default_commission_hint">Used when you give a job to an operator. You can change it for each job.</string>
-    <string name="fin_commission_percent">Percent of job amount</string>
+    <string name="fin_commission_percent">% of job value</string>
     <string name="fin_commission_per_km">Per km</string>
-    <string name="fin_commission_fixed">Fixed amount</string>
+    <string name="fin_commission_fixed">Fixed ₹ per job</string>
     <string name="fin_platform_fee_note">Cranezo platform fee is %1$s%% of the job amount before GST.</string>
 
     <!-- owner: one job's money -->

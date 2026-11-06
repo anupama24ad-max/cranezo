@@ -2321,7 +2321,8 @@ fun Modifier.glassEffect(
     val shine = remember(shinePeak) { shineBrush(shinePeak) }
     // Light mode: a clear grey outline (the white shine edge disappears on white screens)
     val borderBrush = if (borderColor.isSpecified) SolidColor(borderColor)
-    else if (!colors.isDark) SolidColor(Color(0xFF0F172A).copy(alpha = if (inset) 0.14f else 0.18f))
+    // (the shadow only darkens the bottom / right, so the left edge relies on this outline: keep it clearly visible)
+    else if (!colors.isDark) SolidColor(Color(0xFF0F172A).copy(alpha = if (inset) 0.20f else 0.26f))
     else Brush.linearGradient(listOf(colors.glassBorderTop, colors.glassBorderBottom))
 
     this

@@ -172,6 +172,21 @@ fun OperatorHomeTab(
             }
         }
 
+        // not verified yet: nothing can be done until the admin approves the documents
+        val notVerified = home != null && home.verified == false
+        if (notVerified) {
+            GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBadge(icon = Icons.Default.Work, accent = AmberPrimary, size = dimen_40)
+                    Spacer(modifier = Modifier.width(dimen_12))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.op_not_verified_title), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.op_not_verified_sub), size = font_12, color = appColors.textSecondary)
+                    }
+                }
+            }
+        }
+
         // Online / offline
         GlassCard(contentPadding = dimen_12) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -189,6 +204,8 @@ fun OperatorHomeTab(
                 }
                 androidx.compose.material3.Switch(
                     checked = home?.online == true,
+                    // going online needs verified documents (going offline is always allowed)
+                    enabled = !notVerified || home?.online == true,
                     onCheckedChange = { vm?.onIntent(OperatorTabsIntent.ToggleOnline) },
                     colors = androidx.compose.material3.SwitchDefaults.colors(
                         checkedThumbColor = Color.White,

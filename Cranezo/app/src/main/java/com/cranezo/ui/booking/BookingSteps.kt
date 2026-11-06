@@ -536,7 +536,7 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                     )
                     GlassFieldBox(onClick = {
                         TimePickerDialog(
-                            context,
+                            context, R.style.Theme_Cranezo_Picker,
                             { _, hour, minute ->
                                 vm?.onIntent(BookingIntent.TimeChanged(String.format(Locale.US, "%02d:%02d", hour, minute)))
                             },

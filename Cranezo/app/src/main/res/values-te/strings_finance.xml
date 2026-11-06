@@ -52,9 +52,9 @@
     <string name="fin_add_charge">ఛార్జ్ జోడించండి</string>
     <string name="fin_default_commission">ఆపరేటర్ చెల్లింపు (సాధారణ)</string>
     <string name="fin_default_commission_hint">ఆపరేటర్‌కు పని ఇచ్చినప్పుడు వర్తిస్తుంది. ప్రతి పనికి మార్చవచ్చు.</string>
-    <string name="fin_commission_percent">పని మొత్తంలో శాతం</string>
+    <string name="fin_commission_percent">పని విలువలో %</string>
     <string name="fin_commission_per_km">కిమీకి</string>
-    <string name="fin_commission_fixed">స్థిర మొత్తం</string>
+    <string name="fin_commission_fixed">ప్రతి పనికి స్థిర ₹</string>
     <string name="fin_platform_fee_note">Cranezo ప్లాట్‌ఫామ్ ఫీజు GSTకి ముందు మొత్తంలో %1$s%%.</string>
 
     <string name="fin_job_money_title">పని డబ్బు</string>

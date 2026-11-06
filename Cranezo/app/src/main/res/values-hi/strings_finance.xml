@@ -52,9 +52,9 @@
     <string name="fin_add_charge">शुल्क जोड़ें</string>
     <string name="fin_default_commission">ऑपरेटर का भुगतान (सामान्य)</string>
     <string name="fin_default_commission_hint">जब आप ऑपरेटर को काम देते हैं तब लगता है। हर काम के लिए बदल सकते हैं।</string>
-    <string name="fin_commission_percent">काम की रकम का प्रतिशत</string>
+    <string name="fin_commission_percent">काम की कीमत का %</string>
     <string name="fin_commission_per_km">प्रति किमी</string>
-    <string name="fin_commission_fixed">तय रकम</string>
+    <string name="fin_commission_fixed">हर काम पर तय ₹</string>
     <string name="fin_platform_fee_note">Cranezo प्लेटफ़ॉर्म शुल्क GST से पहले की रकम का %1$s%% है।</string>
 
     <string name="fin_job_money_title">काम का पैसा</string>
