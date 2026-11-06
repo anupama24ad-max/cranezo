@@ -183,4 +183,7 @@
     <string name="op_on_hold_sub">Paused since %1$s. Tap Resume when work starts again.</string>
     <string name="op_hold_hint">Waiting for material or the site? Put the job on hold.</string>
     <string name="cj_on_hold">On hold: the operator paused the job</string>
+    <string name="oe_compared_to">Compared to %1$s</string>
+    <string name="oe_settled_on">Will be settled on %1$s</string>
+    <string name="oe_no_jobs">No completed jobs yet.</string>
 </resources>

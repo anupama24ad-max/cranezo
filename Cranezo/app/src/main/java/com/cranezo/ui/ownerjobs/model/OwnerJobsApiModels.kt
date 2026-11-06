@@ -211,6 +211,8 @@ data class OwnerEarningJob(
     val crane: EarningJobCrane? = null,
     val location: String? = null,
     val completed_at: String? = null,
+    // how long the crane worked
+    val duration_seconds: Long? = null,
     val amount: Double? = null,
     val net_amount: Double? = null,
     val settlement_status: String? = null,

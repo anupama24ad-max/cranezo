@@ -182,4 +182,7 @@
     <string name="op_on_hold_sub">%1$s నుండి ఆగింది. పని మళ్లీ మొదలైనప్పుడు మళ్లీ ప్రారంభించండి నొక్కండి.</string>
     <string name="op_hold_hint">సామగ్రి లేదా సైట్ కోసం వేచి ఉన్నారా? పనిని ఆపండి.</string>
     <string name="cj_on_hold">ఆగి ఉంది: ఆపరేటర్ పనిని ఆపారు</string>
+    <string name="oe_compared_to">%1$s తో పోలిస్తే</string>
+    <string name="oe_settled_on">%1$s న సెటిల్ అవుతుంది</string>
+    <string name="oe_no_jobs">ఇంకా పూర్తయిన పనులు లేవు.</string>
 </resources>

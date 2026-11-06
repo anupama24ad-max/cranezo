@@ -182,4 +182,7 @@
     <string name="op_on_hold_sub">%1$s से रुका है। काम फिर शुरू हो तो फिर शुरू करें दबाएँ।</string>
     <string name="op_hold_hint">सामान या साइट का इंतज़ार? काम रोक दें।</string>
     <string name="cj_on_hold">रुका है: ऑपरेटर ने काम रोका है</string>
+    <string name="oe_compared_to">%1$s की तुलना में</string>
+    <string name="oe_settled_on">%1$s को सेटल होगा</string>
+    <string name="oe_no_jobs">अभी कोई पूरा काम नहीं।</string>
 </resources>
