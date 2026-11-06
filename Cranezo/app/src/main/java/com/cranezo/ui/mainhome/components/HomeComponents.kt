@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -204,7 +205,7 @@ fun StatTile(
             .padding(horizontal = dimen_10, vertical = dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconBadge(icon = icon, accent = accent,modifier = Modifier.size(dimen_50))
+        IconBadge(icon = icon, accent = accent, size = dimen_36)
         Spacer(modifier = Modifier.width(dimen_10))
         Column {
             Textview(
@@ -338,11 +339,12 @@ fun TwoColumnRow(
     left: @Composable (Modifier) -> Unit,
     right: @Composable (Modifier) -> Unit
 ) {
+    // both cards of a row get the same height, like the design
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(dimen_12)
     ) {
-        left(Modifier.weight(1f))
-        right(Modifier.weight(1f))
+        left(Modifier.weight(1f).fillMaxHeight())
+        right(Modifier.weight(1f).fillMaxHeight())
     }
 }
