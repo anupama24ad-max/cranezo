@@ -200,6 +200,12 @@ fun JobDetailsScreen(
     val booking = state.booking ?: return
     val context = LocalContext.current
     var cancelOpen by remember { mutableStateOf(false) }
+    // a push about this booking (operator on the way, arrived, job started, completion code, completed...)
+    // reloads it, and the screen switches to that stage by itself
+    com.cranezo.push.OnPush { data ->
+        val id = booking.booking_id
+        if (id != null && (data["booking_id"] == id || data["booking_id"].isNullOrBlank())) vm?.onIntent(BookingIntent.PollBooking(id))
+    }
 
     // Whatever the stage is, the booking is kept fresh while it can still change
     val live = booking.stage in listOf("accepted", "awaiting_operator", "en_route", "summary")

@@ -85,6 +85,8 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
     val onIntent: (MainHomeIntent) -> Unit = { vm?.onIntent(it) }
     val cranes = vm?.cranesState?.collectAsStateWithLifecycle()?.value ?: MyCranesState()
     val profile = vm?.profile?.collectAsStateWithLifecycle()?.value
+    // owner home numbers (today's jobs, requests, jobs needing an operator) update when a push arrives
+    com.cranezo.push.OnPush { if (state.role == com.cranezo.ui.chooserole.UserRole.CRANE_OWNER) onIntent(MainHomeIntent.RefreshOwnerHome) }
 
     // Add Crane and Crane Details open in their own screen; reload the list if something changed there
     val context = LocalContext.current

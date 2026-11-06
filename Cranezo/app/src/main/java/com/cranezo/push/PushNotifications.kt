@@ -151,7 +151,18 @@ object PushNotifications {
             }
             "owner_job" -> bookingId?.let { OwnerJobActivity.intent(context, it) }
             "operator_job" -> bookingId?.let { OperatorActivity.intent(context, it) }
-            "announcement", "support_ticket" -> SupportActivity.intent(context, SupportRoutes.NOTIFICATIONS)
+            "announcement" -> SupportActivity.intent(context, SupportRoutes.NOTIFICATIONS)
+            // the support request itself (its chat), or the list when the id is missing
+            "support_ticket" -> extras.getString("ticket_id")?.let { SupportActivity.ticketIntent(context, it) }
+                ?: SupportActivity.intent(context, SupportRoutes.TICKETS)
+            // complaints, operator job requests, commission and settlements
+            "complaint" -> extras.getString("complaint_id")?.let {
+                com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMPLAINT, it)
+            } ?: com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMPLAINTS)
+            "owner_job_requests" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.JOB_REQUESTS)
+            "operator_job_requests" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.MY_REQUESTS)
+            "operator_payments" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.MY_PAYMENTS)
+            "owner_settlements" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.PLATFORM)
             // Rapido-style requests: the owner's list of requests near them; the customer's request screen
             "owner_crane_requests" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
             "crane_request" -> BookingActivity.intent(context, BookingRoutes.REQUEST)

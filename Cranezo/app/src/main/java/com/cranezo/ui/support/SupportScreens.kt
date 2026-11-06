@@ -158,6 +158,7 @@ private val previewNotification = SupportNotification(
 @Composable
 fun NotificationsScreen(vm: SupportViewModel? = null, onBack: () -> Unit = {}) {
     val state = rememberSupportState(vm, SupportUiState(notifications = listOf(previewNotification), summary = NotificationSummary(1, 1), notificationsLoaded = true))
+    com.cranezo.push.OnPush { vm?.onIntent(SupportIntent.PollNotifications) }
     LaunchedEffect(Unit) {
         vm?.onIntent(SupportIntent.LoadNotifications)
         // While open, the unread count is asked for every 10 seconds

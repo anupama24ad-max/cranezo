@@ -238,6 +238,8 @@ fun RequestStatusScreen(
 ) {
     val state by vm.ui.collectAsStateWithLifecycle()
     val r = state.request
+    // a push (owner accepted, 2 minutes left, booking confirmed) shows straight away
+    com.cranezo.push.OnPush { vm.refresh() }
     // live: every 4 seconds while something can change
     LaunchedEffect(r?.request_id, r?.status) {
         if (r == null) vm.loadActive()

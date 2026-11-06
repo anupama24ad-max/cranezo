@@ -34,6 +34,8 @@ class CranezoMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         val title = message.notification?.title ?: message.data["title"] ?: return
         val body = message.notification?.body ?: message.data["body"].orEmpty()
+        // the screen on view reloads if the push is about what it shows
+        PushEvents.emit(message.data)
         // app open: job updates slide up as a sheet on the current screen instead of a system notification
         if (!InAppAlerts.tryShow(title, body, message.data)) PushNotifications.show(applicationContext, title, body, message.data)
         // the bell on the home screen shows the new unread count straight away

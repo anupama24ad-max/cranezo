@@ -42,6 +42,12 @@ class SupportActivity :
 
         fun intent(context: Context, route: String): Intent =
             Intent(context, SupportActivity::class.java).putExtra(EXTRA_ROUTE, route)
+
+        /** Opens one support request (from a push about a reply) */
+        fun ticketIntent(context: Context, ticketId: String): Intent =
+            intent(context, SupportRoutes.TICKETS).putExtra(EXTRA_TICKET, ticketId)
+
+        private const val EXTRA_TICKET = "ticket_id"
     }
 
     @Composable
@@ -53,6 +59,14 @@ class SupportActivity :
         var createCategory by rememberSaveable { mutableStateOf("issue") }
         val role = SessionManager(this).getUserRole()
 
+        // opened from a push about a support reply: straight into that request
+        LaunchedEffect(Unit) {
+            intent.getStringExtra(EXTRA_TICKET)?.let {
+                vm.onIntent(SupportIntent.OpenTicket(it))
+                nav.navigate(SupportRoutes.TICKET)
+            }
+        }
+
         LaunchedEffect(Unit) {
             vm.effect.collect { effect ->
                 when (effect) {
@@ -62,6 +76,17 @@ class SupportActivity :
                     is SupportEffect.OpenTarget -> {
                         val target = effect.item.target
                         val bookingId = target?.booking_id
+                        // same screens as tapping the push (PushNotifications.targetIntent)
+                        val shared = setOf("complaint", "owner_job_requests", "operator_job_requests", "operator_payments", "owner_settlements")
+                        if (target?.screen in shared) {
+                            val extras = android.os.Bundle().apply {
+                                putString("screen", target?.screen)
+                                target?.booking_id?.let { putString("booking_id", it) }
+                                target?.complaint_id?.let { putString("complaint_id", it) }
+                            }
+                            com.cranezo.push.PushNotifications.targetIntent(this@SupportActivity, extras, role)?.let { startActivity(it) }
+                            return@collect
+                        }
                         when (target?.screen) {
                             "booking", "track", "receipt", "rate" -> bookingId?.let { id ->
                                 startActivity(
