@@ -104,6 +104,8 @@ fun OwnerEarningsTab(
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: previewState
     val onIntent: (OwnerEarningsIntent) -> Unit = { vm?.onIntent(it) }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { onIntent(OwnerEarningsIntent.Load) }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { onIntent(OwnerEarningsIntent.Load) }
     var showAll by remember { mutableStateOf(false) }
     val context = androidx.compose.ui.platform.LocalContext.current
 

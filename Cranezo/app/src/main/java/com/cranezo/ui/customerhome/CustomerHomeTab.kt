@@ -139,6 +139,8 @@ fun CustomerHomeTab(
     val context = LocalContext.current
     // On opening and whenever the app comes back to the foreground
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm?.refresh() }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { vm?.refresh() }
     val home = state.home
 
     Column(

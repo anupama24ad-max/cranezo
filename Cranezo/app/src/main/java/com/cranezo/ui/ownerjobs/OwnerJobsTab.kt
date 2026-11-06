@@ -119,6 +119,8 @@ fun OwnerJobsTab(
         ?: OwnerJobsState(counts = OwnerJobCounts(1, 2, 1, 0, 0), jobs = listOf(previewJob), total = 1, loaded = true)
     val onIntent: (OwnerJobsIntent) -> Unit = { vm?.onIntent(it) }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { onIntent(OwnerJobsIntent.Refresh) }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { onIntent(OwnerJobsIntent.Refresh) }
     val context = LocalContext.current
 
     OwnerRequestHost(

@@ -118,6 +118,8 @@ fun OperatorHomeTab(
         )
     )
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OperatorTabsIntent.LoadHome) }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { vm?.onIntent(OperatorTabsIntent.LoadHome) }
     val home = state.home
 
     Column(
@@ -359,6 +361,8 @@ fun OperatorJobsTab(
 ) {
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: OperatorTabsState(jobs = listOf(previewJob), jobsLoaded = true)
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OperatorTabsIntent.LoadJobs(state.jobsTab)) }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { vm?.onIntent(OperatorTabsIntent.LoadJobs(state.jobsTab)) }
 
     Column(
         modifier = Modifier
@@ -469,6 +473,8 @@ fun OperatorEarningsTab(
         earningsTotal = 1, earningsLoaded = true
     )
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OperatorTabsIntent.LoadEarnings) }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { vm?.onIntent(OperatorTabsIntent.LoadEarnings) }
     val summary = state.earnings
 
     Column(

@@ -157,6 +157,8 @@ fun OwnerJobDetailsScreen(
     }
     // back from the payment settle screen (or anywhere): show the latest
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OwnerJobDetailIntent.Poll) }
+    // a push about a job, request or payment: show the change right away
+    com.cranezo.push.OnPush { vm?.onIntent(OwnerJobDetailIntent.Poll) }
     // the customer's advance countdown re-syncs every 15 seconds
     LaunchedEffect(job?.advance_due?.due_at) {
         while (job?.advance_due != null) {

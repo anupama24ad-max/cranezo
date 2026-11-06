@@ -129,6 +129,7 @@ fun OperatorJobFlow(
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: OperatorJobState(job = previewJob, loaded = true)
     val onIntent: (OperatorJobIntent) -> Unit = { vm?.onIntent(it) }
     LaunchedEffect(bookingId) { if (bookingId.isNotEmpty()) onIntent(OperatorJobIntent.Load(bookingId)) }
+    com.cranezo.push.OnPush { data -> if (data["booking_id"].isNullOrBlank() || data["booking_id"] == bookingId) onIntent(OperatorJobIntent.Poll) }
 
     // Breakdown, issue and emergency open over the monitoring screen
     var report by rememberSaveable { mutableStateOf<String?>(null) }

@@ -4,7 +4,13 @@ package com.cranezo.ui.support.model
 
 // ---- Notifications ----
 
-data class NotificationTarget(val screen: String? = null, val booking_id: String? = null, val ticket_id: String? = null)
+data class NotificationTarget(
+    val screen: String? = null,
+    val booking_id: String? = null,
+    val ticket_id: String? = null,
+    val complaint_id: String? = null,
+    val request_id: String? = null
+)
 
 data class SupportNotification(
     val id: String? = null,
