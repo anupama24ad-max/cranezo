@@ -59,7 +59,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassFieldBox
@@ -532,7 +532,7 @@ private fun PhotoThumb(
             .clip(RoundedCornerShape(dimen_12))
             .background(appColors.subtleFill)
     ) {
-        AsyncImage(
+        ShimmerImage(
             model = photo.displayUri,
             contentDescription = null,
             contentScale = ContentScale.Crop,

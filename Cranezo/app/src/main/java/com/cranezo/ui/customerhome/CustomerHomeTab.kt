@@ -56,7 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.booking.BookingActivity
 import com.cranezo.ui.booking.BookingRoutes
@@ -253,7 +253,7 @@ private fun BannerCarousel(banners: List<HomeBanner>, onAction: (BannerAction?) 
             Box(
                 modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(dimen_20)).clickable { onAction(banner.action) }
             ) {
-                AsyncImage(
+                ShimmerImage(
                     model = fileUrl(banner.image), contentDescription = null, contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize(),
                     onError = { failed = failed + banner.id }

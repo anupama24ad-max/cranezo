@@ -56,7 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.booking.components.BookingScaffold
 import com.cranezo.ui.booking.components.BookingTag
@@ -494,7 +494,7 @@ private fun SitePhotoScreen(job: OperatorJob, state: OperatorJobState, onIntent:
             Textview(stringResource(R.string.op_captured_photo), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
                 Box(modifier = Modifier.size(dimen_100).clip(RoundedCornerShape(dimen_12))) {
-                    AsyncImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
+                    ShimmerImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
                 }
                 Column(modifier = Modifier.weight(1f)) {
                     Textview(formatServerDateTime(photo.captured_at), size = font_12, color = appColors.textPrimary)
@@ -769,7 +769,7 @@ private fun PhotosNotesScreen(job: OperatorJob, state: OperatorJobState, onInten
             Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
                 state.finalPhotos.forEachIndexed { index, photo ->
                     Box(modifier = Modifier.size(dimen_56).clip(RoundedCornerShape(dimen_10))) {
-                        AsyncImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
+                        ShimmerImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
                         Icon(
                             Icons.Default.Close, contentDescription = null, tint = Color.White,
                             modifier = Modifier.align(Alignment.TopEnd).size(dimen_16).background(Color.Black.copy(alpha = 0.5f), CircleShape)

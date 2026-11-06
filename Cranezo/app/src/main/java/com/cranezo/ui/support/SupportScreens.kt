@@ -72,7 +72,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.booking.components.BookingScaffold
 import com.cranezo.ui.booking.components.BookingTag
@@ -528,7 +528,7 @@ private fun AttachmentRow(state: SupportUiState, onAdd: () -> Unit, onRemove: (S
     Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
         state.attachments.forEach { path ->
             Box(modifier = Modifier.size(dimen_56).clip(RoundedCornerShape(dimen_10))) {
-                AsyncImage(model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
+                ShimmerImage(model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
                 Icon(
                     Icons.Default.Close, contentDescription = null, tint = Color.White,
                     modifier = Modifier.align(Alignment.TopEnd).size(dimen_16).background(Color.Black.copy(alpha = 0.5f), CircleShape).clickable { onRemove(path) }
@@ -625,7 +625,7 @@ private fun MessageBubble(m: TicketMessage) {
                     if (!mine) Textview(m.sender_label.orEmpty(), size = font_10, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
                     if (!m.body.isNullOrBlank()) Textview(m.body, size = font_13, color = if (mine) Color.Black else appColors.textPrimary)
                     m.attachments.orEmpty().forEach { path ->
-                        AsyncImage(
+                        ShimmerImage(
                             model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop,
                             modifier = Modifier.padding(top = dimen_6).size(dimen_100).clip(RoundedCornerShape(dimen_8))
                                 .clickable { com.cranezo.ui.cranes.openFile(context, path) }

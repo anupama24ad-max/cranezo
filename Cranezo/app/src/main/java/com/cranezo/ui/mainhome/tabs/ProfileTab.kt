@@ -46,7 +46,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.chooserole.UserRole
 import com.cranezo.ui.components.CommonGradientButton
@@ -112,7 +112,7 @@ private fun ProfileAvatar(profile: ProfileData?, fallbackName: String, onClick: 
                 fontWeight = FontWeight.Bold
             )
             if (url != null) {
-                AsyncImage(
+                ShimmerImage(
                     model = url,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,

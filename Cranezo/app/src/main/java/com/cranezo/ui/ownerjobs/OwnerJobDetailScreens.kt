@@ -45,7 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.core.composecore.BaseVMComposeActivity
 import com.cranezo.ui.booking.components.BookingScaffold
@@ -511,7 +511,7 @@ private fun PhotoGrid(title: String, photos: List<com.cranezo.ui.operator.model.
                             modifier = Modifier.fillMaxWidth().height(dimen_88).clip(RoundedCornerShape(dimen_10))
                                 .clickable { com.cranezo.ui.cranes.openFile(context, photo.photo_url) }
                         ) {
-                            AsyncImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
+                            ShimmerImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
                         }
                         if (photo.captured_at != null) Textview(formatServerDateTime(photo.captured_at), size = font_10, color = appColors.textSecondary, maxLines = 2)
                     }
@@ -564,7 +564,7 @@ fun EvidenceScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
                     if (!issue.breakdown_type_name.isNullOrBlank()) Textview(issue.breakdown_type_name, size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                     if (!issue.description.isNullOrBlank()) Textview(issue.description, size = font_12, color = appColors.textSecondary)
                     issue.photos.orEmpty().forEach { path ->
-                        AsyncImage(model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.padding(top = dimen_6).fillMaxWidth().height(dimen_100).clip(RoundedCornerShape(dimen_10)))
+                        ShimmerImage(model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.padding(top = dimen_6).fillMaxWidth().height(dimen_100).clip(RoundedCornerShape(dimen_10)))
                     }
                 }
             }

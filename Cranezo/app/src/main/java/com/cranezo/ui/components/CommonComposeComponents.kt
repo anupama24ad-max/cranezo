@@ -142,24 +142,23 @@ import kotlinx.coroutines.flow.distinctUntilChanged
     Font(R.font.inter_bold, FontWeight.Bold)
 )*/
 
+/** Moving highlight used while something loads (images, placeholders). Follows light / dark mode. */
 fun Modifier.shimmerEffect(): Modifier = composed {
+    val dark = appColors.isDark
     var size by remember { mutableStateOf(IntSize.Zero) }
     val transition = rememberInfiniteTransition(label = "")
     val startOffsetX by transition.animateFloat(
         initialValue = -2 * size.width.toFloat(),
         targetValue = 2 * size.width.toFloat(),
         animationSpec = infiniteRepeatable(
-            animation = tween(1000)
+            animation = tween(1100)
         ), label = ""
     )
 
     background(
         brush = Brush.linearGradient(
-            colors = listOf(
-                Color(0xFFE0E0E0),
-                Color(0xFFF5F5F5),
-                Color(0xFFE0E0E0),
-            ),
+            colors = if (dark) listOf(Color(0xFF1A2333), Color(0xFF2A3548), Color(0xFF1A2333))
+            else listOf(Color(0xFFE0E0E0), Color(0xFFF5F5F5), Color(0xFFE0E0E0)),
             start = Offset(startOffsetX, 0f),
             end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
         )
@@ -968,7 +967,7 @@ fun ProfileAvatarPicker(
             contentAlignment = Alignment.Center
         ) {
             if (photoUri != null) {
-                AsyncImage(
+                ShimmerImage(
                     model = photoUri,
                     contentDescription = stringResource(R.string.profile_photo),
                     modifier = Modifier.fillMaxSize(),

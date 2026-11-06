@@ -34,7 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.Textview
@@ -118,7 +118,7 @@ fun CraneImage(
             modifier = Modifier.size(dimen_28)
         )
         if (url != null) {
-            AsyncImage(
+            ShimmerImage(
                 model = url,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,

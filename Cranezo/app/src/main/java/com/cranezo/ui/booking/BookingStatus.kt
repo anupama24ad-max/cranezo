@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
+import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
 import com.cranezo.ui.booking.components.BookingScaffold
 import com.cranezo.ui.booking.components.BookingTag
@@ -256,7 +256,7 @@ fun BookingConfirmedScreen(
                     Box(modifier = Modifier.size(dimen_44).clip(CircleShape)) {
                         val url = fileUrl(operator.profile_image)
                         Icon(Icons.Default.Person, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_44))
-                        if (url != null) AsyncImage(model = url, contentDescription = null, modifier = Modifier.size(dimen_44))
+                        if (url != null) ShimmerImage(model = url, contentDescription = null, modifier = Modifier.size(dimen_44))
                     }
                     Spacer(modifier = Modifier.width(dimen_12))
                     Column(modifier = Modifier.weight(1f)) {
