@@ -60,6 +60,7 @@ import com.cranezo.ui.mainhome.components.IconBadge
 import com.cranezo.ui.mainhome.components.InfoBlue
 import com.cranezo.ui.mainhome.components.SuccessGreen
 import com.cranezo.ui.operator.model.JobCrane
+import com.cranezo.ui.ownerjobs.model.AdvanceDue
 import com.cranezo.ui.ownerjobs.model.AssignedOperator
 import com.cranezo.ui.ownerjobs.model.Monitoring
 import com.cranezo.ui.ownerjobs.model.OwnerCompletion
