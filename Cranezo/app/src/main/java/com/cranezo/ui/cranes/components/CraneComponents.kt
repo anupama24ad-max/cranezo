@@ -25,6 +25,10 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -105,13 +109,15 @@ fun CraneImage(
     shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_12)
 ) {
     val url = fileUrl(path)
+    var failed by remember(url) { mutableStateOf(false) }
     Box(
         modifier = modifier
             .clip(shape)
             .background(appColors.subtleFill),
         contentAlignment = Alignment.Center
     ) {
-        Icon(
+        // the icon is only for "no picture" or "picture failed"; it must not show through a loaded image
+        if (url == null || failed) Icon(
             imageVector = Icons.Default.PrecisionManufacturing,
             contentDescription = null,
             tint = appColors.textHint,
@@ -122,7 +128,8 @@ fun CraneImage(
                 model = url,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
+                modifier = Modifier.matchParentSize(),
+                onError = { failed = true }
             )
         }
     }
