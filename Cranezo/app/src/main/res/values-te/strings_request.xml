@@ -185,4 +185,17 @@
     <string name="oe_compared_to">%1$s తో పోలిస్తే</string>
     <string name="oe_settled_on">%1$s న సెటిల్ అవుతుంది</string>
     <string name="oe_no_jobs">ఇంకా పూర్తయిన పనులు లేవు.</string>
+    <string name="unit_ton">టన్</string>
+    <string name="cap_light">తేలిక</string>
+    <string name="cap_medium">మధ్యస్థం</string>
+    <string name="cap_heavy">భారీ</string>
+    <string name="cap_very_heavy">చాలా భారీ</string>
+    <string name="cap_extra_heavy">అత్యంత భారీ</string>
+    <string name="cap_use_light">చిన్న పనులు: సామగ్రి తరలించడం, లోడింగ్-అన్‌లోడింగ్, చిన్న యంత్రాలు.</string>
+    <string name="cap_use_medium">ఇళ్లు, భవన నిర్మాణ స్థలాలు: స్టీల్ బీమ్‌లు, ప్రీకాస్ట్ స్లాబ్‌లు, పంపులు, జనరేటర్లు.</string>
+    <string name="cap_use_heavy">ఫ్యాక్టరీలు, ఎత్తైన భవనాలు: పెద్ద పరికరాలు, వంతెన గర్డర్లు, ట్యాంకులు.</string>
+    <string name="cap_use_very_heavy">పారిశ్రామిక ప్లాంట్లు: రియాక్టర్లు, పెద్ద ట్యాంకులు, టర్బైన్లు, పొడవైన వంతెన గర్డర్లు.</string>
+    <string name="cap_use_extra_heavy">మెగా ప్రాజెక్టులు: పవర్ ప్లాంట్లు, రిఫైనరీలు, గాలిమరలు.</string>
+    <string name="cap_weight_hint">%1$s కిలోల వరకు ఎత్తుతుంది, సుమారు %2$d చిన్న కార్ల బరువు.</string>
+    <string name="cap_note">ఇది గరిష్ట సామర్థ్యం. ఆచరణలో ఎంత ఎత్తగలదో దూరంపై ఆధారపడుతుంది, కాబట్టి యజమానికి మీ బరువు చెప్పండి.</string>
 </resources>
