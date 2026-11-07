@@ -188,7 +188,7 @@ private fun PdfPages(url: String, onOpenOutside: () -> Unit) {
                 modifier = Modifier.clickable { onOpenOutside() }.padding(12.dp)
             )
         }
-        pages == null -> CircularProgressIndicator(color = Color(0xFFFFA000))
+        pages == null -> com.cranezo.ui.components.CranezoLoader()
         else -> LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),

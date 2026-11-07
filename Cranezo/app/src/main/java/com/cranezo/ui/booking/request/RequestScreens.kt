@@ -121,7 +121,7 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
         Textview(listOf(capacityName, typeName).filter { it.isNotBlank() }.joinToString(" "), size = font_13, color = appColors.textSecondary)
         if (state.estimating || (e == null && !state.estimateFailed)) {
             Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = AmberPrimary, strokeWidth = dimen_3)
+                com.cranezo.ui.components.CranezoLoader()
             }
             return@MapSheetPage
         }
@@ -267,7 +267,7 @@ fun RequestStatusScreen(
     ) {
         if (r == null) {
             Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = AmberPrimary, strokeWidth = dimen_3)
+                com.cranezo.ui.components.CranezoLoader()
             }
             return@MapSheetPage
         }

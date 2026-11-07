@@ -148,4 +148,6 @@ dependencies {
 
 
     implementation(libs.coil.compose)
+    // animated logo loader (res/raw/cranezo_loader.gif)
+    implementation(libs.coil.gif)
 }
