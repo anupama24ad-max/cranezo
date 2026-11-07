@@ -58,7 +58,8 @@ class CranesViewModel @Inject constructor(
 
     private companion object {
         const val MAX_FILE_BYTES = 50L * 1024 * 1024
-        const val OPERATOR_PAGE_SIZE = 20
+        // the most the server returns per request (the picker also has a search box)
+        const val OPERATOR_PAGE_SIZE = 100
 
         // "type" of POST /owner/cranes/form-options when only one list is wanted
         const val TYPE_CRANE_TYPES = 6
