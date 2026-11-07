@@ -67,7 +67,7 @@ fun OwnerHomeScreen(
             shape = androidx.compose.foundation.shape.RoundedCornerShape(dimen_20),
             backgroundColor = if (appColors.isDark) DarkBluish.copy(alpha = 0.55f) else androidx.compose.ui.graphics.Color.Unspecified
         ) {
-            SectionTitle(text = stringResource(R.string.home_fleet_overview), icon = Icons.Default.PrecisionManufacturing)
+            SectionTitle(text = stringResource(R.string.home_fleet_overview), icon = R.drawable.fleet_ic)
             Spacer(modifier = Modifier.height(dimen_14))
             Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
                 TwoColumnRow(

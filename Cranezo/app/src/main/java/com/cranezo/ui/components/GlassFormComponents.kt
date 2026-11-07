@@ -118,6 +118,7 @@ fun GlassFieldBox(
     modifier: Modifier = Modifier,
     minHeight: Dp = dimen_52,
     onClick: (() -> Unit)? = null,
+    verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
@@ -127,7 +128,7 @@ fun GlassFieldBox(
             .glassEffect(RoundedCornerShape(dimen_14))
             .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
             .padding(horizontal = dimen_12),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = verticalAlignment,
         content = content
     )
 }
@@ -154,13 +155,19 @@ fun GlassInputField(
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         GlassFieldLabel(label, isRequired)
-        GlassFieldBox(minHeight = minHeight) {
+        // Multi-line fields start at the top-left, like a text area; single-line ones stay centred
+        GlassFieldBox(
+            minHeight = minHeight,
+            verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top
+        ) {
             if (leftIcon != null) {
                 Icon(
                     imageVector = leftIcon,
                     contentDescription = null,
                     tint = appColors.textHint,
-                    modifier = Modifier.size(dimen_20)
+                    modifier = Modifier
+                        .then(if (singleLine) Modifier else Modifier.padding(top = dimen_12))
+                        .size(dimen_20)
                 )
                 Spacer(modifier = Modifier.width(dimen_12))
             }
@@ -184,7 +191,7 @@ fun GlassInputField(
                 ),
                 cursorBrush = SolidColor(AmberPrimary),
                 decorationBox = { innerTextField ->
-                    Box(contentAlignment = Alignment.CenterStart) {
+                    Box(contentAlignment = if (singleLine) Alignment.CenterStart else Alignment.TopStart) {
                         if (value.isEmpty()) {
                             Textview(text = placeholder, size = font_14, color = appColors.textHint)
                         }

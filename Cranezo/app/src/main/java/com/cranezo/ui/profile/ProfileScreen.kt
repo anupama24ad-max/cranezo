@@ -199,6 +199,7 @@ fun ProfileContent(
                         onValueChange = { onIntent(ProfileIntent.FieldChanged(ProfileField.FULL_NAME, it)) },
                         placeholder = stringResource(R.string.field_full_name_hint),
                         leftIcon = Icons.Default.Person,
+                        isRequired = true,
                         capitalization = KeyboardCapitalization.Words
                     )
 
@@ -208,6 +209,7 @@ fun ProfileContent(
                         onValueChange = {},
                         placeholder = stringResource(R.string.field_mobile_hint),
                         leftIcon = Icons.Default.Phone,
+                        isRequired = true,
                         readOnly = true,
                         rightContent = { VerifiedBadge() }
                     )
@@ -306,6 +308,7 @@ private fun ProfileFormItemView(
                     options = options,
                     onSelected = { onIntent(ProfileIntent.OptionSelected(item.field, it)) },
                     leftIcon = item.icon,
+                    isRequired = item.required,
                     // The options may have failed to load earlier: try again when the user opens it
                     onOpen = { if (options.isEmpty()) onIntent(ProfileIntent.RetryOptions(item.source)) }
                 )
@@ -316,6 +319,7 @@ private fun ProfileFormItemView(
                 value = uiState.value(item.field),
                 placeholder = stringResource(item.placeholder),
                 onDateSelected = { onIntent(ProfileIntent.FieldChanged(item.field, it)) },
+                isRequired = item.required,
                 allowPastDates = item.allowPastDates,
                 allowFutureDates = item.allowFutureDates
             )
@@ -332,6 +336,7 @@ private fun ProfileFormItemView(
                     },
                     placeholder = stringResource(item.placeholder),
                     leftIcon = item.icon,
+                    isRequired = item.required,
                     singleLine = !isMultiline,
                     minHeight = if (isMultiline) dimen_80 else dimen_52,
                     keyboardType = when {

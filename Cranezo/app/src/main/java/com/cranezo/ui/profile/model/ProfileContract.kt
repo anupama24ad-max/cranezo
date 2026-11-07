@@ -176,8 +176,13 @@ object ProfileFormSchema {
     fun fields(role: UserRole, userType: String): Set<ProfileField> =
         items(role, userType).filterIsInstance<ProfileFormItem.Input>().map { it.field }.toSet()
 
-    // Only the company name is required, everything after it is optional
+    // Full name and mobile are drawn by the screen above these. Only the company name is required,
+    // everything else is optional.
     private fun ownerItems() = listOf(
+        ProfileFormItem.Input(
+            ProfileField.EMAIL, R.string.field_email, R.string.field_email_hint,
+            Icons.Default.Email, FieldKind.EMAIL
+        ),
         ProfileFormItem.Input(
             field = ProfileField.COMPANY_NAME,
             label = R.string.field_company_name,
@@ -209,26 +214,22 @@ object ProfileFormSchema {
             ProfileField.ESTABLISHED_ON, R.string.field_established_on, R.string.field_established_on_hint,
             Icons.Default.CalendarMonth, FieldKind.DATE, allowFutureDates = false
         ),
-        ProfileFormItem.Input(
-            ProfileField.COMPANY_ADDRESS, R.string.field_business_address, R.string.field_business_address_hint,
-            Icons.Default.LocationOn, FieldKind.MULTILINE
-        ),
-        ProfileFormItem.Input(
-            ProfileField.CITY, R.string.field_city, R.string.field_city_hint,
-            Icons.Default.LocationOn
-        ),
         // For owners the state is plain text (customers pick it from the state dropdown)
         ProfileFormItem.Input(
             ProfileField.STATE, R.string.field_state, R.string.field_state_text_hint,
             Icons.Default.Map
         ),
         ProfileFormItem.Input(
+            ProfileField.CITY, R.string.field_city, R.string.field_city_hint,
+            Icons.Default.LocationOn
+        ),
+        ProfileFormItem.Input(
             ProfileField.PINCODE, R.string.field_pincode, R.string.field_pincode_hint,
             Icons.Default.LocationOn, FieldKind.NUMBER
         ),
         ProfileFormItem.Input(
-            ProfileField.EMAIL, R.string.field_email, R.string.field_email_hint,
-            Icons.Default.Email, FieldKind.EMAIL
+            ProfileField.COMPANY_ADDRESS, R.string.field_business_address, R.string.field_business_address_hint,
+            Icons.Default.LocationOn, FieldKind.MULTILINE
         )
     )
 

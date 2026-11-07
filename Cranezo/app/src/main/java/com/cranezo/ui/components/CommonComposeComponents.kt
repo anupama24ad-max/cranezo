@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -129,7 +128,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.cranezo.R
 import com.cranezo.ui.theme.*
 import kotlinx.coroutines.delay
@@ -910,14 +908,13 @@ fun VerifiedBadge(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(dimen_12))
-            .background(Color(0xFF00C853))
+            .background(DarkGreen)
             .padding(horizontal = dimen_8, vertical = dimen_4),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.Check,
+            painter = painterResource(R.drawable.tick_ic),
             contentDescription = null,
-            tint = White,
             modifier = Modifier.size(dimen_12)
         )
         Spacer(modifier = Modifier.width(dimen_4))
@@ -979,7 +976,7 @@ fun ProfileAvatarPicker(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_camera),
+                        painter = painterResource(id = R.drawable.camera_ic),
                         contentDescription = stringResource(R.string.profile_add_photo),
                         tint = appColors.textPrimary,
                         modifier = Modifier.size(dimen_28)

@@ -31,6 +31,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.annotation.DrawableRes
 import androidx.compose.ui.text.font.FontWeight
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.Textview
@@ -68,7 +72,7 @@ fun HomeHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Textview(text = greeting(), size = font_11, color = appColors.textSecondary)
+            Textview(text = greeting(), size = font_14, color = appColors.textSecondary)
             Spacer(modifier = Modifier.height(dimen_2))
             Textview(
                 text = name,
@@ -134,11 +138,46 @@ fun SectionTitle(
     icon: ImageVector? = null,
     actionText: String? = null,
     onActionClick: () -> Unit = {}
+) = SectionTitleContent(
+    text = text,
+    modifier = modifier,
+    subtitle = subtitle,
+    icon = icon?.let { rememberVectorPainter(it) },
+    actionText = actionText,
+    onActionClick = onActionClick
+)
+
+/** Same as above, with a drawable resource as the icon, e.g. `icon = R.drawable.fleet_ic`. */
+@Composable
+fun SectionTitle(
+    text: String,
+    @DrawableRes icon: Int,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    actionText: String? = null,
+    onActionClick: () -> Unit = {}
+) = SectionTitleContent(
+    text = text,
+    modifier = modifier,
+    subtitle = subtitle,
+    icon = painterResource(icon),
+    actionText = actionText,
+    onActionClick = onActionClick
+)
+
+@Composable
+private fun SectionTitleContent(
+    text: String,
+    modifier: Modifier,
+    subtitle: String?,
+    icon: Painter?,
+    actionText: String?,
+    onActionClick: () -> Unit
 ) {
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         if (icon != null) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 contentDescription = null,
                 tint = AmberPrimary,
                 modifier = Modifier.size(dimen_18)
