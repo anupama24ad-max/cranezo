@@ -115,7 +115,14 @@ fun HomeHeader(
                     modifier = Modifier
                         .size(dimen_40)
                         .glassEffect(CircleShape)
-                        .clickable { context.startActivity(com.cranezo.ui.support.SupportActivity.intent(context, com.cranezo.ui.support.SupportRoutes.NOTIFICATIONS)) },
+                        .clickable {
+                            context.startActivity(
+                                com.cranezo.ui.support.SupportActivity.intent(
+                                    context,
+                                    com.cranezo.ui.support.SupportRoutes.NOTIFICATIONS
+                                )
+                            )
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -137,7 +144,12 @@ fun HomeHeader(
                             .border(dimen_1, androidx.compose.ui.graphics.Color.White, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Textview(if ((badge ?: 0) > 9) "9+" else badge.toString(), size = 9.sp, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
+                        Textview(
+                            if ((badge ?: 0) > 9) "9+" else badge.toString(),
+                            size = 9.sp,
+                            color = androidx.compose.ui.graphics.Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -231,6 +243,46 @@ fun IconBadge(
     size: androidx.compose.ui.unit.Dp = dimen_32,
     // A solid accent circle with a dark icon, e.g. the "+" of Add Crane
     filled: Boolean = false
+) = IconBadge(
+    painter = rememberVectorPainter(icon),
+    accent = accent,
+    modifier = modifier,
+    size = size,
+    filled = filled
+)
+
+/**
+ * Same badge with a drawable, e.g. `IconBadge(iconRes = R.drawable.ic_crane, accent = AmberPrimary)`.
+ * Set [tinted] = false for coloured images (PNG / multi-colour vectors) so they keep their own colours.
+ */
+@Composable
+fun IconBadge(
+    @DrawableRes iconRes: Int,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    size: androidx.compose.ui.unit.Dp = dimen_32,
+    filled: Boolean = false,
+    tinted: Boolean = true,
+    isBorder: Boolean = false,
+) = IconBadge(
+    painter = painterResource(iconRes),
+    accent = accent,
+    modifier = modifier,
+    size = size,
+    filled = filled,
+    tinted = tinted,
+    isBorder = isBorder,
+)
+
+@Composable
+fun IconBadge(
+    painter: Painter,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    size: androidx.compose.ui.unit.Dp = dimen_32,
+    filled: Boolean = false,
+    tinted: Boolean = true,
+    isBorder: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -238,14 +290,32 @@ fun IconBadge(
             .clip(if (filled) CircleShape else RoundedCornerShape(dimen_8))
             .background(
                 if (filled) Brush.verticalGradient(listOf(LightYellow, DarkYellow))
-                else Brush.verticalGradient(listOf(accent.copy(alpha = 0.22f), accent.copy(alpha = 0.12f)))
+                else Brush.verticalGradient(
+                    listOf(
+                        accent.copy(alpha = 0.22f),
+                        accent.copy(alpha = 0.12f)
+                    )
+                )
+            )
+            .then(
+                if (isBorder) {
+                    Modifier.border(
+                        width =dimen_1,
+                        color = accent.copy(alpha = 0.5f),
+                        shape = if (filled) CircleShape else RoundedCornerShape(dimen_8)
+                    )
+                } else Modifier
             ),
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = icon,
+            painter = painter,
             contentDescription = null,
-            tint = if (filled) Color.Black else accent,
+            tint = when {
+                !tinted -> Color.Unspecified
+                filled -> Color.Black
+                else -> accent
+            },
             modifier = Modifier.size(size * 0.55f)
         )
     }
@@ -256,7 +326,7 @@ fun IconBadge(
 fun StatTile(
     value: String,
     label: String,
-    icon: ImageVector,
+    icon: Int,
     accent: Color,
     modifier: Modifier = Modifier
 ) {
@@ -267,7 +337,7 @@ fun StatTile(
             .padding(horizontal = dimen_10, vertical = dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconBadge(icon = icon, accent = accent, size = dimen_36)
+        IconBadge(iconRes = icon, accent = accent, size = dimen_36)
         Spacer(modifier = Modifier.width(dimen_10))
         Column {
             Textview(
@@ -287,8 +357,9 @@ fun MetricCard(
     title: String,
     value: String,
     caption: String,
-    icon: ImageVector,
+    @DrawableRes icon: Int,
     accent: Color,
+    isBorder: Boolean = false,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
@@ -299,7 +370,7 @@ fun MetricCard(
         onClick = onClick
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconBadge(icon = icon, accent = accent, size = dimen_28)
+            IconBadge(iconRes = icon, accent = accent, size = dimen_28, isBorder = isBorder)
             Spacer(modifier = Modifier.width(dimen_8))
             Textview(
                 text = title,
@@ -324,7 +395,7 @@ fun MetricCard(
 fun QuickActionTile(
     title: String,
     subtitle: String,
-    icon: ImageVector,
+    @DrawableRes  icon:  Int,
     accent: Color,
     modifier: Modifier = Modifier,
     highlighted: Boolean = false,
@@ -342,7 +413,7 @@ fun QuickActionTile(
             .padding(horizontal = dimen_10, vertical = dimen_12),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconBadge(icon = icon, accent = accent, size = dimen_36, filled = highlighted)
+        IconBadge(iconRes = icon, accent = accent, size = dimen_36, filled = highlighted)
         Spacer(modifier = Modifier.width(dimen_10))
         Column {
             Textview(
@@ -391,7 +462,12 @@ fun GlassTextButton(
             .padding(horizontal = dimen_14, vertical = dimen_6),
         contentAlignment = Alignment.Center
     ) {
-        Textview(text = text, size = font_12, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
+        Textview(
+            text = text,
+            size = font_12,
+            color = appColors.primaryText,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 
@@ -403,10 +479,16 @@ fun TwoColumnRow(
 ) {
     // both cards of a row get the same height, like the design
     Row(
-        modifier = modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(androidx.compose.foundation.layout.IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(dimen_12)
     ) {
-        left(Modifier.weight(1f).fillMaxHeight())
-        right(Modifier.weight(1f).fillMaxHeight())
+        left(Modifier
+            .weight(1f)
+            .fillMaxHeight())
+        right(Modifier
+            .weight(1f)
+            .fillMaxHeight())
     }
 }
