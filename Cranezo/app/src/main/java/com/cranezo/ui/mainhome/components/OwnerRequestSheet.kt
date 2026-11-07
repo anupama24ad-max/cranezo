@@ -1,7 +1,6 @@
 package com.cranezo.ui.mainhome.components
 
 import android.content.Intent
-import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Vibrator
 import androidx.compose.foundation.background
@@ -93,13 +92,19 @@ fun OwnerRequestHost(
     if (request == null) return
     val context = LocalContext.current
 
-    // The alert, once per request
-    LaunchedEffect(request.booking_id) {
-        runCatching {
-            RingtoneManager.getRingtone(context, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)).play()
-            @Suppress("DEPRECATION")
-            (context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? Vibrator)?.vibrate(600)
+    // The buzzer rings (raw/buzzer_tone, looping) while the request is open: stops on accept,
+    // decline, dismiss, when the countdown ends, or after 30 seconds at most
+    androidx.compose.runtime.DisposableEffect(request.booking_id, accepted) {
+        if (!accepted) {
+            val ringMs = ((request.seconds_left ?: 30).coerceIn(1, 30)) * 1000L
+            com.cranezo.push.BuzzerPlayer.start(context, ringMs)
+            runCatching {
+                @Suppress("DEPRECATION")
+                (context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? Vibrator)
+                    ?.vibrate(longArrayOf(0, 800, 400, 800, 400, 800), -1)
+            }
         }
+        onDispose { com.cranezo.push.BuzzerPlayer.stop() }
     }
 
     // Counted down on the phone from the server's number; at 0 the buttons stop working
