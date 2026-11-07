@@ -53,10 +53,7 @@ fun CustomerHomeScreen(
     state: MainHomeUiState,
     onNavigate: (String) -> Unit = {}
 ) {
-    val displayName = buildString {
-        append(state.userName.ifBlank { stringResource(R.string.home_customer_default_name) })
-        if (state.memberId.isNotBlank()) append(", #${state.memberId}")
-    }
+    val displayName = state.userName.ifBlank { stringResource(R.string.home_customer_default_name) }
 
     Column(
         modifier = Modifier
@@ -67,6 +64,8 @@ fun CustomerHomeScreen(
     ) {
         HomeHeader(
             name = displayName,
+            // the customer ID is small: CUST100001 shows as #100001
+            tag = state.memberId.takeIf { it.isNotBlank() }?.let { "#" + it.removePrefix("CUST") },
             subtitle = stringResource(R.string.home_customer_subtitle)
         )
 

@@ -60,6 +60,8 @@ fun HomeHeader(
     subtitle: String,
     modifier: Modifier = Modifier,
     showNotification: Boolean = true,
+    // small text after the name, e.g. the customer ID "#100001"
+    tag: String? = null,
     // Unread notifications: the dot is hidden at 0; null keeps the dot (screens without the number)
     unread: Int? = null
 ) {
@@ -70,13 +72,26 @@ fun HomeHeader(
         Column(modifier = Modifier.weight(1f)) {
             Textview(text = greeting(), size = font_11, color = appColors.textSecondary)
             Spacer(modifier = Modifier.height(dimen_2))
-            Textview(
-                text = name,
-                size = font_22,
-                color = appColors.textPrimary,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1
-            )
+            Row(verticalAlignment = Alignment.Bottom) {
+                Textview(
+                    text = name,
+                    size = font_22,
+                    color = appColors.textPrimary,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+                if (!tag.isNullOrBlank()) {
+                    Textview(
+                        text = " $tag",
+                        size = font_12,
+                        color = appColors.textSecondary,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = dimen_2, bottom = dimen_3)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(dimen_2))
             Textview(text = subtitle, size = font_11, color = appColors.textSecondary)
         }
