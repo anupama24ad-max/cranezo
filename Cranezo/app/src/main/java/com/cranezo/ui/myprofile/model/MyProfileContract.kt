@@ -36,6 +36,7 @@ object PKey {
     // Operator documents: sent alone, after the file was uploaded
     const val LICENSE_FRONT = "operator_license_front"
     const val LICENSE_BACK = "operator_license_back"
+    const val VOTER_FILE = "voter_id_file"
     const val AADHAR_FILE = "aadhar_card_file"
     const val PAN_FILE = "pan_card_file"
     const val OTHER_FILE = "other_document_file"

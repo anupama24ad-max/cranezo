@@ -118,6 +118,7 @@
     <string name="field_owner_id_hint">Enter Owner ID (e.g. ONR659897)</string>
     <string name="doc_license_front">License Front</string>
     <string name="doc_license_back">License Back</string>
+    <string name="doc_voter_id">Voter ID Card</string>
     <string name="doc_aadhaar">Aadhaar Card</string>
     <string name="doc_pan">PAN Card</string>
     <string name="doc_other">Other Documents</string>
@@ -999,8 +1000,8 @@
     <string name="op_step_accept_hint">Check the details and tap Accept.</string>
     <string name="op_step_go">Go to the site</string>
     <string name="op_step_go_hint">Follow Google Maps. At the site, tap the yellow button.</string>
-    <string name="op_step_safety">Photo and safety check</string>
-    <string name="op_step_safety_hint">Take one site photo, then tick every safety item.</string>
+    <string name="op_step_safety">Site photo</string>
+    <string name="op_step_safety_hint">Take one photo of the site, then wait for the customer to confirm.</string>
     <string name="op_step_work">Work in progress</string>
     <string name="op_step_work_hint">Work until the end time shown. Tap Finish Job when done.</string>
     <string name="op_step_finish">Finish and get the customer code</string>

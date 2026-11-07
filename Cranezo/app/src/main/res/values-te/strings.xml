@@ -118,6 +118,7 @@
     <string name="field_owner_id_hint">యజమాని ID నమోదు చేయండి (ఉదా. ONR659897)</string>
     <string name="doc_license_front">లైసెన్స్ ముందు వైపు</string>
     <string name="doc_license_back">లైసెన్స్ వెనుక వైపు</string>
+    <string name="doc_voter_id">ఓటర్ ఐడి కార్డ్</string>
     <string name="doc_aadhaar">ఆధార్ కార్డ్</string>
     <string name="doc_pan">పాన్ కార్డ్</string>
     <string name="doc_other">ఇతర పత్రాలు</string>
@@ -846,8 +847,8 @@
     <string name="op_step_accept_hint">వివరాలు చూసి అంగీకరించండి నొక్కండి.</string>
     <string name="op_step_go">సైట్‌కు వెళ్ళండి</string>
     <string name="op_step_go_hint">Google Maps చూసి వెళ్ళండి. సైట్ వద్ద పసుపు బటన్ నొక్కండి.</string>
-    <string name="op_step_safety">ఫోటో మరియు భద్రతా తనిఖీ</string>
-    <string name="op_step_safety_hint">సైట్ ఫోటో తీయండి, తర్వాత ప్రతి భద్రతా అంశాన్ని టిక్ చేయండి.</string>
+    <string name="op_step_safety">సైట్ ఫోటో</string>
+    <string name="op_step_safety_hint">సైట్ ఫోటో తీసి, కస్టమర్ నిర్ధారణ కోసం వేచి ఉండండి.</string>
     <string name="op_step_work">పని జరుగుతోంది</string>
     <string name="op_step_work_hint">చూపిన సమయం వరకు పని చేయండి. పూర్తయ్యాక పని ముగించండి నొక్కండి.</string>
     <string name="op_step_finish">పని ముగించి కస్టమర్ కోడ్ తీసుకోండి</string>

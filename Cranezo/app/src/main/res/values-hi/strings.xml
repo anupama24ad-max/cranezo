@@ -118,6 +118,7 @@
     <string name="field_owner_id_hint">मालिक ID दर्ज करें (जैसे ONR659897)</string>
     <string name="doc_license_front">लाइसेंस आगे का भाग</string>
     <string name="doc_license_back">लाइसेंस पीछे का भाग</string>
+    <string name="doc_voter_id">वोटर आईडी कार्ड</string>
     <string name="doc_aadhaar">आधार कार्ड</string>
     <string name="doc_pan">पैन कार्ड</string>
     <string name="doc_other">अन्य दस्तावेज़</string>
@@ -846,8 +847,8 @@
     <string name="op_step_accept_hint">जानकारी देखें और स्वीकार करें दबाएँ।</string>
     <string name="op_step_go">साइट पर जाएँ</string>
     <string name="op_step_go_hint">Google Maps देखकर जाएँ। साइट पर पीला बटन दबाएँ।</string>
-    <string name="op_step_safety">फोटो और सुरक्षा जाँच</string>
-    <string name="op_step_safety_hint">साइट की एक फोटो लें, फिर हर सुरक्षा बिंदु पर टिक करें।</string>
+    <string name="op_step_safety">साइट की फोटो</string>
+    <string name="op_step_safety_hint">साइट की एक फोटो लें, फिर ग्राहक की पुष्टि का इंतज़ार करें।</string>
     <string name="op_step_work">काम चल रहा है</string>
     <string name="op_step_work_hint">दिखाए गए समय तक काम करें। काम खत्म होने पर काम खत्म करें दबाएँ।</string>
     <string name="op_step_finish">काम खत्म करें और ग्राहक कोड लें</string>

@@ -534,12 +534,14 @@ fun OperatorEarningsTab(
 @Composable
 fun NewJobAlert(onView: () -> Unit, onLater: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
-    LaunchedEffect(Unit) {
+    // rings like an incoming call (the buzzer tone) until the operator opens the job or taps Later
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        com.cranezo.push.BuzzerPlayer.start(context)
         runCatching {
-            android.media.RingtoneManager.getRingtone(context, android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)).play()
             @Suppress("DEPRECATION")
-            (context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator)?.vibrate(600)
+            (context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator)?.vibrate(longArrayOf(0, 800, 400, 800), -1)
         }
+        onDispose { com.cranezo.push.BuzzerPlayer.stop() }
     }
     GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
         Row(verticalAlignment = Alignment.CenterVertically) {

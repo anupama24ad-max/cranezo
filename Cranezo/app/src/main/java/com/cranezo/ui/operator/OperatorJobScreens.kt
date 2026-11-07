@@ -301,6 +301,11 @@ private fun InfoRow(
 private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     val accepted = job.next_action == NextAction.START_JOURNEY
+    // the new job rings (buzzer tone) until the operator accepts or declines it
+    androidx.compose.runtime.DisposableEffect(job.booking_id, accepted) {
+        if (!accepted) com.cranezo.push.BuzzerPlayer.start(context)
+        onDispose { com.cranezo.push.BuzzerPlayer.stop() }
+    }
     // Decline asks once more on the page itself (no popup): the bottom bar turns into Cancel / Yes, decline
     var confirmDecline by remember { mutableStateOf(false) }
 

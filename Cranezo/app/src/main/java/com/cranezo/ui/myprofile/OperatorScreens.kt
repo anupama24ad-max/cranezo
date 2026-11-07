@@ -53,6 +53,7 @@ import com.cranezo.utils.imagePicker.rememberImagePickerController
 /** The request field that replaces a document: the license has a front and a back. */
 private fun replaceField(key: String?, back: Boolean): String? = when (key) {
     "operator_license" -> if (back) PKey.LICENSE_BACK else PKey.LICENSE_FRONT
+    "voter_id" -> PKey.VOTER_FILE
     "aadhar_card" -> PKey.AADHAR_FILE
     "pan_card" -> PKey.PAN_FILE
     "other_documents" -> PKey.OTHER_FILE
