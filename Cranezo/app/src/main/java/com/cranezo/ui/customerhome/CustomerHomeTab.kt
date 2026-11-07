@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
+import com.cranezo.ui.components.glassEffect
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -152,23 +154,55 @@ fun CustomerHomeTab(
     ) {
         val name = home?.greeting_name?.takeIf { it.isNotBlank() }
         HomeHeader(
-            name = when {
-                name == null -> stringResource(R.string.ch_welcome)
-                !home.member_id.isNullOrBlank() -> "$name, #${home.member_id}"
-                else -> name
-            },
+            name = name ?: stringResource(R.string.ch_welcome),
+            // "#100001": the ID is small (CUST100001 shows as #100001)
+            tag = home?.member_id?.takeIf { it.isNotBlank() }?.let { "#" + it.removePrefix("CUST") },
             subtitle = stringResource(R.string.home_customer_subtitle),
             unread = home?.unread_notifications ?: 0
         )
 
         BannerCarousel(home?.banners.orEmpty().sortedBy { it.sort_order ?: 0 }) { runBannerAction(context, it, onProfile) }
 
+        // Quick Access: Track My Crane, My Jobs, Need Help? side by side
+        val quick = home?.quick_access.orEmpty().take(3)
+        if (quick.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(dimen_4))
+            Textview(stringResource(R.string.home_quick_access), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
+                quick.forEach { item ->
+                    val accent = if (item.icon == "jobs") InfoBlue else AmberPrimary
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .glassEffect(RoundedCornerShape(dimen_16))
+                            .clickable { openScreen(context, item.screen, onProfile) }
+                            .padding(dimen_12)
+                    ) {
+                        Row(verticalAlignment = Alignment.Top) {
+                            IconBadge(icon = quickIcon(item.icon), accent = accent, size = dimen_40)
+                            Spacer(modifier = Modifier.weight(1f))
+                            if ((item.badge ?: 0) > 0) BookingTag(item.badge.toString(), Red)
+                        }
+                        Spacer(modifier = Modifier.height(dimen_10))
+                        Textview(item.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 2)
+                        Spacer(modifier = Modifier.height(dimen_2))
+                        Textview(item.subtitle.orEmpty(), size = font_11, color = appColors.textSecondary, maxLines = 2)
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(dimen_4))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Textview(stringResource(R.string.home_recent_booking), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            Textview(
-                stringResource(R.string.common_view_all), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.clickable { openScreen(context, "my_jobs", onProfile) }
-            )
+            Textview(stringResource(R.string.home_recent_booking), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Row(
+                modifier = Modifier.clickable { openScreen(context, "my_jobs", onProfile) }.padding(dimen_4),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Textview(stringResource(R.string.common_view_all), size = font_12, color = appColors.textSecondary, fontWeight = FontWeight.Medium)
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_16))
+            }
         }
         val recent = home?.recent_bookings.orEmpty()
         if (state.loaded && recent.isEmpty() || home != null && recent.isEmpty()) {
@@ -196,24 +230,6 @@ fun CustomerHomeTab(
                         }
                         if (booking.can_rate == true) BookingTag(stringResource(R.string.cj_rate), AmberPrimary)
                     }
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
-                }
-            }
-        }
-        // Need help and other links at the bottom, after the bookings
-        // Quick links, minus the ones the bottom bar already has (Track, My Jobs). One full-width row each,
-        // so long titles in Hindi or Telugu never squeeze into narrow columns.
-        val quick = home?.quick_access.orEmpty().filterNot { it.screen == "track" || it.screen == "my_jobs" }
-        quick.forEach { item ->
-            GlassCard(contentPadding = dimen_14, minHeight = dimen_56, onClick = { openScreen(context, item.screen, onProfile) }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconBadge(icon = quickIcon(item.icon), accent = AmberPrimary, size = dimen_36)
-                    Spacer(modifier = Modifier.width(dimen_12))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Textview(item.title.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                        Textview(item.subtitle.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
-                    }
-                    if ((item.badge ?: 0) > 0) BookingTag(item.badge.toString(), Red)
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)
                 }
             }

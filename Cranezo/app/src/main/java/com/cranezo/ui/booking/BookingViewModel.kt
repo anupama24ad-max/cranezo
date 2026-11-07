@@ -295,7 +295,8 @@ class BookingViewModel @Inject constructor(
     fun chosenNames(): Pair<String, String> {
         val s = _uiState.value
         val type = s.options?.crane_types?.firstOrNull { it.id == s.craneType }?.name.orEmpty()
-        val capacity = s.options?.capacities?.firstOrNull { it.id == s.capacity }?.name.orEmpty()
+        // "16" -> "16 Ton"
+        val capacity = CapacityInfo.withUnit(s.options?.capacities?.firstOrNull { it.id == s.capacity }?.name, string(R.string.unit_ton))
         return capacity to type
     }
 

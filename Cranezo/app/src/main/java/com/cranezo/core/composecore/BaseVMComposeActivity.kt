@@ -27,6 +27,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
@@ -301,14 +303,16 @@ fun LoadingOverlay() {
 
             }, contentAlignment = Alignment.Center
     ) {
-      /*  LottiePlayer(
-            lottieRes = R.raw.app_loader,
+        // the Cranezo logo animation, small, on a soft card so it reads on any screen
+        Box(
             modifier = Modifier
-                .size(150.dp)
-                .align(Alignment.Center),
-            loop = true,
-            speed = 1f
-        )*/
+                .shadow(8.dp, androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                .clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                .background(com.cranezo.ui.theme.appColors.bgBase.copy(alpha = 0.92f))
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            com.cranezo.ui.components.CranezoLoader(height = 64.dp)
+        }
     }
 }
 

@@ -166,7 +166,8 @@ class OwnerJobDetailViewModel @Inject constructor(
             }
             OwnerJobDetailIntent.LoadOperators -> runWhenOnline {
                 setIsLoading(true)
-                repo.ownerOperatorsApi(headers(), JSONObject()).isRequestCallSuspendSuccess(
+                // 100 is the most the server returns per request; without a range it sends only 10
+                repo.ownerOperatorsApi(headers(), JSONObject().put("min", 0).put("max", 100)).isRequestCallSuspendSuccess(
                     success = { r -> _uiState.update { it.copy(operators = r?.data.orEmpty(), operatorsLoaded = true) } },
                     failure = { _, _, m ->
                         _uiState.update { it.copy(operatorsLoaded = true) }

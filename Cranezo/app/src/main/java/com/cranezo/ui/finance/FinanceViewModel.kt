@@ -77,6 +77,13 @@ class FinanceViewModel @Inject constructor(
     var sm: SessionManager
 ) : BaseViewModel(app) {
 
+    private companion object {
+        /** Records per request: the most the server gives (it sends 10 when no range is sent) */
+        const val LIST_PAGE = 100
+        /** Safety stop for one list */
+        const val LIST_MAX = 500
+    }
+
     private val _ui = MutableStateFlow(FinanceUiState())
     val ui: StateFlow<FinanceUiState> = _ui.asStateFlow()
 
@@ -124,7 +131,46 @@ class FinanceViewModel @Inject constructor(
         }
     }
 
-    private fun page(min: Int = 0, max: Int = 50) = JSONObject().put("min", min).put("max", max)
+    private fun page(min: Int = 0, max: Int = LIST_PAGE) = JSONObject().put("min", min).put("max", max)
+
+    /**
+     * A list endpoint, loaded completely. The server sends 10 records when no range is given and at most 100
+     * per request, so this asks for 100 at a time and keeps going while the server says there is more
+     * (up to LIST_MAX records), instead of showing only the first page of a long history.
+     */
+    private fun <T> callAll(
+        path: String,
+        type: Type,
+        page: String,
+        extra: JSONObject.() -> Unit = {},
+        onData: (List<T>) -> Unit
+    ) {
+        _ui.update { it.copy(loading = true) }
+        runWhenOnline {
+            val all = mutableListOf<T>()
+            var min = 0
+            while (true) {
+                var more = false
+                var failed = false
+                val body = page(min, min + LIST_PAGE).apply(extra)
+                repo.financePost(path, headers(), body).isRequestCallSuspendSuccess(
+                    success = { r ->
+                        val items = parse<List<T>>(r?.data, type).orEmpty()
+                        all += items
+                        more = r?.pagination?.has_more == true && items.isNotEmpty()
+                    },
+                    failure = { _, _, m ->
+                        failed = true
+                        fail(m)
+                    }
+                )
+                if (failed || !more || all.size >= LIST_MAX) break
+                min += LIST_PAGE
+            }
+            onData(all)
+            markLoaded(page)
+        }
+    }
 
     fun clearNotice() = _ui.update { it.copy(notice = null) }
 
@@ -219,19 +265,19 @@ class FinanceViewModel @Inject constructor(
         loadSettlements("owner/settlements")
     }
 
-    fun loadSettlements(path: String) = call<List<SettlementItem>>(path, page(), typeOf<List<SettlementItem>>(), page = "settlements") { d ->
-        _ui.update { it.copy(settlements = d.orEmpty()) }
+    fun loadSettlements(path: String) = callAll<SettlementItem>(path, typeOf<List<SettlementItem>>(), "settlements") { d ->
+        _ui.update { it.copy(settlements = d) }
     }
 
     fun loadTransactions() {
         val path = if (role == "CRANE_OWNER") "owner/transactions" else "customer/transactions"
-        call<List<TransactionItem>>(path, page(), typeOf<List<TransactionItem>>(), page = "transactions") { d ->
-            _ui.update { it.copy(transactions = d.orEmpty()) }
+        callAll<TransactionItem>(path, typeOf<List<TransactionItem>>(), "transactions") { d ->
+            _ui.update { it.copy(transactions = d) }
         }
     }
 
-    fun loadRequests() = call<List<JobRequestItem>>("owner/job-requests", page(), typeOf<List<JobRequestItem>>(), page = "requests") { d ->
-        _ui.update { it.copy(requests = d.orEmpty()) }
+    fun loadRequests() = callAll<JobRequestItem>("owner/job-requests", typeOf<List<JobRequestItem>>(), "requests") { d ->
+        _ui.update { it.copy(requests = d) }
     }
 
     fun respondRequest(requestId: String, accept: Boolean, reason: String = "") {
@@ -244,8 +290,8 @@ class FinanceViewModel @Inject constructor(
 
     private val complaintBase get() = if (role == "CRANE_OWNER") "owner/complaints" else "customer/complaints"
 
-    fun loadComplaints() = call<List<ComplaintItem>>(complaintBase, page(), typeOf<List<ComplaintItem>>(), page = "complaints") { d ->
-        _ui.update { it.copy(complaints = d.orEmpty()) }
+    fun loadComplaints() = callAll<ComplaintItem>(complaintBase, typeOf<List<ComplaintItem>>(), "complaints") { d ->
+        _ui.update { it.copy(complaints = d) }
     }
 
     fun openComplaint(id: String) {
@@ -301,13 +347,14 @@ class FinanceViewModel @Inject constructor(
 
     fun loadAvailable() {
         runWhenOnline {
-            val body = page()
-            if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                fetchCurrentLocation(app)?.let { body.put("latitude", it.latitude).put("longitude", it.longitude) }
-            }
-            call<List<AvailableJob>>("operator/available-jobs", body, typeOf<List<AvailableJob>>(), page = "available") { d ->
-                _ui.update { it.copy(available = d.orEmpty()) }
-            }
+            // the phone's position (nearest jobs first) goes with every page
+            val fix = if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                fetchCurrentLocation(app)
+            } else null
+            callAll<AvailableJob>(
+                "operator/available-jobs", typeOf<List<AvailableJob>>(), "available",
+                extra = { fix?.let { put("latitude", it.latitude).put("longitude", it.longitude) } }
+            ) { d -> _ui.update { it.copy(available = d) } }
         }
     }
 
@@ -317,8 +364,8 @@ class FinanceViewModel @Inject constructor(
         call<JobRequestItem>("operator/available-jobs/request", body, typeOf<JobRequestItem>(), saving = true) { loadAvailable() }
     }
 
-    fun loadMyRequests() = call<List<JobRequestItem>>("operator/job-requests", page(), typeOf<List<JobRequestItem>>(), page = "my_requests") { d ->
-        _ui.update { it.copy(myRequests = d.orEmpty()) }
+    fun loadMyRequests() = callAll<JobRequestItem>("operator/job-requests", typeOf<List<JobRequestItem>>(), "my_requests") { d ->
+        _ui.update { it.copy(myRequests = d) }
     }
 
     fun withdrawRequest(requestId: String) =

@@ -186,4 +186,17 @@
     <string name="oe_compared_to">Compared to %1$s</string>
     <string name="oe_settled_on">Will be settled on %1$s</string>
     <string name="oe_no_jobs">No completed jobs yet.</string>
+    <string name="unit_ton">Ton</string>
+    <string name="cap_light">Light</string>
+    <string name="cap_medium">Medium</string>
+    <string name="cap_heavy">Heavy</string>
+    <string name="cap_very_heavy">Very heavy</string>
+    <string name="cap_extra_heavy">Extra heavy</string>
+    <string name="cap_use_light">Small jobs: shifting material, loading and unloading, small machines.</string>
+    <string name="cap_use_medium">House and building sites: steel beams, precast slabs, pumps and generators.</string>
+    <string name="cap_use_heavy">Factories and tall buildings: big equipment, bridge girders and tanks.</string>
+    <string name="cap_use_very_heavy">Industrial plants: reactors, large tanks, turbines and long bridge girders.</string>
+    <string name="cap_use_extra_heavy">Mega projects: power plants, refineries and wind turbines.</string>
+    <string name="cap_weight_hint">Lifts up to %1$s kg, about the weight of %2$d small cars.</string>
+    <string name="cap_note">This is the maximum. What a crane can lift in practice depends on how far it must reach, so tell the owner your load.</string>
 </resources>

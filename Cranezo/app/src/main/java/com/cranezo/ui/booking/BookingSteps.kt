@@ -268,16 +268,21 @@ fun CapacityStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
         onBack = onBack,
         step = 2,
         bottom = {
-            BottomButtons(
-                mainText = stringResource(R.string.common_continue),
-                onMain = onNext,
-                onBack = onBack,
-                enabled = state.capacity != null
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
+                // what the chosen size is for and how heavy it is, always visible above the buttons
+                val chosen = state.options?.capacities.orEmpty().firstOrNull { it.id == state.capacity }
+                if (chosen != null) CapacityHint(chosen.name)
+                BottomButtons(
+                    mainText = stringResource(R.string.common_continue),
+                    onMain = onNext,
+                    onBack = onBack,
+                    enabled = state.capacity != null
+                )
+            }
         }
     ) {
         StepTitle(R.string.bk_capacity_title, R.string.bk_capacity_subtitle)
-        // Small tiles, 3 per row, title only (e.g. "50 Ton"): quick to scan and tap
+        // Small tiles, 3 per row: "16 Ton" with its class (Light ... Extra heavy) under it
         state.options?.capacities.orEmpty().chunked(3).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
                 row.forEach { capacity ->
@@ -287,17 +292,28 @@ fun CapacityStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                         onClick = { capacity.id?.let { vm?.onIntent(BookingIntent.SelectCapacity(it)) } },
                         modifier = Modifier
                             .weight(1f)
-                            .height(dimen_56)
+                            .height(dimen_64)
                     ) {
-                        Textview(
-                            text = capacity.name.orEmpty(),
-                            size = font_15,
-                            color = if (selected) appColors.primaryText else appColors.textPrimary,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            maxLines = 1,
-                            modifier = Modifier.align(Alignment.Center).padding(horizontal = dimen_6)
-                        )
+                        val tons = CapacityInfo.tons(capacity.name)
+                        Column(modifier = Modifier.align(Alignment.Center).padding(horizontal = dimen_6), horizontalAlignment = Alignment.CenterHorizontally) {
+                            Textview(
+                                text = capacityLabel(capacity.name),
+                                size = font_15,
+                                color = if (selected) appColors.primaryText else appColors.textPrimary,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                maxLines = 1
+                            )
+                            if (tons != null) {
+                                Textview(
+                                    text = stringResource(CapacityInfo.classOf(tons).label),
+                                    size = font_10,
+                                    color = appColors.textSecondary,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    maxLines = 1
+                                )
+                            }
+                        }
                     }
                 }
                 // keep the last row's tiles the same width as the others

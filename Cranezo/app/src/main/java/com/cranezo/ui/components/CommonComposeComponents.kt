@@ -1760,7 +1760,7 @@ fun <T : Any> LazyColumnListViewMinMax(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = AmberPrimary, strokeWidth = 3.dp, modifier = Modifier.size(50.dp))
+            CranezoLoader()
         }
     } else {
         LazyColumn(
@@ -2242,7 +2242,7 @@ fun <T : Any> LazyGridListViewMinMax(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = AmberPrimary, strokeWidth = 3.dp, modifier = Modifier.size(50.dp))
+            CranezoLoader()
         }
     } else {
         LazyVerticalGrid(

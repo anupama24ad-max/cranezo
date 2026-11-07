@@ -130,7 +130,7 @@ fun CraneDetailsScreen(
                 crane != null -> DetailsContent(crane, onManageDocuments)
 
                 state.detailLoading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = AmberPrimary)
+                    com.cranezo.ui.components.CranezoLoader()
                 }
 
                 else -> Column(

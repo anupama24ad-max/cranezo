@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "815531577879",
+    "project_id": "cranezo",
+    "storage_bucket": "cranezo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:815531577879:android:65576e56b3b16f8c250252",
+        "android_client_info": {
+          "package_name": "com.cranezo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGBbrBU25-Rq92PtGv9zBB3iERpE-7SM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

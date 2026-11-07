@@ -107,7 +107,7 @@ fun MyCranesScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = AmberPrimary)
+                com.cranezo.ui.components.CranezoLoader()
             }
 
             state.items.isEmpty() -> EmptyOrError(state.error, onAddCrane, onRefresh)

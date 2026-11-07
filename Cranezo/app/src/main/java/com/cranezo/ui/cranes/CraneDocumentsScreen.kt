@@ -108,7 +108,7 @@ fun CraneDocumentsScreen(
 
             if (crane == null) {
                 Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = AmberPrimary)
+                    com.cranezo.ui.components.CranezoLoader()
                 }
             } else {
                 Column(

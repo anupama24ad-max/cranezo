@@ -185,4 +185,17 @@
     <string name="oe_compared_to">%1$s की तुलना में</string>
     <string name="oe_settled_on">%1$s को सेटल होगा</string>
     <string name="oe_no_jobs">अभी कोई पूरा काम नहीं।</string>
+    <string name="unit_ton">टन</string>
+    <string name="cap_light">हल्की</string>
+    <string name="cap_medium">मध्यम</string>
+    <string name="cap_heavy">भारी</string>
+    <string name="cap_very_heavy">बहुत भारी</string>
+    <string name="cap_extra_heavy">अत्यंत भारी</string>
+    <string name="cap_use_light">छोटे काम: सामान उठाना, चढ़ाना-उतारना, छोटी मशीनें।</string>
+    <string name="cap_use_medium">मकान और बिल्डिंग साइट: स्टील बीम, प्रीकास्ट स्लैब, पंप और जनरेटर।</string>
+    <string name="cap_use_heavy">फैक्ट्री और ऊँची इमारतें: बड़े उपकरण, पुल के गर्डर और टैंक।</string>
+    <string name="cap_use_very_heavy">औद्योगिक प्लांट: रिएक्टर, बड़े टैंक, टर्बाइन और लंबे पुल के गर्डर।</string>
+    <string name="cap_use_extra_heavy">बड़े प्रोजेक्ट: पावर प्लांट, रिफाइनरी और पवन चक्कियाँ।</string>
+    <string name="cap_weight_hint">%1$s किलो तक उठाती है, लगभग %2$d छोटी कारों के वज़न के बराबर।</string>
+    <string name="cap_note">यह अधिकतम क्षमता है। असल में कितना उठेगा यह दूरी पर निर्भर करता है, इसलिए मालिक को अपना भार बताएं।</string>
 </resources>
