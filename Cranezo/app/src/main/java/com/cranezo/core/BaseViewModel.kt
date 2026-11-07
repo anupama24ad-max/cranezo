@@ -108,7 +108,7 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
 
         networkCallJob = viewModelScope.launch {
             val result = pollNetworkUntilGoodOrCanceled()
-            if (result is NetworkState.GoodConnection && isActive) {
+            if (result !is NetworkState.NoConnection && isActive) {
                 onNetworkConnected?.invoke()
             }
         }
@@ -122,13 +122,15 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
     fun runWhenOnline(block: suspend () -> Unit) {
         viewModelScope.launch {
             while (isActive) {
-                if (pollNetworkUntilGoodOrCanceled() !is NetworkState.GoodConnection) return@launch
+                // waits only while there is no network at all; a slow network still makes the call
+                if (pollNetworkUntilGoodOrCanceled() is NetworkState.NoConnection) return@launch
                 try {
                     block()
                     break // success
                 } catch (e: java.io.IOException) {
-                    // network dropped mid-call → show offline, wait for the connection and try again
+                    // network dropped mid-call → show offline, wait a moment for the connection and try again
                     showNetNoticeOffline()
+                    delay(2000)
                 }
             }
         }
@@ -139,7 +141,9 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
         var state = currentNetworkState()
         _networkAlerts.emit(state)
 
-        while (coroutineContext.isActive && !cancelNetworkRequest && state !is NetworkState.GoodConnection) {
+        // Waits only while there is no usable network. A slow network (or one Android has not
+        // "validated" yet, common right after the phone wakes up) does not block API calls.
+        while (coroutineContext.isActive && !cancelNetworkRequest && state is NetworkState.NoConnection) {
             delay(2000)
             state = currentNetworkState()
             _networkAlerts.emit(state)
@@ -166,11 +170,14 @@ abstract class BaseViewModel(application: Application) : AndroidViewModel(applic
             network?.let { cm.getNetworkCapabilities(it) } ?: return NetworkState.NoConnection
 
         if (!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) return NetworkState.NoConnection
-        if (!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) return NetworkState.NoConnection
+        // Not validated yet (just woke up, captive portal check, VPN / private DNS): still try the call
+        if (!caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)) return NetworkState.SlowConnection
 
+        // Android's bandwidth numbers are rough estimates (often low on mobile data): only a really
+        // poor link counts as slow, and slow is only a hint for the banner, never a reason to wait
         val down = caps.linkDownstreamBandwidthKbps
         val up = caps.linkUpstreamBandwidthKbps
-        return if (down < 1000 || up < 500) NetworkState.SlowConnection else NetworkState.GoodConnection
+        return if (down in 1 until 150 || up in 1 until 50) NetworkState.SlowConnection else NetworkState.GoodConnection
     }
 }
 

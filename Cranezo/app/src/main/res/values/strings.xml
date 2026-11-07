@@ -246,7 +246,9 @@
     <string name="net_offline_banner">No Internet. Auto-retry when online…</string>
     <string name="net_no_internet">No Internet</string>
     <string name="net_check_internet">Please check your internet connection and try again.</string>
-    <string name="session_logged_out_elsewhere">You have logged in from another device. For security reasons, you have been logged out of this session.</string>
+    <string name="session_logged_out_elsewhere">Your session has ended. Please sign in again to continue.</string>
+    <string name="session_ended_title">Session ended</string>
+    <string name="session_sign_in_again">Sign in again</string>
 
     <!-- Owner cranes: My Cranes -->
     <string name="crane_my_subtitle">View and manage your registered cranes.</string>

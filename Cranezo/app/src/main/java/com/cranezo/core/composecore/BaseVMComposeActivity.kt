@@ -153,8 +153,8 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                 var snoozed by remember { mutableStateOf(false) }
                 LaunchedEffect(netState) { snoozed = false } // re-enable dialog on the next result
 
-                val showDialog =
-                    !snoozed && (netState is NetworkState.NoConnection || netState is NetworkState.SlowConnection)
+                // only a real "no internet" shows the card; Android's slow / not-validated hints were false alarms
+                val showDialog = !snoozed && netState is NetworkState.NoConnection
                 // ---- Banner host (shared) ----
                 val bannerHost = rememberTopBannerHostState()
                 LaunchedEffect(Unit) {
@@ -254,22 +254,34 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                 }
             }
 
-            SessionExpiredDialog(
-                showDialog = showSessionDialog,
-                message = stringResource(R.string.session_logged_out_elsewhere),
-                onConfirm = {
+            // The session really ended (the token could not be renewed, or the account was blocked):
+            // say why, then sign out and open the sign-in flow. Before, this dialog drew nothing and the
+            // app stayed on a screen where every call failed.
+            if (showSessionDialog) {
+                val reason = dialogState.second.takeIf { it.isNotBlank() && it != "Some Exception Occurred" }
+                val signOut = {
+                    SessionManagerEvent.hide()
                     SessionManager(applicationContext).clearSession()
-                /*    startActivity(
-                        Intent(this, LoginActivity::class.java).apply {
-                            flags =
-                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(
+                        Intent(this@BaseVMComposeActivity, com.cranezo.ui.splash.SplashActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         }
-                    )*/
-
-
-                },
-                onDismiss = { SessionManagerEvent.hide() }
-            )
+                    )
+                    finish()
+                }
+                CranezoTheme(darkTheme = isDark) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = {},
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(onClick = signOut) {
+                                androidx.compose.material3.Text(stringResource(R.string.session_sign_in_again))
+                            }
+                        },
+                        title = { androidx.compose.material3.Text(stringResource(R.string.session_ended_title)) },
+                        text = { androidx.compose.material3.Text(reason ?: stringResource(R.string.session_logged_out_elsewhere)) }
+                    )
+                }
+            }
 
 
         }

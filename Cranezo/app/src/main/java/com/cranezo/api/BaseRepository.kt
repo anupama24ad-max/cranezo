@@ -43,11 +43,12 @@ suspend inline fun <T> safeApiCall(
             Resource.Success(myObject.body() as T)
         } else if (myObject.code() == Error.Companion.UN_AUTHORISED_ERROR) {
             Resource.UnAuthorised(myObject.body(), ErrorType.SESSION_EXPIRED, message.ifBlank { myObject.message() })
-        } else if (myObject.code() == Error.Companion.UN_AUTHORISED_LOGOUT && !conflictAsError) {
-            Resource.Logout(myObject.body(), ErrorType.SESSION_EXPIRED, message)
-        } else if (myObject.code() == Error.Companion.ACCOUNT_BLOCKED) {
+        } else if (myObject.code() == Error.Companion.ACCOUNT_BLOCKED && accountBlocked(message)) {
+            // only a blocked / deactivated / deleted account signs the user out
             Resource.BlockOrDelete(myObject.body(), ErrorType.ACCOUNT_BLOCKED, message)
         } else {
+            // 409 ("already booked", "already paid"...) and other 403s ("documents not verified yet",
+            // "not allowed") are normal messages for the screen, never a logout
 
             Resource.Error(
                 myObject.body(),
@@ -95,6 +96,10 @@ suspend inline fun <T> safeApiCall(
         }
     }
 }
+
+/** The server's 403 for an account that can no longer be used (other 403s are normal errors) */
+fun accountBlocked(message: String?): Boolean =
+    Regex("deactivated|blocked|deleted|suspended", RegexOption.IGNORE_CASE).containsMatchIn(message.orEmpty())
 
 suspend fun <T> Resource<T>?.isRequestCallSuspendSuccess(
     activity: Activity? = null,

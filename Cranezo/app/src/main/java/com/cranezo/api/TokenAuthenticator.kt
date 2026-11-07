@@ -44,22 +44,29 @@ class TokenAuthenticator(
                 return request.newBuilder().header(AppStrings.Constants.authorization, current).build()
             }
 
-            val refreshed = refresh()
-            if (refreshed == null) {
-                SessionManagerEvent.show(
-                    "Session expired. Please log in again.",
-                    AppDialogType.SESSION_EXPIRED
-                )
-                return null
+            return when (val result = refresh()) {
+                is Refresh.Done -> request.newBuilder().header(AppStrings.Constants.authorization, result.bearer).build()
+                // the server said the sign-in is no longer valid: the session is over
+                Refresh.Rejected -> {
+                    SessionManagerEvent.show("", AppDialogType.SESSION_EXPIRED)
+                    null
+                }
+                // no network / server unreachable right now: this call fails, the user stays signed in
+                Refresh.Unreachable -> null
             }
-            return request.newBuilder().header(AppStrings.Constants.authorization, refreshed).build()
         }
     }
 
-    /** Returns the new "Bearer ..." header value, or null when the refresh failed. */
-    private fun refresh(): String? {
+    private sealed interface Refresh {
+        data class Done(val bearer: String) : Refresh
+        data object Rejected : Refresh
+        data object Unreachable : Refresh
+    }
+
+    /** A new "Bearer ..." value; Rejected only when the server refused the refresh token. */
+    private fun refresh(): Refresh {
         val refreshToken = sm.getData(AppStrings.SessionValues.refreshToken, "")
-        if (refreshToken.isBlank()) return null
+        if (refreshToken.isBlank()) return Refresh.Rejected
 
         val body = JSONObject().put(AppStrings.InputData.refresh_token, refreshToken).toString()
             .toRequestBody("application/json".toMediaTypeOrNull())
@@ -71,17 +78,21 @@ class TokenAuthenticator(
 
         return try {
             refreshClient.newCall(request).execute().use { res ->
-                if (!res.isSuccessful) return null
-                val data = JSONObject(res.body?.string().orEmpty()).optJSONObject("data") ?: return null
+                // 401 / 403 / 400: the refresh token is expired or the account is gone
+                if (res.code in 400..499) return Refresh.Rejected
+                // 5xx: the server is having a problem, not the user
+                if (!res.isSuccessful) return Refresh.Unreachable
+                val data = JSONObject(res.body?.string().orEmpty()).optJSONObject("data") ?: return Refresh.Unreachable
                 val access = data.optString("access_token").ifBlank { data.optString("token") }
-                if (access.isBlank()) return null
+                if (access.isBlank()) return Refresh.Unreachable
                 sm.setData(AppStrings.SessionValues.accessToken, access)
                 data.optString("refresh_token").takeIf { it.isNotBlank() }
                     ?.let { sm.setData(AppStrings.SessionValues.refreshToken, it) }
-                bearer(access)
+                Refresh.Done(bearer(access))
             }
         } catch (e: Exception) {
-            null
+            // no network, timeout, DNS: try again later, do not sign the user out
+            Refresh.Unreachable
         }
     }
 

@@ -59,38 +59,29 @@ object AppModule {
         .client(http(TokenAuthenticator(sm, http())))
         .build()
 
+    /**
+     * One shared connection pool, so the API client and the token-refresh client reuse connections.
+     * Idle connections are dropped after 30 seconds: the mobile network silently kills idle sockets
+     * (overnight, or when the phone sleeps), and reusing such a dead socket made the first calls of
+     * the morning hang.
+     */
+    private val pool = okhttp3.ConnectionPool(5, 30, TimeUnit.SECONDS)
+
     fun http(authenticator: Authenticator? = null): OkHttpClient {
-        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-            @Throws(CertificateException::class)
-            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
-            }
-
-            @Throws(CertificateException::class)
-            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
-            }
-
-            override fun getAcceptedIssuers(): Array<X509Certificate> {
-                return arrayOf()
-            }
-        })
-
-        val sslContext = SSLContext.getInstance("SSL")
-        sslContext.init(null, trustAllCerts, SecureRandom())
-        val sslSocketFactory = sslContext.socketFactory
         val loggingInterceptor = HttpLoggingInterceptor()
         // Full request logs only in debug builds: release builds must not print tokens or personal data
         loggingInterceptor.setLevel(if (com.cranezo.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE)
-        val builder = OkHttpClient.Builder().addInterceptor(loggingInterceptor)
-            .addInterceptor(object : Interceptor {
-                override fun intercept(chain: Interceptor.Chain): Response {
-                    val requestBuilder: Request.Builder = chain.request().newBuilder()
-                    return chain.proceed(requestBuilder.build())
-                }
-
-            }).connectTimeout(3, TimeUnit.MINUTES).writeTimeout(3, TimeUnit.MINUTES)
-            .readTimeout(3, TimeUnit.MINUTES)
-            .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-            .hostnameVerifier { hostname, session -> true }
+        val builder = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectionPool(pool)
+            // a call fails in seconds instead of hanging for minutes; a stale connection is retried on a new one
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(45, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .callTimeout(90, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+        // Normal HTTPS certificate checks (the server has a valid certificate); the old
+        // trust-all setup let anyone on the network read or change the traffic.
         authenticator?.let { builder.authenticator(it) }
         return builder.build()
     }
