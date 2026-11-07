@@ -176,6 +176,7 @@ fun Textview(
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
     isunderline: Boolean = false,
+    fontFamily: FontFamily = GeistFontFamily
 ) {
     Text(
         text = text,
@@ -185,7 +186,7 @@ fun Textview(
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
         style = TextStyle(
-//            fontFamily = InterFontFamily,
+            fontFamily = fontFamily,
             fontSize = size,
             fontWeight = fontWeight,
             fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
@@ -218,7 +219,7 @@ fun TextviewWithGradient(
             brush = Brush.verticalGradient(color),
             fontWeight = fontWeight,
             fontStyle = if (italic) FontStyle.Italic else FontStyle.Normal,
-//            fontFamily = fontFamily ?: InterFontFamily
+            fontFamily = fontFamily ?: GeistFontFamily
         ),
         textDecoration = if (isunderline) TextDecoration.Underline else TextDecoration.None
     )
@@ -557,6 +558,7 @@ fun LabelTextview(
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
+    fontFamily: FontFamily = GeistFontFamily
 ) {
     Text(
         text = text,
@@ -566,7 +568,7 @@ fun LabelTextview(
         overflow = TextOverflow.Ellipsis,
         textAlign = textAlign,
         style = TextStyle(
-//            fontFamily = InterFontFamily,
+            fontFamily = fontFamily,
             fontSize = size,
             fontWeight = when {
                 bold -> FontWeight.Bold

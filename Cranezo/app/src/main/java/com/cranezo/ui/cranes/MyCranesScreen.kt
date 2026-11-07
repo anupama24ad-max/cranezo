@@ -139,6 +139,7 @@ fun MyCranesScreen(
 }
 
 @Composable
+
 private fun EmptyOrError(error: String?, onAddCrane: () -> Unit, onRefresh: () -> Unit) {
     Box(
         modifier = Modifier
