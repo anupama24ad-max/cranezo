@@ -166,6 +166,7 @@ object PushNotifications {
             // Rapido-style requests: the owner's list of requests near them; the customer's request screen
             "owner_crane_requests" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
             "crane_request" -> BookingActivity.intent(context, BookingRoutes.REQUEST)
+            "subscription" -> com.cranezo.ui.subscription.SubscriptionActivity.intent(context)
             // "owner_request": the request popup lives on Home, which is already opened
             else -> null
         }

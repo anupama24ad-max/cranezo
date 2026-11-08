@@ -94,7 +94,11 @@ data class OwnerHomeData(
     val dueAmount: Double = 0.0,
     val dueOperators: Int = 0,
     val dueJobs: Int = 0,
-    val dueJobsNoCommission: Int = 0
+    val dueJobsNoCommission: Int = 0,
+    // subscription: state (trial, active, grace, expired), level (ok, info, red) and the message to show
+    val subState: String = "none",
+    val subLevel: String = "ok",
+    val subMessage: String = ""
 )
 
 data class BookingItem(

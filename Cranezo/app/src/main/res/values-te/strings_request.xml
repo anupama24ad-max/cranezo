@@ -222,4 +222,25 @@
     <string name="update_now">ఇప్పుడే అప్‌డేట్ చేయండి</string>
     <string name="update_later">తర్వాత</string>
     <string name="upload_images_only">ఫోటోలు మరియు PDF పత్రాలు మాత్రమే అప్‌లోడ్ చేయవచ్చు. వీడియోలు అనుమతించబడవు.</string>
+    <string name="sub_title">సబ్‌స్క్రిప్షన్</string>
+    <string name="sub_choose">మీ ప్లాన్‌ను ఎంచుకోండి</string>
+    <string name="sub_current">మీ సబ్‌స్క్రిప్షన్</string>
+    <string name="sub_plan_line">%1$s ప్లాన్</string>
+    <string name="sub_from">ప్రారంభం</string>
+    <string name="sub_due">గడువు తేదీ</string>
+    <string name="sub_trial_title">మొదటి నెల ఉచితం</string>
+    <string name="sub_trial_sub">%1$d రోజులు ఉచితం. ఇప్పుడు చెల్లింపు అవసరం లేదు.</string>
+    <string name="sub_start_trial">ఉచిత ట్రయల్ ప్రారంభించండి</string>
+    <string name="sub_per_month">నెలకు ₹%1$s</string>
+    <string name="sub_per_year">సంవత్సరానికి ₹%1$s</string>
+    <string name="sub_save_percent">%1$d%% ఆదా</string>
+    <string name="sub_gst_line">+ ₹%1$s GST (%2$s%%)</string>
+    <string name="sub_fee_line">+ ₹%1$s ఆన్‌లైన్ చెల్లింపు రుసుము (%2$s%%)</string>
+    <string name="sub_pay">₹%1$s చెల్లించండి</string>
+    <string name="sub_pay_extend">₹%1$s చెల్లించి పొడిగించండి</string>
+    <string name="sub_fee_note">చెల్లిస్తే పాత గడువు తేదీ నుండి పొడిగింపు వస్తుంది, కాబట్టి రోజులు కోల్పోరు.</string>
+    <string name="sub_payment_failed">చెల్లింపు పూర్తి కాలేదు.</string>
+    <string name="sub_menu_title">నా సబ్‌స్క్రిప్షన్</string>
+    <string name="sub_menu_sub">ప్లాన్, గడువు తేదీ మరియు చెల్లింపు</string>
+    <string name="sub_home_action">ప్లాన్‌లు చూడండి</string>
 </resources>

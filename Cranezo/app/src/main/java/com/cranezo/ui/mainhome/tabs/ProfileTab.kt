@@ -276,6 +276,14 @@ fun HomeProfileScreen(
                     subtitle = stringResource(if (role == UserRole.CRANE_OWNER) R.string.fin_platform_sub else R.string.fin_complaints_customer_sub),
                     onClick = { context.startActivity(FinanceActivity.intent(context)) }
                 )
+                if (role == UserRole.CRANE_OWNER) {
+                    MenuRow(
+                        icon = Icons.Default.AccountBalanceWallet,
+                        title = stringResource(R.string.sub_menu_title),
+                        subtitle = stringResource(R.string.sub_menu_sub),
+                        onClick = { context.startActivity(com.cranezo.ui.subscription.SubscriptionActivity.intent(context)) }
+                    )
+                }
                 MenuRow(
                     icon = Icons.Default.Person,
                     title = stringResource(R.string.mp_personal_info),

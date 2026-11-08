@@ -223,4 +223,25 @@
     <string name="update_now">Update now</string>
     <string name="update_later">Later</string>
     <string name="upload_images_only">Only pictures and PDF documents can be uploaded. Videos are not allowed.</string>
+    <string name="sub_title">Subscription</string>
+    <string name="sub_choose">Choose your plan</string>
+    <string name="sub_current">Your subscription</string>
+    <string name="sub_plan_line">%1$s plan</string>
+    <string name="sub_from">From</string>
+    <string name="sub_due">Due date</string>
+    <string name="sub_trial_title">First month free</string>
+    <string name="sub_trial_sub">%1$d days free. No payment now.</string>
+    <string name="sub_start_trial">Start free trial</string>
+    <string name="sub_per_month">₹%1$s per month</string>
+    <string name="sub_per_year">₹%1$s per year</string>
+    <string name="sub_save_percent">Save %1$d%%</string>
+    <string name="sub_gst_line">+ ₹%1$s GST (%2$s%%)</string>
+    <string name="sub_fee_line">+ ₹%1$s online payment fee (%2$s%%)</string>
+    <string name="sub_pay">Pay ₹%1$s</string>
+    <string name="sub_pay_extend">Pay ₹%1$s and extend</string>
+    <string name="sub_fee_note">Paying extends your due date from the old due date, so you do not lose any days.</string>
+    <string name="sub_payment_failed">The payment was not completed.</string>
+    <string name="sub_menu_title">My subscription</string>
+    <string name="sub_menu_sub">Plan, due date and payment</string>
+    <string name="sub_home_action">View plans</string>
 </resources>

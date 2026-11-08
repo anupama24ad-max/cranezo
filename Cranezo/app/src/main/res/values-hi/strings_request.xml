@@ -222,4 +222,25 @@
     <string name="update_now">अभी अपडेट करें</string>
     <string name="update_later">बाद में</string>
     <string name="upload_images_only">केवल फोटो और PDF दस्तावेज़ अपलोड किए जा सकते हैं। वीडियो की अनुमति नहीं है।</string>
+    <string name="sub_title">सब्सक्रिप्शन</string>
+    <string name="sub_choose">अपना प्लान चुनें</string>
+    <string name="sub_current">आपका सब्सक्रिप्शन</string>
+    <string name="sub_plan_line">%1$s प्लान</string>
+    <string name="sub_from">शुरू</string>
+    <string name="sub_due">देय तिथि</string>
+    <string name="sub_trial_title">पहला महीना मुफ़्त</string>
+    <string name="sub_trial_sub">%1$d दिन मुफ़्त। अभी कोई भुगतान नहीं।</string>
+    <string name="sub_start_trial">मुफ़्त ट्रायल शुरू करें</string>
+    <string name="sub_per_month">₹%1$s प्रति माह</string>
+    <string name="sub_per_year">₹%1$s प्रति वर्ष</string>
+    <string name="sub_save_percent">%1$d%% बचाएँ</string>
+    <string name="sub_gst_line">+ ₹%1$s GST (%2$s%%)</string>
+    <string name="sub_fee_line">+ ₹%1$s ऑनलाइन भुगतान शुल्क (%2$s%%)</string>
+    <string name="sub_pay">₹%1$s का भुगतान करें</string>
+    <string name="sub_pay_extend">₹%1$s का भुगतान करें और बढ़ाएँ</string>
+    <string name="sub_fee_note">भुगतान करने पर पुरानी देय तिथि से अवधि बढ़ती है, इसलिए कोई दिन नहीं जाता।</string>
+    <string name="sub_payment_failed">भुगतान पूरा नहीं हुआ।</string>
+    <string name="sub_menu_title">मेरा सब्सक्रिप्शन</string>
+    <string name="sub_menu_sub">प्लान, देय तिथि और भुगतान</string>
+    <string name="sub_home_action">प्लान देखें</string>
 </resources>

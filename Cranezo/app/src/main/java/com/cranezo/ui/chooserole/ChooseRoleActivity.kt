@@ -27,7 +27,9 @@ class ChooseRoleActivity : BaseVMComposeActivity<ChooseRoleViewModel>(
             onBackClick = { moveTaskToBack(true) },
             onContinueClick = { role ->
                 sm.setUserRole(role.name)
-                val intent = android.content.Intent(this@ChooseRoleActivity, com.cranezo.ui.profile.ProfileActivity::class.java)
+                // a crane owner chooses a plan first (free first month, monthly or yearly), then the usual sign-up goes on
+                val intent = if (role == UserRole.CRANE_OWNER) com.cranezo.ui.subscription.SubscriptionActivity.intent(this@ChooseRoleActivity, signup = true)
+                else android.content.Intent(this@ChooseRoleActivity, com.cranezo.ui.profile.ProfileActivity::class.java)
                 startActivity(intent)
             }
         )

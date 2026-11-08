@@ -86,6 +86,31 @@ fun OwnerHomeScreen(
         verticalArrangement = Arrangement.spacedBy(dimen_16)
     ) {
 
+        // Subscription: the free trial, a due date that is near (red), overdue or expired. Nothing when all is well.
+        val subContext = androidx.compose.ui.platform.LocalContext.current
+        val subRed = state.owner.subLevel == "red"
+        if (state.owner.subMessage.isNotBlank() && (subRed || state.owner.subState == "trial")) {
+            val tone = if (subRed) androidx.compose.ui.graphics.Color(0xFFEF4444) else AmberPrimary
+            GlassCard(
+                contentPadding = dimen_14, borderColor = tone,
+                onClick = { subContext.startActivity(com.cranezo.ui.subscription.SubscriptionActivity.intent(subContext)) }
+            ) {
+                androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(
+                            state.owner.subMessage, size = font_14, color = if (subRed) tone else appColors.textPrimary,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        )
+                        Textview(stringResource(R.string.sub_home_action), size = font_12, color = appColors.textSecondary)
+                    }
+                    androidx.compose.material3.Icon(
+                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null, tint = tone
+                    )
+                }
+            }
+        }
+
         // Money to pay the operators: first thing on the dashboard, highlighted with a badge while something is unpaid
         val dueContext = androidx.compose.ui.platform.LocalContext.current
         if (state.owner.dueOperators > 0) {

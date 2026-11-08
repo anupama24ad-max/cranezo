@@ -105,6 +105,10 @@
             android:exported="false"
             android:theme="@style/Theme.Cranezo" />
         <activity
+            android:name=".ui.subscription.SubscriptionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
             android:name=".ui.finance.FinanceActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"
