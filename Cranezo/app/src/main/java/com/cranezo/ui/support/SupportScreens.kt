@@ -650,7 +650,7 @@ fun ConversationScreen(
     val state = rememberSupportState(
         vm, SupportUiState(ticket = Ticket("1", "TKT-1", "issue", "Report an Issue", "App crashes", 1, "In Progress", can_reply = true, messages = listOf(
             TicketMessage(1, "user", true, "You", "The app closes when I tap pay.", null, "2026-09-05T04:00:00.000Z"),
-            TicketMessage(2, "admin", false, "Cranzo Support", "Thanks, we are checking this now.", null, "2026-09-05T04:05:00.000Z")
+            TicketMessage(2, "admin", false, "Cranezo Support", "Thanks, we are checking this now.", null, "2026-09-05T04:05:00.000Z")
         )), ticketLoaded = true)
     )
     val ticket = state.ticket
