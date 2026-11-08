@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -72,7 +73,7 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
     LaunchedEffect(job) {
         if (job != null && !filled) {
             filled = true
-            val current = job.assigned_operator ?: job.suggested_operator?.let { com.cranezo.ui.finance.model.AssignedOperatorRef(it.id, it.full_name) }
+            val current = job.assigned_operator ?: job.suggested_operator?.takeIf { it.is_online == true }?.let { com.cranezo.ui.finance.model.AssignedOperatorRef(it.id, it.full_name) }
             if (selected.isEmpty() && current?.id != null) {
                 selected = current.id
                 selectedName = current.full_name.orEmpty()
@@ -122,37 +123,43 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
         // 1. who does the job
         FinSection(stringResource(R.string.as_choose)) {
             val suggestedId = job.suggested_operator?.id
+            // (id, name, code) to usual?, online?  -- operators who are online come first
             val list = buildList {
-                job.suggested_operator?.let { s -> s.id?.let { add(Triple(it, s.full_name.orEmpty(), s.member_id.orEmpty()) to true) } }
-                state.operators.filter { it.id != suggestedId }.forEach { o -> o.id?.let { add(Triple(it, o.full_name.orEmpty(), o.member_id.orEmpty()) to false) } }
+                job.suggested_operator?.let { s -> s.id?.let { add(Triple(it, s.full_name.orEmpty(), s.member_id.orEmpty()) to Pair(true, s.is_online == true)) } }
+                state.operators.filter { it.id != suggestedId }.forEach { o -> o.id?.let { add(Triple(it, o.full_name.orEmpty(), o.member_id.orEmpty()) to Pair(false, o.is_online == true)) } }
+            }.sortedByDescending { it.second.second }
+            if (list.isNotEmpty() && list.none { it.second.second }) {
+                Textview(stringResource(R.string.as_all_offline), size = font_12, color = appColors.textSecondary)
             }
             if ("operators" in state.loaded && list.isEmpty()) {
                 Textview(stringResource(R.string.as_no_operators), size = font_12, color = appColors.textSecondary)
             }
             Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
-                list.forEach { (o, usual) ->
-                    val on = selected == o.first
+                list.forEach { (o, flags) ->
+                    val (usual, online) = flags
+                    val on = selected == o.first && online
                     Row(
                         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_12))
                             .background(if (on) AmberPrimary.copy(alpha = 0.18f) else appColors.subtleFill)
-                            .clickable {
+                            .then(if (online) Modifier.clickable {
                                 selected = o.first
                                 selectedName = o.second
                                 otherCode = ""
-                            }
+                            } else Modifier)
                             .padding(dimen_10),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconBadge(icon = Icons.Default.Person, accent = AmberPrimary, size = dimen_36)
+                        IconBadge(icon = Icons.Default.Person, accent = if (online) AmberPrimary else appColors.textHint, size = dimen_36)
                         Spacer(modifier = Modifier.width(dimen_10))
-                        Column(modifier = Modifier.weight(1f)) {
+                        Column(modifier = Modifier.weight(1f).then(if (online) Modifier else Modifier.alpha(0.55f))) {
                             Textview(o.second, size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                             Textview(o.third, size = font_11, color = appColors.textSecondary)
                         }
-                        if (usual) BookingTag(stringResource(R.string.rq_usual_operator), SuccessGreen)
+                        if (!online) BookingTag(stringResource(R.string.as_offline), Color(0xFF9CA3AF))
+                        else if (usual) BookingTag(stringResource(R.string.rq_usual_operator), SuccessGreen)
                         Spacer(modifier = Modifier.width(dimen_8))
                         // the round choice mark: a ring, with a dot inside when chosen
-                        Box(modifier = Modifier.size(dimen_20).clip(CircleShape).background(if (on) AmberPrimary else appColors.subtleBorder), contentAlignment = Alignment.Center) {
+                        if (online) Box(modifier = Modifier.size(dimen_20).clip(CircleShape).background(if (on) AmberPrimary else appColors.subtleBorder), contentAlignment = Alignment.Center) {
                             Box(modifier = Modifier.size(dimen_10).clip(CircleShape).background(if (on) Color.White else Color.Transparent))
                         }
                     }
@@ -187,6 +194,21 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
             if (type == "percent" && commission?.job_value != null) {
                 Spacer(modifier = Modifier.height(dimen_6))
                 TextRow(stringResource(R.string.cm_job_value), amountText(commission.job_value))
+            }
+            // one-tap usual values, so most owners never type
+            if (type == "percent") {
+                Row(modifier = Modifier.padding(top = dimen_8), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+                    listOf("8", "10", "12").forEach { q ->
+                        val on = value == q
+                        Box(
+                            modifier = Modifier.clip(RoundedCornerShape(dimen_20))
+                                .background(if (on) AmberPrimary.copy(alpha = 0.22f) else appColors.subtleFill)
+                                .clickable { value = q }
+                                .padding(horizontal = dimen_16, vertical = dimen_8),
+                            contentAlignment = Alignment.Center
+                        ) { Textview("$q%", size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold) }
+                    }
+                }
             }
             // updates while typing
             MoneyRow(stringResource(R.string.cm_operator_will_get), earns, bold = true, color = FinGreen)

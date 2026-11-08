@@ -269,4 +269,9 @@
     <string name="rq_book_new">Book a crane</string>
     <string name="bk_track_none">Live tracking is not available for this booking yet. It starts when the operator begins the journey.</string>
     <string name="crane_doc_optional">Optional</string>
+    <string name="bk_pay_now_line">Pay now to confirm (%1$d%%)</string>
+    <string name="bk_pay_later_line">Pay after the job</string>
+    <string name="bk_price_note">This is the full price. Nothing else is added later.</string>
+    <string name="as_offline">Offline</string>
+    <string name="as_all_offline">No operator is online right now. Ask your operator to switch Online on, then come back.</string>
 </resources>

@@ -111,5 +111,7 @@ data class Operator(
     val owner_id: String? = null,
     // "owner_added" or "registered"
     val source: String? = null,
-    val is_mobile_verified: Boolean? = null
+    val is_mobile_verified: Boolean? = null,
+    // the operator's Online / Offline button
+    val is_online: Boolean? = null
 )

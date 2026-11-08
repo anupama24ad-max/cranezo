@@ -220,7 +220,7 @@ data class OwnerEarningJob(
 )
 
 /** The crane's usual operator, offered first when assigning a job */
-data class SuggestedOperator(val id: String? = null, val full_name: String? = null, val member_id: String? = null)
+data class SuggestedOperator(val id: String? = null, val full_name: String? = null, val member_id: String? = null, val is_online: Boolean? = null)
 
 /** Booking for someone else: who to call at the site */
 data class SiteContact(val name: String? = null, val phone: String? = null)

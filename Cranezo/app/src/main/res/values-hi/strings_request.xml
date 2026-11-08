@@ -268,4 +268,9 @@
     <string name="rq_book_new">क्रेन बुक करें</string>
     <string name="bk_track_none">इस बुकिंग के लिए लाइव ट्रैकिंग अभी उपलब्ध नहीं है। ऑपरेटर के यात्रा शुरू करने पर यह चालू होगी।</string>
     <string name="crane_doc_optional">वैकल्पिक</string>
+    <string name="bk_pay_now_line">पुष्टि के लिए अभी दें (%1$d%%)</string>
+    <string name="bk_pay_later_line">काम के बाद दें</string>
+    <string name="bk_price_note">यह पूरी कीमत है। बाद में कुछ और नहीं जुड़ेगा।</string>
+    <string name="as_offline">ऑफ़लाइन</string>
+    <string name="as_all_offline">अभी कोई ऑपरेटर ऑनलाइन नहीं है। अपने ऑपरेटर से ऑनलाइन करने को कहें, फिर वापस आएँ।</string>
 </resources>

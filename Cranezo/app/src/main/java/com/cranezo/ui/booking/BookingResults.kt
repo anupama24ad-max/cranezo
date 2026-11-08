@@ -423,6 +423,14 @@ private fun PriceBreakdown(price: BookingPrice?) {
             .forEach { PriceLine(it.label.orEmpty(), rupees(it.amount)) }
         Spacer(modifier = Modifier.height(dimen_6))
         PriceLine(stringResource(R.string.bk_estimated_total), rupees(price.total_payable ?: price.total_amount), bold = true)
+        // "Why this price?": what is paid now and what is paid later, in plain words
+        if ((price.advance_amount ?: 0.0) > 0) {
+            Spacer(modifier = Modifier.height(dimen_6))
+            PriceLine(stringResource(R.string.bk_pay_now_line, price.advance_percent ?: 0), rupees(price.advance_amount), valueColor = AmberPrimary)
+            PriceLine(stringResource(R.string.bk_pay_later_line), rupees(price.remaining_amount))
+            Spacer(modifier = Modifier.height(dimen_4))
+            Textview(stringResource(R.string.bk_price_note), size = font_11, color = appColors.textHint)
+        }
     }
 }
 
