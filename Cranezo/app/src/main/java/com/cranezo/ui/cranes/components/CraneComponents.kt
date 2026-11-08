@@ -106,7 +106,11 @@ fun CraneStatusBadge(
 fun CraneImage(
     path: String?,
     modifier: Modifier = Modifier,
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_12)
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(dimen_12),
+    /** Crop fills the box; Fit shows the whole picture */
+    contentScale: ContentScale = ContentScale.Crop,
+    /** Room around the picture inside the box (e.g. to keep it clear of a label strip) */
+    imagePadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues()
 ) {
     val url = fileUrl(path)
     var failed by remember(url) { mutableStateOf(false) }
@@ -127,8 +131,8 @@ fun CraneImage(
             ShimmerImage(
                 model = url,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize(),
+                contentScale = contentScale,
+                modifier = Modifier.matchParentSize().padding(imagePadding),
                 onError = { failed = true }
             )
         }

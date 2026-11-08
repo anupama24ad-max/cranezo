@@ -222,11 +222,15 @@ fun CraneTypeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext:
                         onClick = { type.id?.let { vm?.onIntent(BookingIntent.SelectCraneType(it)) } },
                         modifier = Modifier.weight(1f).aspectRatio(1.25f).heightIn(min = dimen_132)
                     ) {
-                        // The picture fills the card; the name sits in a dark strip along the bottom
+                        // The whole picture is shown (scaled down, never cropped) above the name strip
                         CraneImage(
                             path = type.image,
                             modifier = Modifier.matchParentSize(),
-                            shape = RoundedCornerShape(dimen_16)
+                            shape = RoundedCornerShape(dimen_16),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                            imagePadding = androidx.compose.foundation.layout.PaddingValues(
+                                start = dimen_8, end = dimen_8, top = dimen_8, bottom = dimen_36 + dimen_4
+                            )
                         )
                         Box(
                             modifier = Modifier
