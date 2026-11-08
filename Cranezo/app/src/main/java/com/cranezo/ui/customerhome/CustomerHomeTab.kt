@@ -262,7 +262,7 @@ private fun BannerCarousel(banners: List<HomeBanner>, onAction: (BannerAction?) 
     Column(verticalArrangement = Arrangement.spacedBy(dimen_8), horizontalAlignment = Alignment.CenterHorizontally) {
         HorizontalPager(
             state = pager,
-            modifier = Modifier.fillMaxWidth().height(dimen_175)
+            modifier = Modifier.fillMaxWidth().height(200.dp)
                 .androidxPointerWatch { touching = it }
         ) { page ->
             val banner = visible[page]
