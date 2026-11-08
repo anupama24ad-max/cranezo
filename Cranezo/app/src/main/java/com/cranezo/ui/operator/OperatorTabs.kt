@@ -445,7 +445,8 @@ private fun Modifier.clickableTab(onClick: () -> Unit): Modifier = this.then(
 
 @Composable
 private fun EarningTile(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier = Modifier, tint: Color = AmberPrimary) {
-    GlassCard(modifier = modifier.fillMaxHeight(), contentPadding = dimen_12, minHeight = dimen_96) {
+    // compact, and the content sits in the middle of the tile
+    GlassCard(modifier = modifier.fillMaxHeight(), contentPadding = dimen_12, minHeight = dimen_72, verticalArrangement = Arrangement.Center) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBadge(icon = icon, accent = tint, size = dimen_36)
             Spacer(modifier = Modifier.width(dimen_10))

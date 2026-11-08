@@ -255,4 +255,17 @@
     <string name="as_done_title">ఆపరేటర్ కేటాయించబడ్డారు</string>
     <string name="as_done_body">%1$s కు ఈ జాబ్‌కు %2$s వస్తుంది. వారికి తెలియజేయబడింది.</string>
     <string name="as_done_back">జాబ్‌కు తిరిగి వెళ్ళండి</string>
+    <string name="sp_issue_intro">ఏమి తప్పు జరిగిందో చెప్పండి. మేము ప్రతి రిపోర్ట్ చదివి యాప్‌లో సమాధానం ఇస్తాము.</string>
+    <string name="sp_contact_intro">మా బృందానికి రాయండి. మేము యాప్‌లో సమాధానం ఇస్తాము.</string>
+    <string name="sp_issue_kind">ఇది దేని గురించి?</string>
+    <string name="sp_kind_app">యాప్ సమస్య</string>
+    <string name="sp_kind_booking">బుకింగ్</string>
+    <string name="sp_kind_payment">చెల్లింపు</string>
+    <string name="sp_kind_operator">ఆపరేటర్ లేదా క్రేన్</string>
+    <string name="sp_kind_other">మరొకటి</string>
+    <string name="sp_photos_hint">ఐచ్ఛికం. గరిష్టంగా 5 ఫోటోలు.</string>
+    <string name="rq_view_bookings">నా బుకింగ్‌లు చూడండి</string>
+    <string name="rq_book_new">క్రేన్ బుక్ చేయండి</string>
+    <string name="bk_track_none">ఈ బుకింగ్‌కు లైవ్ ట్రాకింగ్ ఇంకా అందుబాటులో లేదు. ఆపరేటర్ ప్రయాణం మొదలుపెట్టినప్పుడు ఇది మొదలవుతుంది.</string>
+    <string name="crane_doc_optional">ఐచ్ఛికం</string>
 </resources>

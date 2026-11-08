@@ -350,7 +350,14 @@ fun TrackScreen(
     }
 
     BookingScaffold(onBack = onBack, title = stringResource(R.string.bk_track_title)) {
-        if (track == null) return@BookingScaffold
+        if (track == null) {
+            if (state.trackLoaded) {
+                Textview(stringResource(R.string.bk_track_none), size = font_14, color = appColors.textSecondary, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(top = dimen_40))
+            } else {
+                Box(modifier = Modifier.fillMaxWidth().padding(top = dimen_40), contentAlignment = Alignment.Center) { com.cranezo.ui.components.CranezoLoader() }
+            }
+            return@BookingScaffold
+        }
 
         // The live map: the crane moves towards the site as the operator drives (updated every 5 seconds)
         val craneAt = track.crane_location
@@ -459,19 +466,6 @@ fun TrackScreen(
             }
         }
 
-        // Where the crane is, in the maps app
-        val location = track.crane_location
-        if (location?.latitude != null && location.longitude != null) {
-            CommonGradientButton(
-                text = stringResource(R.string.bk_open_in_maps),
-                leftIcon = Icons.Default.Map,
-                onClick = {
-                    context.startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("geo:${location.latitude},${location.longitude}?q=${location.latitude},${location.longitude}"))
-                    )
-                }
-            )
-        }
         Spacer(modifier = Modifier.height(dimen_8))
     }
 }

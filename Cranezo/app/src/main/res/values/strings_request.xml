@@ -256,4 +256,17 @@
     <string name="as_done_title">Operator assigned</string>
     <string name="as_done_body">%1$s will earn %2$s for this job. They have been told.</string>
     <string name="as_done_back">Back to the job</string>
+    <string name="sp_issue_intro">Tell us what went wrong. We read every report and reply in the app.</string>
+    <string name="sp_contact_intro">Write to our team. We reply in the app.</string>
+    <string name="sp_issue_kind">What is it about?</string>
+    <string name="sp_kind_app">App problem</string>
+    <string name="sp_kind_booking">Booking</string>
+    <string name="sp_kind_payment">Payment</string>
+    <string name="sp_kind_operator">Operator or crane</string>
+    <string name="sp_kind_other">Something else</string>
+    <string name="sp_photos_hint">Optional. Up to 5 photos.</string>
+    <string name="rq_view_bookings">View my bookings</string>
+    <string name="rq_book_new">Book a crane</string>
+    <string name="bk_track_none">Live tracking is not available for this booking yet. It starts when the operator begins the journey.</string>
+    <string name="crane_doc_optional">Optional</string>
 </resources>

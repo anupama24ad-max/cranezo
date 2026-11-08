@@ -56,6 +56,9 @@ import com.cranezo.ui.theme.*
 import com.cranezo.utils.formatServerDate
 import com.cranezo.utils.formatServerDateTime
 import com.cranezo.utils.rupees
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Schedule
+import com.cranezo.ui.mainhome.components.IconBadge
 
 // =============================================================================================
 // Shared page pieces: plain sections, label/amount rows, chips and inline notices. No popups.
@@ -190,32 +193,43 @@ fun statusTone(status: String?): Color = when (status) {
 
 @Composable
 fun SettlementRow(s: SettlementItem) {
-    GlassCard(contentPadding = dimen_12, minHeight = dimen_40) {
+    GlassCard(contentPadding = dimen_14, minHeight = dimen_64) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            IconBadge(icon = Icons.Filled.CheckCircle, accent = FinGreen, size = dimen_40)
+            Spacer(modifier = Modifier.width(dimen_12))
             Column(modifier = Modifier.weight(1f)) {
-                Textview(s.direction_label.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                Textview(s.direction_label.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 2)
                 Textview(
                     listOfNotNull(formatServerDate(s.settled_at), s.method_label, s.reference).joinToString(" · "),
-                    size = font_12, color = appColors.textSecondary
+                    size = font_12, color = appColors.textSecondary, maxLines = 1
                 )
-                Textview(stringResource(R.string.fin_jobs_count, s.jobs_count ?: 0), size = font_12, color = appColors.textHint)
+                Textview(stringResource(R.string.fin_jobs_count, s.jobs_count ?: 0), size = font_11, color = appColors.textHint)
             }
-            Textview(amountText(s.amount), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(dimen_10))
+            Textview(amountText(s.amount), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
         }
     }
 }
 
 @Composable
 fun TransactionRow(t: TransactionItem, onOpen: ((TransactionItem) -> Unit)? = null) {
-    GlassCard(contentPadding = dimen_12, minHeight = dimen_40, onClick = onOpen?.let { open -> { open(t) } }) {
+    GlassCard(contentPadding = dimen_14, minHeight = dimen_64, onClick = onOpen?.let { open -> { open(t) } }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // the round mark on the left says at a glance: paid, failed or waiting
+            IconBadge(
+                icon = when (t.status) { "success" -> Icons.Filled.CheckCircle; "failed" -> Icons.Filled.Close; else -> Icons.Filled.Schedule },
+                accent = statusTone(t.status), size = dimen_40
+            )
+            Spacer(modifier = Modifier.width(dimen_12))
             Column(modifier = Modifier.weight(1f)) {
-                Textview(t.booking_code ?: t.transaction_code.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                Textview(listOfNotNull(t.method_name, formatServerDateTime(t.created_at)).joinToString(" · "), size = font_12, color = appColors.textSecondary)
-                Textview(t.transaction_code.orEmpty(), size = font_11, color = appColors.textHint)
+                Textview(t.booking_code ?: t.transaction_code.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                Textview(listOfNotNull(t.method_name, formatServerDateTime(t.created_at)).joinToString(" · "), size = font_12, color = appColors.textSecondary, maxLines = 1)
+                Textview(t.transaction_code.orEmpty(), size = font_11, color = appColors.textHint, maxLines = 1)
             }
-            Column(horizontalAlignment = Alignment.End) {
-                Textview(amountText(t.amount), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(dimen_10))
+            // amount and status share the same right edge
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(dimen_4)) {
+                Textview(amountText(t.amount), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
                 BookingTag(t.status_label.orEmpty(), statusTone(t.status))
             }
         }
@@ -269,6 +283,9 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
             )
             Textview(stringResource(R.string.rq_advance_hint), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_6))
         }
+        // GST and additional charges: hidden for now, the admin sets them (they keep the values already saved).
+        // To let owners edit them again, remove the comment marks around this block.
+        /*
         FinSection(stringResource(R.string.fin_gst)) {
             GlassInputField(
                 label = stringResource(R.string.fin_gst_percent), value = gst, onValueChange = { gst = it.filter { c -> c.isDigit() || c == '.' } },
@@ -312,6 +329,8 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
                 )
             }
         }
+
+        */
 
         FinSection(stringResource(R.string.fin_default_commission)) {
             Textview(stringResource(R.string.fin_default_commission_hint), size = font_12, color = appColors.textSecondary)

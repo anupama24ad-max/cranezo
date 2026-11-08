@@ -15,7 +15,10 @@ import com.cranezo.ui.theme.appColors
 import com.cranezo.ui.theme.dimen_10
 import com.cranezo.ui.theme.dimen_14
 import com.cranezo.ui.theme.dimen_44
+import com.cranezo.ui.theme.font_13
 import com.cranezo.ui.theme.font_14
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Column
 
 private val ConfirmRed = Color(0xFFEF4444)
 
@@ -31,21 +34,26 @@ fun InlineConfirm(
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
     cancelText: String = stringResource(R.string.common_cancel),
-    danger: Boolean = true
+    danger: Boolean = true,
+    // true: no card of its own, for use inside another card
+    plain: Boolean = false
 ) {
-    GlassCard(modifier = modifier, contentPadding = dimen_14, borderColor = if (danger) ConfirmRed else AmberPrimary) {
-        Textview(message, size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+    val body: @Composable ColumnScope.() -> Unit = {
+        Textview(message, size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Medium)
         Spacer(modifier = Modifier.height(dimen_10))
+        // two equal buttons on one line, short texts
         Row(horizontalArrangement = Arrangement.spacedBy(dimen_10)) {
             CommonGradientButton(
-                text = cancelText, modifier = Modifier.weight(1f), height = dimen_44, onClick = onCancel,
+                text = cancelText, modifier = Modifier.weight(1f), height = dimen_44, onClick = onCancel, textSize = font_14,
                 gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
             )
             CommonGradientButton(
-                text = confirmText, modifier = Modifier.weight(1f), height = dimen_44, onClick = onConfirm,
+                text = confirmText, modifier = Modifier.weight(1f), height = dimen_44, onClick = onConfirm, textSize = font_14,
                 gradientColors = if (danger) listOf(ConfirmRed, ConfirmRed) else listOf(AmberPrimary, AmberPrimary),
                 textColor = if (danger) Color.White else Color.Black
             )
         }
     }
+    if (plain) Column(modifier = modifier, content = body)
+    else GlassCard(modifier = modifier, contentPadding = dimen_14, borderColor = if (danger) ConfirmRed else AmberPrimary, content = body)
 }

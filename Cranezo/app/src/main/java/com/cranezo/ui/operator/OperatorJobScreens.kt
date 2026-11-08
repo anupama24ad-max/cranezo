@@ -103,13 +103,6 @@ private val previewJob = OperatorJob(
     estimated_earnings = 12000.0, special_requirements = "Heavy lifting equipment required\nSite access available"
 )
 
-private fun openMaps(context: Context, site: JobSite?, navigate: Boolean) {
-    val lat = site?.latitude ?: return
-    val lng = site.longitude ?: return
-    val uri = if (navigate) "google.navigation:q=$lat,$lng" else "geo:$lat,$lng?q=$lat,$lng"
-    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri))) }
-}
-
 private fun dial(context: Context, customer: JobCustomer?) {
     val number = customer?.mobile_number ?: return
     context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${customer.country_code.orEmpty()}$number")))
@@ -363,18 +356,7 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
             }
             Spacer(modifier = Modifier.height(dimen_8))
             InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
-            InfoRow(
-                Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address,
-                trailing = if (job.job_site?.latitude != null) {
-                    {
-                        CommonGradientButton(
-                            text = stringResource(R.string.op_map), onClick = { openMaps(context, job.job_site, false) },
-                            height = dimen_36, textSize = font_12, modifier = Modifier.width(dimen_80),
-                            gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
-                        )
-                    }
-                } else null
-            )
+            InfoRow(Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address)
             InfoRow(Icons.Default.Schedule, stringResource(R.string.op_when), formatServerDateTime(job.schedule?.start_at), sub = job.duration?.label)
         }
         // The one number the operator cares about most, large
@@ -409,18 +391,8 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
 @Composable
 private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
-    // The rule from the server (ARRIVAL_CHECK_REQUIRED in its .env): when true the operator must reach the site
-    // before "arrived" works, and the map and the Google Maps button are shown; when false none of that.
-    val rule = job.arrival_rule
-    val required = rule?.required != false
-    val radiusKm = rule?.radius_km ?: 1.0
     val siteLat = job.job_site?.latitude
     val siteLng = job.job_site?.longitude
-    val distKm = if (state.myLatitude != null && state.myLongitude != null && siteLat != null && siteLng != null)
-        com.cranezo.utils.distanceKm(state.myLatitude, state.myLongitude, siteLat, siteLng) else null
-    val tooFar = required && (distKm == null || distKm > radiusKm)
-    val tooFarMessage = if (distKm == null) stringResource(R.string.op_location_off_toast)
-        else stringResource(R.string.op_reach_site_toast, com.cranezo.utils.distanceLabel(distKm))
     // the yellow road route, asked again when the operator has moved about 100 m
     LaunchedEffect(state.myLatitude?.let { Math.round(it * 1000) }, state.myLongitude?.let { Math.round(it * 1000) }) {
         val la = state.myLatitude
@@ -434,19 +406,12 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     BookingScaffold(
         onBack = onClose,
         title = stringResource(R.string.op_on_the_way),
-        bottom = {
-            CommonGradientButton(
-                text = stringResource(R.string.op_reached_button),
-                gradientColors = if (tooFar) listOf(appColors.subtleFill, appColors.subtleFill) else listOf(AmberPrimary, AmberSecondary),
-                textColor = if (tooFar) appColors.textHint else Color.Black,
-                // too far: the button explains why instead of doing nothing
-                onClick = { if (tooFar) com.cranezo.ui.components.AppMessages.error(tooFarMessage) else onIntent(OperatorJobIntent.Arrived) }
-            )
-        }
+        // no restriction: the operator continues with this button whenever they are ready
+        bottom = { CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
     ) {
         OperatorStepHeader(job.next_action)
-        // where the customer's site is, and where the operator is now (updates as they drive); only when the operator has to reach the site
-        if (required) Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
+        // where the customer's site is, and where the operator is now (updates as they drive)
+        Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
             com.cranezo.ui.booking.request.SiteMap(
                 latitude = job.job_site?.latitude, longitude = job.job_site?.longitude, address = job.job_site?.address,
                 modifier = Modifier.matchParentSize(),
@@ -480,16 +445,6 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
                     "${job.job_site.distance_km} km", sub = stringResource(R.string.op_eta_min, job.job_site.eta_minutes ?: 0)
                 )
             }
-        }
-        // Turn-by-turn directions open in the Google Maps app (voice guidance in the phone's language).
-        // Shown only when the operator has to reach the site; with the rule off there is nothing to navigate to.
-        if (required) {
-            CommonGradientButton(
-                text = stringResource(R.string.op_open_google_maps), leftIcon = Icons.Default.Navigation, onClick = { openMaps(context, job.job_site, true) },
-                enabled = job.job_site?.latitude != null, height = dimen_56,
-                gradientColors = listOf(InfoBlue, InfoBlue), textColor = Color.White
-            )
-            Textview(stringResource(R.string.op_reach_site_hint, com.cranezo.utils.distanceLabel(radiusKm)), size = font_12, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         }
         Textview(stringResource(R.string.op_location_shared), size = font_12, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         if (job.customer?.mobile_number != null) {

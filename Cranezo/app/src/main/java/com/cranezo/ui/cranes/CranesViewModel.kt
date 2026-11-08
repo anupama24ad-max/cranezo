@@ -306,7 +306,7 @@ class CranesViewModel @Inject constructor(
             f.capacityId == null -> string(R.string.crane_msg_select_capacity)
             f.registration.isBlank() -> string(R.string.crane_msg_enter_registration)
             f.photos.isEmpty() -> string(R.string.crane_msg_add_photo)
-            state.mode == FormMode.ADD && state.documentTypes.any { f.documents[it.id]?.upload?.path == null } ->
+            state.mode == FormMode.ADD && state.documentTypes.any { it.required != false && f.documents[it.id]?.upload?.path == null } ->
                 string(R.string.crane_msg_upload_documents)
 
             f.location.isBlank() -> string(R.string.crane_msg_enter_location)

@@ -955,7 +955,7 @@
     <string name="sp_raise_emergency">Raise Emergency Request</string>
     <string name="sp_call_emergency_title">Call emergency support?</string>
     <string name="sp_call_emergency_message">Our emergency team will be alerted with your location, and then your phone will dial the emergency number.</string>
-    <string name="sp_yes_call">Yes, alert and call</string>
+    <string name="sp_yes_call">Yes, call now</string>
     <string name="sp_phone_unavailable">Phone support is not available right now, please use chat.</string>
     <string name="sp_faqs">FAQs</string>
     <string name="sp_still_need_help">Still need help? Contact support</string>

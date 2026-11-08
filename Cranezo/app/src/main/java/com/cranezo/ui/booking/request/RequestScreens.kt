@@ -243,7 +243,8 @@ fun RequestStatusScreen(
     onClose: () -> Unit,
     onBooked: (String) -> Unit,
     onTryAgain: () -> Unit,
-    onEditBooking: () -> Unit = onTryAgain
+    onEditBooking: () -> Unit = onTryAgain,
+    onMyBookings: () -> Unit = {}
 ) {
     val state by vm.ui.collectAsStateWithLifecycle()
     val r = state.request
@@ -275,8 +276,20 @@ fun RequestStatusScreen(
         onBack = goBack
     ) {
         if (r == null) {
-            Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
-                com.cranezo.ui.components.CranezoLoader()
+            if (!state.activeChecked) {
+                Box(modifier = Modifier.fillMaxWidth().padding(dimen_32), contentAlignment = Alignment.Center) {
+                    com.cranezo.ui.components.CranezoLoader()
+                }
+            } else {
+                // opened from an old notice: the request is over, so say so and offer the next step (never a loader that does not end)
+                FinSection(stringResource(R.string.rq_none_title)) {
+                    Textview(stringResource(R.string.rq_none_body), size = font_14, color = appColors.textSecondary)
+                }
+                CommonGradientButton(text = stringResource(R.string.rq_view_bookings), onClick = onMyBookings)
+                CommonGradientButton(
+                    text = stringResource(R.string.rq_book_new), onClick = onTryAgain,
+                    gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
+                )
             }
             return@MapSheetPage
         }

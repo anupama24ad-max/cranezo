@@ -157,7 +157,8 @@ fun GlassInputField(
         GlassFieldLabel(label, isRequired)
         // Multi-line fields start at the top-left, like a text area; single-line ones stay centred
         GlassFieldBox(
-            minHeight = minHeight,
+            // a description box starts compact (about 3 lines) and grows as the person types
+            minHeight = if (singleLine) minHeight else minOf(minHeight, dimen_76),
             verticalAlignment = if (singleLine) Alignment.CenterVertically else Alignment.Top
         ) {
             if (leftIcon != null) {

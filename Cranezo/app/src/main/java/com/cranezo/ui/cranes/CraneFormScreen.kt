@@ -300,7 +300,7 @@ fun CraneFormScreen(
                                 val typeId = type.id ?: return@forEach
                                 val entry = form.documents[typeId]
                                 DocumentRow(
-                                    title = type.name.orEmpty(),
+                                    title = type.name.orEmpty() + if (type.required == false) " · " + stringResource(R.string.crane_doc_optional) else "",
                                     upload = entry?.upload,
                                     expiry = entry?.expiry.orEmpty(),
                                     onPick = {

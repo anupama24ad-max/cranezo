@@ -146,7 +146,8 @@ object PushNotifications {
                 when (role) {
                     "CRANE_OWNER" -> OwnerJobActivity.intent(context, it)
                     "OPERATOR" -> OperatorActivity.intent(context, it)
-                    else -> BookingActivity.bookingIntent(context, it)
+                    // "the crane is on the way": the live tracking itself, not the booking page
+                    else -> if (screen == "track") BookingActivity.trackIntent(context, it) else BookingActivity.bookingIntent(context, it)
                 }
             }
             "owner_job" -> bookingId?.let { OwnerJobActivity.intent(context, it) }

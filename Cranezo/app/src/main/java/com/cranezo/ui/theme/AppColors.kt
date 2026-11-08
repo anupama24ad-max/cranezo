@@ -113,18 +113,18 @@ val LightAppColors = AppColors(
     textPrimary = Color(0xFF0F172A),
     textSecondary = Color(0xFF64748B),
     textHint = Color(0xFF94A3B8),
-    primaryText = Color(0xFFB45309),
+    primaryText = Color(0xFFC2410C),
     primaryTint = Color(0xFFF59E0B).copy(alpha = 0.14f),
-    // card.fill: frosted white, the soft yellow glow shows faintly through
-    glassTop = Color(0xFFFFFFFF).copy(alpha = 0.78f),
-    glassBottom = Color(0xFFFFFFFF).copy(alpha = 0.78f),
+    // card.fill: clean white cards with a soft blue-grey edge and a light shadow
+    glassTop = Color(0xFFFFFFFF).copy(alpha = 0.97f),
+    glassBottom = Color(0xFFFFFFFF).copy(alpha = 0.97f),
     glassSheen = Color(0xFFFFFFFF),
-    glassBorderTop = Color(0xFFFFFFFF).copy(alpha = 0.90f),
-    glassBorderBottom = Color(0xFF0F172A).copy(alpha = 0.08f),
-    glassShadow = Color(0xFF0F172A).copy(alpha = 0.08f),
+    glassBorderTop = Color(0xFFDCE4F0),
+    glassBorderBottom = Color(0xFFCBD6E6),
+    glassShadow = Color(0xFF1E3A8A).copy(alpha = 0.10f),
     glassInset = Color(0xFF0F172A).copy(alpha = 0.04f),
-    subtleFill = Color(0xFFF1F4F9),
-    subtleBorder = Color(0xFFB8C2D0),
+    subtleFill = Color(0xFFEDF1F8),
+    subtleBorder = Color(0xFFCBD6E6),
     imageVeil = Color(0xFFFFFFFF),
     screenTop = Color(0xFFEAF1FB),
     screenBottom = Color(0xFFF9FBFE),
@@ -132,11 +132,11 @@ val LightAppColors = AppColors(
     heroTop = Color(0xFF0B1F3F),
     heroBottom = Color(0xFF050A15),
     heroGlow = Color(0xFFF59E0B),
-    // A clean, light page: a soft butter-yellow touch at the very top fading quickly into a calm cool off-white,
-    // so the white cards stand out and the page does not look heavy or yellow
-    bodyTop = Color(0xFFFFEFC2),
-    bodyMid = Color(0xFFF8F6F2),
-    bodyBottom = Color(0xFFF2F5FA),
+    // A fresh light page: a faint sky-blue at the top fading into a cool near-white. White cards and amber buttons
+    // stand out on it; nothing is yellow or grey-brown.
+    bodyTop = Color(0xFFE9F1FF),
+    bodyMid = Color(0xFFF3F7FD),
+    bodyBottom = Color(0xFFF7F9FD),
     bodyShine = Color(0xFFFFFFFF)
 )
 

@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.cranezo.ui.theme.*
 
 /**
- * The search field of the whole app: glass, 52 high, radius 14, a constant 1.5 border whose colour
+ * The search field of the whole app: glass, 44 high, radius 14, a constant 1.5 border whose colour
  * turns amber on focus. Width comes from the parent. The clear button takes the place of the spinner
  * while loading, and the field height never changes.
  */
@@ -57,7 +57,7 @@ fun SearchInput(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(dimen_52)
+            .height(dimen_44)
             .glassEffect(shape, borderColor = if (focused) AmberPrimary else androidx.compose.ui.graphics.Color.Unspecified, borderWidth = 1.5.dp)
             .padding(start = dimen_16, end = dimen_12),
         verticalAlignment = Alignment.CenterVertically

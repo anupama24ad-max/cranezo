@@ -231,12 +231,6 @@ fun OwnerJobDetailsScreen(
                     Textview(location?.name ?: location?.address.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     Textview(location?.address.orEmpty(), size = font_11, color = appColors.textSecondary)
                 }
-                if (location?.latitude != null) {
-                    Textview(
-                        stringResource(R.string.oj_view_on_map), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.clickable { openMapAt(context, location.latitude, location.longitude) }
-                    )
-                }
             }
         }
 
@@ -421,6 +415,14 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
 
     BookingScaffold(onBack = onBack, title = stringResource(R.string.oj_view_live_location)) {
         if (track == null) return@BookingScaffold
+        // where the crane is, on the map in the app (it can be opened full screen)
+        Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
+            com.cranezo.ui.booking.request.SiteMap(
+                latitude = track.site?.latitude, longitude = track.site?.longitude, address = track.site?.address,
+                modifier = Modifier.matchParentSize(),
+                craneLatitude = track.crane_location?.latitude, craneLongitude = track.crane_location?.longitude, craneTitle = track.crane?.title
+            )
+        }
         GlassCard(contentPadding = dimen_14) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CraneImage(path = track.crane?.primary_photo, modifier = Modifier.size(dimen_56))
@@ -461,10 +463,6 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
                     }
                 }
             }
-        }
-        val loc = track.crane_location
-        if (loc?.latitude != null) {
-            CommonGradientButton(text = stringResource(R.string.bk_open_in_maps), onClick = { openMapAt(context, loc.latitude, loc.longitude) })
         }
     }
 }

@@ -255,4 +255,17 @@
     <string name="as_done_title">ऑपरेटर तय हो गया</string>
     <string name="as_done_body">%1$s को इस जॉब के %2$s मिलेंगे। उन्हें बता दिया गया है।</string>
     <string name="as_done_back">जॉब पर वापस जाएँ</string>
+    <string name="sp_issue_intro">बताइए क्या गड़बड़ हुई। हम हर रिपोर्ट पढ़ते हैं और ऐप में जवाब देते हैं।</string>
+    <string name="sp_contact_intro">हमारी टीम को लिखें। हम ऐप में जवाब देंगे।</string>
+    <string name="sp_issue_kind">यह किस बारे में है?</string>
+    <string name="sp_kind_app">ऐप की समस्या</string>
+    <string name="sp_kind_booking">बुकिंग</string>
+    <string name="sp_kind_payment">भुगतान</string>
+    <string name="sp_kind_operator">ऑपरेटर या क्रेन</string>
+    <string name="sp_kind_other">कुछ और</string>
+    <string name="sp_photos_hint">वैकल्पिक। अधिकतम 5 फोटो।</string>
+    <string name="rq_view_bookings">मेरी बुकिंग देखें</string>
+    <string name="rq_book_new">क्रेन बुक करें</string>
+    <string name="bk_track_none">इस बुकिंग के लिए लाइव ट्रैकिंग अभी उपलब्ध नहीं है। ऑपरेटर के यात्रा शुरू करने पर यह चालू होगी।</string>
+    <string name="crane_doc_optional">वैकल्पिक</string>
 </resources>

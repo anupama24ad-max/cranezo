@@ -89,6 +89,11 @@ class BookingActivity :
         private const val EXTRA_ROUTE = "route"
 
         private const val EXTRA_BOOKING = "booking_id"
+        private const val EXTRA_TRACK = "open_track"
+
+        /** Opens the live tracking of one booking (from a "crane is on the way" notice) */
+        fun trackIntent(context: Context, bookingId: String): Intent =
+            intent(context, BookingRoutes.BOOKINGS).putExtra(EXTRA_BOOKING, bookingId).putExtra(EXTRA_TRACK, true)
 
         /** Opens one booking (from a notification). */
         fun bookingIntent(context: Context, bookingId: String): Intent =
@@ -103,7 +108,11 @@ class BookingActivity :
         val nav = rememberNavController()
         val start = intent.getStringExtra(EXTRA_ROUTE) ?: BookingRoutes.TYPE
         // Opened from a notification: that booking's screen, by its stage
-        LaunchedEffect(Unit) { intent.getStringExtra(EXTRA_BOOKING)?.let { vm.onIntent(BookingIntent.OpenBooking(it)) } }
+        LaunchedEffect(Unit) {
+            intent.getStringExtra(EXTRA_BOOKING)?.let {
+                vm.onIntent(if (intent.getBooleanExtra(EXTRA_TRACK, false)) BookingIntent.OpenTrack(it) else BookingIntent.OpenBooking(it))
+            }
+        }
 
         LaunchedEffect(Unit) {
             vm.effect.collect { effect ->
@@ -202,7 +211,8 @@ class BookingActivity :
                         vm.onIntent(BookingIntent.OpenBooking(id))
                     },
                     // start again from step 4 with a fresh offer
-                    onTryAgain = toWhenStep
+                    onTryAgain = toWhenStep,
+                    onMyBookings = { nav.navigate(BookingRoutes.BOOKINGS) { popUpTo(BookingRoutes.REQUEST) { inclusive = true } } }
                 )
             }
             composable(BookingRoutes.RESULTS) {

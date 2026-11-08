@@ -2404,9 +2404,12 @@ fun GlassCard(
     borderColor: Color = Color.Unspecified,
     onClick: (() -> Unit)? = null,
     isGlassy: Boolean = true,
+    // how the content sits when the card is taller than it: Center for a tile that has a minimum height
+    verticalArrangement: androidx.compose.foundation.layout.Arrangement.Vertical = androidx.compose.foundation.layout.Arrangement.Top,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
+        verticalArrangement = verticalArrangement,
         modifier = if(isGlassy){
             modifier
                 .fillMaxWidth()

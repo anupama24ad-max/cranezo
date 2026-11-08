@@ -53,6 +53,7 @@ val dimen_75 = 75.dp
 val dimen_78 = 78.dp
 val dimen_80 = 80.dp
 val dimen_76 = 76.dp
+val dimen_72 = 72.dp
 val dimen_88 = 88.dp
 val dimen_104 = 104.dp
 val dimen_132 = 132.dp

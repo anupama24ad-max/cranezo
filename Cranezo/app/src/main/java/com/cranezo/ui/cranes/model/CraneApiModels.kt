@@ -85,7 +85,9 @@ data class CraneOwner(
 data class FormOption(
     val id: Int? = null,
     val name: String? = null,
-    val description: String? = null
+    val description: String? = null,
+    // crane documents: false = optional (Fitness Certificate, Form 38, Pollution Certificate)
+    val required: Boolean? = null
 )
 
 /** `data` of POST /owner/cranes/form-options with an empty body. */

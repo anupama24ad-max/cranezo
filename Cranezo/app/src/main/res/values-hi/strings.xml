@@ -802,7 +802,7 @@
     <string name="sp_raise_emergency">आपातकालीन अनुरोध भेजें</string>
     <string name="sp_call_emergency_title">आपातकालीन सहायता को कॉल करें?</string>
     <string name="sp_call_emergency_message">हमारी आपातकालीन टीम को आपकी लोकेशन के साथ सूचित किया जाएगा, फिर आपका फ़ोन आपातकालीन नंबर डायल करेगा।</string>
-    <string name="sp_yes_call">हाँ, सूचित करें और कॉल करें</string>
+    <string name="sp_yes_call">हाँ, अभी कॉल करें</string>
     <string name="sp_phone_unavailable">फ़ोन सहायता अभी उपलब्ध नहीं है, कृपया चैट इस्तेमाल करें।</string>
     <string name="sp_faqs">अक्सर पूछे जाने वाले सवाल</string>
     <string name="sp_still_need_help">अब भी मदद चाहिए? सहायता से संपर्क करें</string>

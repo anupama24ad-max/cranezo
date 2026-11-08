@@ -110,6 +110,7 @@ import com.cranezo.utils.imagePicker.rememberImagePickerController
 import com.cranezo.utils.serverMonthName
 import com.cranezo.utils.serverYear
 import kotlinx.coroutines.delay
+import com.cranezo.ui.components.glassEffect
 
 fun dialNumber(context: Context, number: String?) {
     if (number.isNullOrBlank()) return
@@ -295,12 +296,13 @@ fun HelpSupportHomeScreen(
 
     BookingScaffold(onBack = onBack, title = stringResource(R.string.mp_help_support), subtitle = stringResource(R.string.sp_here_to_help)) {
         // Search opens the FAQ search
-        GlassCard(contentPadding = dimen_12, onClick = onSearch) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Search, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_20))
-                Spacer(modifier = Modifier.width(dimen_10))
-                Textview(home?.search_placeholder ?: stringResource(R.string.sp_search_help), size = font_13, color = appColors.textHint)
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth().height(dimen_44).glassEffect(RoundedCornerShape(dimen_14)).clickable { onSearch() }.padding(horizontal = dimen_14),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.Search, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_20))
+            Spacer(modifier = Modifier.width(dimen_10))
+            Textview(home?.search_placeholder ?: stringResource(R.string.sp_search_help), size = font_13, color = appColors.textHint, maxLines = 1)
         }
 
         home?.emergency?.let { e ->
@@ -313,25 +315,27 @@ fun HelpSupportHomeScreen(
                         Textview(e.subtitle.orEmpty(), size = font_11, color = appColors.textSecondary)
                     }
                 }
-                Spacer(modifier = Modifier.height(dimen_8))
-                // Without a number the team can still be alerted, but there is nothing to call
-                CommonGradientButton(
-                    text = stringResource(if (e.available == true) R.string.sp_call_now else R.string.sp_raise_emergency),
-                    onClick = { confirmEmergency = true }, height = dimen_40, textSize = font_12,
-                    gradientColors = listOf(Red.copy(alpha = 0.25f), Red.copy(alpha = 0.25f)), textColor = Red
-                )
-            }
-            // asks once more right below the card (no popup)
-            if (confirmEmergency) {
-                com.cranezo.ui.components.InlineConfirm(
-                    message = stringResource(R.string.sp_call_emergency_message),
-                    confirmText = stringResource(R.string.sp_yes_call),
-                    onConfirm = {
-                        confirmEmergency = false
-                        vm?.onIntent(SupportIntent.Emergency(null, ""))
-                    },
-                    onCancel = { confirmEmergency = false }
-                )
+                Spacer(modifier = Modifier.height(dimen_10))
+                if (confirmEmergency) {
+                    // asks once more inside the same card (no popup, no second card)
+                    com.cranezo.ui.components.InlineConfirm(
+                        message = stringResource(R.string.sp_call_emergency_message),
+                        confirmText = stringResource(R.string.sp_yes_call),
+                        plain = true,
+                        onConfirm = {
+                            confirmEmergency = false
+                            vm?.onIntent(SupportIntent.Emergency(null, ""))
+                        },
+                        onCancel = { confirmEmergency = false }
+                    )
+                } else {
+                    // Without a number the team can still be alerted, but there is nothing to call
+                    CommonGradientButton(
+                        text = stringResource(if (e.available == true) R.string.sp_call_now else R.string.sp_raise_emergency),
+                        onClick = { confirmEmergency = true }, height = dimen_40, textSize = font_12,
+                        gradientColors = listOf(Red.copy(alpha = 0.25f), Red.copy(alpha = 0.25f)), textColor = Red
+                    )
+                }
             }
         }
 
@@ -514,13 +518,45 @@ fun CreateTicketScreen(
             }
             return@BookingScaffold
         }
+        Textview(stringResource(if (category == "issue") R.string.sp_issue_intro else R.string.sp_contact_intro), size = font_13, color = appColors.textSecondary)
+        if (category == "issue") {
+            // one tap fills the subject: easier than typing
+            Textview(stringResource(R.string.sp_issue_kind), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+            val kinds = listOf(R.string.sp_kind_app, R.string.sp_kind_booking, R.string.sp_kind_payment, R.string.sp_kind_operator, R.string.sp_kind_other).map { stringResource(it) }
+            KindChips(kinds, subject) { subject = it }
+        }
         GlassInputField(label = stringResource(R.string.sp_subject), value = subject, onValueChange = { subject = it.take(120) }, placeholder = stringResource(R.string.sp_subject_hint))
         GlassInputField(
             label = stringResource(R.string.sp_describe), value = description, onValueChange = { description = it.take(1000) },
-            placeholder = stringResource(R.string.sp_describe_hint), singleLine = false, minHeight = dimen_120, isRequired = true
+            placeholder = stringResource(R.string.sp_describe_hint), singleLine = false, minHeight = dimen_76, isRequired = true
         )
-        Textview(stringResource(R.string.sp_photos), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+        Column(verticalArrangement = Arrangement.spacedBy(dimen_4)) {
+            Textview(stringResource(R.string.sp_photos), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+            Textview(stringResource(R.string.sp_photos_hint), size = font_11, color = appColors.textHint)
+        }
         AttachmentRow(state, picker::openChooser) { vm?.onIntent(SupportIntent.RemoveAttachment(it)) }
+    }
+}
+
+/** Small tap-to-choose labels that wrap onto the next line */
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+@Composable
+private fun KindChips(options: List<String>, selected: String, onSelect: (String) -> Unit) {
+    androidx.compose.foundation.layout.FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(dimen_8),
+        verticalArrangement = Arrangement.spacedBy(dimen_8)
+    ) {
+        options.forEach { label ->
+            val on = selected == label
+            Box(
+                modifier = Modifier.clip(RoundedCornerShape(dimen_20))
+                    .background(if (on) AmberPrimary.copy(alpha = 0.22f) else appColors.subtleFill)
+                    .clickable { onSelect(label) }
+                    .padding(horizontal = dimen_14, vertical = dimen_8)
+            ) {
+                Textview(label, size = font_13, color = if (on) appColors.primaryText else appColors.textPrimary, fontWeight = if (on) FontWeight.Bold else FontWeight.Medium)
+            }
+        }
     }
 }
 
@@ -619,12 +655,13 @@ private fun MessageBubble(m: TicketMessage) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (mine) Arrangement.End else Arrangement.Start) {
                 Column(
                     modifier = Modifier.widthIn(max = dimen_280)
-                        .clip(RoundedCornerShape(dimen_14))
-                        .background(if (mine) AmberPrimary.copy(alpha = 0.85f) else appColors.subtleFill)
-                        .padding(dimen_10)
+                        // the corner next to the sender is square: it reads as a speech bubble
+                        .clip(RoundedCornerShape(topStart = dimen_16, topEnd = dimen_16, bottomStart = if (mine) dimen_16 else dimen_4, bottomEnd = if (mine) dimen_4 else dimen_16))
+                        .background(if (mine) AmberPrimary else appColors.subtleFill)
+                        .padding(horizontal = dimen_12, vertical = dimen_8)
                 ) {
                     if (!mine) Textview(m.sender_label.orEmpty(), size = font_10, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
-                    if (!m.body.isNullOrBlank()) Textview(m.body, size = font_13, color = if (mine) Color.Black else appColors.textPrimary)
+                    if (!m.body.isNullOrBlank()) Textview(m.body, size = font_14, color = if (mine) Color.Black else appColors.textPrimary)
                     m.attachments.orEmpty().forEach { path ->
                         ShimmerImage(
                             model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop,
@@ -632,9 +669,43 @@ private fun MessageBubble(m: TicketMessage) {
                                 .clickable { com.cranezo.ui.cranes.openFile(context, path) }
                         )
                     }
-                    Textview(formatServerTime(m.created_at), size = font_10, color = if (mine) Color.Black.copy(alpha = 0.6f) else appColors.textHint, modifier = Modifier.align(Alignment.End))
+                    Textview(formatServerTime(m.created_at), size = font_10, color = if (mine) Color.Black.copy(alpha = 0.6f) else appColors.textHint, modifier = Modifier.align(Alignment.End).padding(top = dimen_2))
                 }
             }
+        }
+    }
+}
+
+/** The chat box: photo button, a rounded field that grows a little, and a round send button */
+@Composable
+private fun ChatInputBar(text: String, onChange: (String) -> Unit, onAttach: () -> Unit, onSend: () -> Unit, sending: Boolean, hasAttachments: Boolean) {
+    val canSend = (text.isNotBlank() || hasAttachments) && !sending
+    Row(
+        modifier = Modifier.fillMaxWidth().glassEffect(RoundedCornerShape(dimen_28)).padding(horizontal = dimen_8, vertical = dimen_6),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(modifier = Modifier.size(dimen_40).clip(CircleShape).clickable { onAttach() }, contentAlignment = Alignment.Center) {
+            Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_22))
+        }
+        androidx.compose.foundation.text.BasicTextField(
+            value = text,
+            onValueChange = onChange,
+            maxLines = 4,
+            modifier = Modifier.weight(1f).padding(horizontal = dimen_6),
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = font_14, color = appColors.textPrimary),
+            cursorBrush = androidx.compose.ui.graphics.SolidColor(AmberPrimary),
+            decorationBox = { inner ->
+                Box(contentAlignment = Alignment.CenterStart) {
+                    if (text.isEmpty()) Textview(stringResource(R.string.sp_type_message), size = font_14, color = appColors.textHint, maxLines = 1)
+                    inner()
+                }
+            }
+        )
+        Box(
+            modifier = Modifier.size(dimen_40).clip(CircleShape).background(if (canSend) AmberPrimary else appColors.subtleFill).clickable(enabled = canSend) { onSend() },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = if (canSend) Color.Black else appColors.textHint, modifier = Modifier.size(dimen_20))
         }
     }
 }
@@ -730,21 +801,14 @@ fun ConversationScreen(
             } else if (ticket != null) {
                 Column(modifier = Modifier.padding(horizontal = dimen_20, vertical = dimen_8)) {
                     if (state.attachments.isNotEmpty()) AttachmentRow(state, picker::openChooser) { vm?.onIntent(SupportIntent.RemoveAttachment(it)) }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_24).clickable { picker.openChooser() })
-                        Spacer(modifier = Modifier.width(dimen_8))
-                        Box(modifier = Modifier.weight(1f)) {
-                            GlassInputField(label = "", value = text, onValueChange = { text = it.take(1000) }, placeholder = stringResource(R.string.sp_type_message))
+                    ChatInputBar(
+                        text = text, onChange = { text = it.take(1000) }, onAttach = { picker.openChooser() },
+                        sending = state.isSending, hasAttachments = state.attachments.isNotEmpty(),
+                        onSend = {
+                            vm?.onIntent(SupportIntent.SendReply(text))
+                            text = ""
                         }
-                        Spacer(modifier = Modifier.width(dimen_8))
-                        Icon(
-                            Icons.AutoMirrored.Filled.Send, contentDescription = null, tint = AmberPrimary,
-                            modifier = Modifier.size(dimen_28).clickable(enabled = !state.isSending) {
-                                vm?.onIntent(SupportIntent.SendReply(text))
-                                text = ""
-                            }
-                        )
-                    }
+                    )
                 }
             }
         }

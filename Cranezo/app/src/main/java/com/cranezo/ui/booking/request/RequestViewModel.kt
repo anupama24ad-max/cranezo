@@ -22,6 +22,8 @@ data class RequestUiState(
     val estimating: Boolean = false,
     val estimateFailed: Boolean = false,
     val request: CraneRequestView? = null,
+    // the server was asked for the running request (so "nothing running" is known, not just "still loading")
+    val activeChecked: Boolean = false,
     val busy: Boolean = false,
     // "No crane found" was sent to the team
     val sentToTeam: Boolean = false,
@@ -111,9 +113,9 @@ class RequestViewModel @Inject constructor(
 
     /** The request in progress (searching or waiting for the advance), to reopen it */
     fun loadActive(onFound: () -> Unit = {}) {
-        post("customer/crane-requests/active", JSONObject(), busy = false, quiet = true) { d ->
+        post("customer/crane-requests/active", JSONObject(), busy = false, quiet = true, onFail = { _ui.update { it.copy(activeChecked = true) } }) { d ->
             val r = parse(d, CraneRequestView::class.java)
-            _ui.update { it.copy(request = r) }
+            _ui.update { it.copy(request = r, activeChecked = true) }
             if (r != null) onFound()
         }
     }

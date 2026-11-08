@@ -183,7 +183,8 @@ fun CraneDocumentsScreen(
                                 Spacer(modifier = Modifier.width(dimen_10))
                                 Column(modifier = Modifier.weight(1f)) {
                                     Textview(
-                                        text = typeName.ifBlank { current?.document_type_name.orEmpty() },
+                                        text = typeName.ifBlank { current?.document_type_name.orEmpty() } +
+                                            if (state.documentTypes.firstOrNull { it.id == typeId }?.required == false) " · " + stringResource(R.string.crane_doc_optional) else "",
                                         size = font_14,
                                         color = appColors.textPrimary,
                                         fontWeight = FontWeight.SemiBold,

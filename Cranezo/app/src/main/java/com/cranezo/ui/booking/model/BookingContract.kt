@@ -34,6 +34,8 @@ data class BookingUiState(
     val detail: AvailableCrane? = null,
     val booking: Booking? = null,
     val track: TrackInfo? = null,
+    // the first answer for the track screen has come (so "not available" is known, not just "loading")
+    val trackLoaded: Boolean = false,
 
     // My bookings
     val bookings: List<Booking> = emptyList(),
@@ -88,6 +90,8 @@ sealed interface BookingIntent {
     data object CancelBooking : BookingIntent
 
     data class OpenBooking(val bookingId: String) : BookingIntent
+    // straight to the live tracking of a booking (from Track My Cranes and from the notice)
+    data class OpenTrack(val bookingId: String) : BookingIntent
     data class LoadBookings(val group: String) : BookingIntent
     data object LoadMoreBookings : BookingIntent
     // Back to a clean flow

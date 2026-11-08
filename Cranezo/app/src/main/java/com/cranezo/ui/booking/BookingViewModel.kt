@@ -88,6 +88,7 @@ class BookingViewModel @Inject constructor(
             BookingIntent.CancelBooking -> cancelBooking()
 
             is BookingIntent.OpenBooking -> openBooking(intent.bookingId)
+            is BookingIntent.OpenTrack -> openTrack(intent.bookingId)
             BookingIntent.ConfirmArrival -> confirmArrival()
             is BookingIntent.RequestExtra -> extensionCall("extension/request", intent.minutes, intent.message)
             BookingIntent.CancelExtra -> extensionCall("extension/cancel", null, "")
@@ -494,7 +495,7 @@ class BookingViewModel @Inject constructor(
                 .isRequestCallSuspendSuccess(
                     success = { response ->
                         response?.data?.let { b ->
-                            _uiState.update { it.copy(booking = b) }
+                            _uiState.update { it.copy(booking = b, track = null, trackLoaded = false) }
                             _effect.send(
                                 BookingEffect.Go(BookingRoutes.DETAILS)
                             )
@@ -506,10 +507,29 @@ class BookingViewModel @Inject constructor(
         }
     }
 
+    /** Opens the live tracking of a booking directly (the booking is loaded first so the screen knows which one) */
+    private fun openTrack(bookingId: String) {
+        runWhenOnline {
+            setIsLoading(true)
+            repo.bookingActionApi(headers(), "get", JSONObject().put("booking_id", bookingId))
+                .isRequestCallSuspendSuccess(
+                    success = { response ->
+                        response?.data?.let { b ->
+                            _uiState.update { it.copy(booking = b, track = null, trackLoaded = false) }
+                            _effect.send(BookingEffect.Go(BookingRoutes.TRACK))
+                        }
+                    },
+                    failure = { _, _, message -> fail(message) }
+                )
+            setIsLoading(false)
+        }
+    }
+
     private fun loadTrack(bookingId: String) {
         viewModelScope.launch {
             repo.trackApi(headers(), JSONObject().put("booking_id", bookingId)).isRequestCallSuspendSuccess(
-                success = { response -> response?.data?.let { t -> _uiState.update { it.copy(track = t) } } }
+                success = { response -> response?.data?.let { t -> _uiState.update { it.copy(track = t, trackLoaded = true) } } ?: _uiState.update { it.copy(trackLoaded = true) } },
+                failure = { _, _, _ -> _uiState.update { it.copy(trackLoaded = true) } }
             )
         }
     }

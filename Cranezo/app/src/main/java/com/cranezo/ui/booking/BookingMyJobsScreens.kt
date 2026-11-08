@@ -477,7 +477,7 @@ fun TrackMyCranesScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                 Spacer(modifier = Modifier.height(dimen_8))
                 CommonGradientButton(
                     text = stringResource(R.string.cj_view_live_tracking),
-                    onClick = { t.booking_id?.let { vm?.onIntent(BookingIntent.OpenBooking(it)) } },
+                    onClick = { t.booking_id?.let { vm?.onIntent(BookingIntent.OpenTrack(it)) } },
                     height = dimen_40, textSize = font_12
                 )
             }
