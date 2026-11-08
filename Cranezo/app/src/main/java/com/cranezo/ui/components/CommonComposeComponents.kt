@@ -2471,8 +2471,8 @@ fun ScreenBackground(
                             brush = Brush.verticalGradient(
                                 colorStops = arrayOf(
                                     0f to colors.bodyTop,
-                                    0.3f to colors.bodyMid,
-                                    0.7f to colors.bodyBottom,
+                                    0.2f to colors.bodyMid,
+                                    0.55f to colors.bodyBottom,
                                     1f to colors.bodyBottom
                                 )
                             )
@@ -2480,7 +2480,7 @@ fun ScreenBackground(
                         // shine: a bright soft glow from the top left corner
                         drawRect(
                             brush = Brush.radialGradient(
-                                colors = listOf(colors.bodyShine.copy(alpha = 0.65f), Color.Transparent),
+                                colors = listOf(colors.bodyShine.copy(alpha = 0.55f), Color.Transparent),
                                 center = Offset(size.width * 0.1f, size.height * 0.04f),
                                 radius = size.width * 0.9f
                             )

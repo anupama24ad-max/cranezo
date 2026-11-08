@@ -132,9 +132,11 @@ val LightAppColors = AppColors(
     heroTop = Color(0xFF0B1F3F),
     heroBottom = Color(0xFF050A15),
     heroGlow = Color(0xFFF59E0B),
-    bodyTop = Color(0xFFF1D88A),
-    bodyMid = Color(0xFFFBF1D2),
-    bodyBottom = Color(0xFFFFFFFF),
+    // A clean, light page: a soft butter-yellow touch at the very top fading quickly into a calm cool off-white,
+    // so the white cards stand out and the page does not look heavy or yellow
+    bodyTop = Color(0xFFFFEFC2),
+    bodyMid = Color(0xFFF8F6F2),
+    bodyBottom = Color(0xFFF2F5FA),
     bodyShine = Color(0xFFFFFFFF)
 )
 
