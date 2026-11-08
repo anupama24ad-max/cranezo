@@ -245,6 +245,12 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun notificationsApi(h: Map<String, String>, body: JSONObject): Resource<ApiResult<List<AppNotification>>?> =
         safeApiCall(conflictAsError = true) { api.notificationsApi("notifications/list", h, json(body)) }
 
+    suspend fun placesSearchApi(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.placesSearchApi("places/search", h, json(body)) }
+
+    suspend fun placesReverseApi(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.placesReverseApi("places/reverse", h, json(body)) }
+
     suspend fun unreadCountApi(h: Map<String, String>): Resource<ApiResult<UnreadCount>?> =
         safeApiCall(conflictAsError = true) { api.unreadCountApi("notifications/unread-count", h, json(JSONObject())) }
 

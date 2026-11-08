@@ -341,9 +341,31 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
         if (granted) vm?.onIntent(BookingIntent.LocateMe)
     }
 
+    var showPicker by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    // first visit with nothing chosen: fetch the phone's position by itself when the permission is already given
+    LaunchedEffect(Unit) {
+        if (state.latitude == null &&
+            androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) vm?.onIntent(BookingIntent.LocateMe)
+    }
+    if (showPicker) {
+        LocationPickerDialog(
+            initialLatitude = state.latitude, initialLongitude = state.longitude,
+            resolveAddress = { la, lo -> vm?.addressAt(la, lo) },
+            onConfirm = { la, lo, address ->
+                vm?.pickOnMap(la, lo, address)
+                showPicker = false
+            },
+            onDismiss = { showPicker = false }
+        )
+    }
+
     BookingScaffold(
         onBack = onBack,
         step = 3,
+        followKeyboard = false,
         bottom = {
             BottomButtons(
                 mainText = stringResource(R.string.common_continue),
@@ -401,6 +423,9 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                 )
             }
         }
+
+        // the chosen spot on a map; tap it to move the pin
+        LocationMapPreview(latitude = state.latitude, longitude = state.longitude, onOpen = { showPicker = true })
 
         GlassInputField(
             label = stringResource(R.string.bk_site_name),

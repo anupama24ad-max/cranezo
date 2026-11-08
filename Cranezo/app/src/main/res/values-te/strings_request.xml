@@ -198,4 +198,10 @@
     <string name="cap_use_extra_heavy">మెగా ప్రాజెక్టులు: పవర్ ప్లాంట్లు, రిఫైనరీలు, గాలిమరలు.</string>
     <string name="cap_weight_hint">%1$s కిలోల వరకు ఎత్తుతుంది, సుమారు %2$d చిన్న కార్ల బరువు.</string>
     <string name="cap_note">ఇది గరిష్ట సామర్థ్యం. ఆచరణలో ఎంత ఎత్తగలదో దూరంపై ఆధారపడుతుంది, కాబట్టి యజమానికి మీ బరువు చెప్పండి.</string>
+    <string name="bk_pick_on_map">మ్యాప్‌లో ఖచ్చితమైన స్థలాన్ని ఎంచుకోండి</string>
+    <string name="bk_adjust_on_map">మ్యాప్‌లో మార్చండి</string>
+    <string name="bk_move_map_hint">పిన్ మీ సైట్ మీద ఉండేలా మ్యాప్‌ను కదిలించండి</string>
+    <string name="bk_confirm_location">లొకేషన్ నిర్ధారించండి</string>
+    <string name="bk_finding_address">చిరునామా వెతుకుతున్నాం…</string>
+    <string name="bk_map_needs_key">ఈ బిల్డ్‌లో మ్యాప్ అందుబాటులో లేదు.</string>
 </resources>

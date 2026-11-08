@@ -199,4 +199,10 @@
     <string name="cap_use_extra_heavy">Mega projects: power plants, refineries and wind turbines.</string>
     <string name="cap_weight_hint">Lifts up to %1$s kg, about the weight of %2$d small cars.</string>
     <string name="cap_note">This is the maximum. What a crane can lift in practice depends on how far it must reach, so tell the owner your load.</string>
+    <string name="bk_pick_on_map">Set the exact spot on the map</string>
+    <string name="bk_adjust_on_map">Adjust on map</string>
+    <string name="bk_move_map_hint">Move the map so the pin is on your site</string>
+    <string name="bk_confirm_location">Confirm location</string>
+    <string name="bk_finding_address">Finding the address…</string>
+    <string name="bk_map_needs_key">The map is not available on this build.</string>
 </resources>

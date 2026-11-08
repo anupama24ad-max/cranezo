@@ -198,4 +198,10 @@
     <string name="cap_use_extra_heavy">बड़े प्रोजेक्ट: पावर प्लांट, रिफाइनरी और पवन चक्कियाँ।</string>
     <string name="cap_weight_hint">%1$s किलो तक उठाती है, लगभग %2$d छोटी कारों के वज़न के बराबर।</string>
     <string name="cap_note">यह अधिकतम क्षमता है। असल में कितना उठेगा यह दूरी पर निर्भर करता है, इसलिए मालिक को अपना भार बताएं।</string>
+    <string name="bk_pick_on_map">नक्शे पर सही जगह चुनें</string>
+    <string name="bk_adjust_on_map">नक्शे पर बदलें</string>
+    <string name="bk_move_map_hint">नक्शा हिलाएँ ताकि पिन आपकी साइट पर आए</string>
+    <string name="bk_confirm_location">लोकेशन पक्की करें</string>
+    <string name="bk_finding_address">पता ढूँढ रहे हैं…</string>
+    <string name="bk_map_needs_key">इस बिल्ड में नक्शा उपलब्ध नहीं है।</string>
 </resources>

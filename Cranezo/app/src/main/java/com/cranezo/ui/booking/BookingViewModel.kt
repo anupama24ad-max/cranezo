@@ -176,16 +176,53 @@ class BookingViewModel @Inject constructor(
         }
         suggestJob = viewModelScope.launch {
             kotlinx.coroutines.delay(400)
-            val found = withContext(Dispatchers.IO) {
-                runCatching {
-                    @Suppress("DEPRECATION")
-                    Geocoder(app, Locale.getDefault()).getFromLocationName("$query, India", 5).orEmpty()
-                }.getOrDefault(emptyList())
+            // the server's search first (it knows villages and small towns); the phone's own search is the backup
+            var list = serverPlaces(query)
+            if (list.isEmpty()) {
+                val found = withContext(Dispatchers.IO) {
+                    runCatching {
+                        @Suppress("DEPRECATION")
+                        Geocoder(app, Locale.getDefault()).getFromLocationName("$query, India", 5).orEmpty()
+                    }.getOrDefault(emptyList())
+                }
+                list = found.mapNotNull { a ->
+                    val line = a.getAddressLine(0) ?: return@mapNotNull null
+                    AddressSuggestion(line, a.latitude, a.longitude)
+                }.distinctBy { it.label }
             }
-            _suggestions.value = found.mapNotNull { a ->
-                val line = a.getAddressLine(0) ?: return@mapNotNull null
-                AddressSuggestion(line, a.latitude, a.longitude)
-            }.distinctBy { it.label }
+            _suggestions.value = list
+        }
+    }
+
+    /** Address search on the server (OpenStreetMap data); an empty list when it is not available */
+    private suspend fun serverPlaces(query: String): List<AddressSuggestion> {
+        var out = emptyList<AddressSuggestion>()
+        val st = _uiState.value
+        val body = JSONObject().put("q", query)
+        st.latitude?.let { body.put("latitude", it) }
+        st.longitude?.let { body.put("longitude", it) }
+        repo.placesSearchApi(headers(), body).isRequestCallSuspendSuccess(success = { r ->
+            out = r?.data.orEmpty().mapNotNull { p ->
+                val la = p.latitude ?: return@mapNotNull null
+                val lo = p.longitude ?: return@mapNotNull null
+                AddressSuggestion(p.label ?: return@mapNotNull null, la, lo)
+            }
+        })
+        return out
+    }
+
+    /** The address for a point picked on the map (the phone first, then the server) */
+    suspend fun addressAt(latitude: Double, longitude: Double): String? = reverseGeocode(latitude, longitude)
+
+    /** A spot chosen on the map */
+    fun pickOnMap(latitude: Double, longitude: Double, address: String?) {
+        _suggestions.value = emptyList()
+        _uiState.update {
+            it.copy(
+                latitude = latitude, longitude = longitude,
+                siteAddress = address?.takeIf { a -> a.isNotBlank() } ?: it.siteAddress.ifBlank { String.format(Locale.US, "%.5f, %.5f", latitude, longitude) },
+                siteName = it.siteName.ifBlank { address.orEmpty().substringBefore(",") }
+            )
         }
     }
 
@@ -217,6 +254,11 @@ class BookingViewModel @Inject constructor(
         if (query.isBlank()) return
         _uiState.update { it.copy(isLocating = true) }
         viewModelScope.launch {
+            val hit = serverPlaces(query).firstOrNull()
+            if (hit != null) {
+                _uiState.update { it.copy(isLocating = false, latitude = hit.latitude, longitude = hit.longitude, siteAddress = hit.label) }
+                return@launch
+            }
             val found = withContext(Dispatchers.IO) {
                 runCatching {
                     @Suppress("DEPRECATION")
@@ -239,13 +281,19 @@ class BookingViewModel @Inject constructor(
         }
     }
 
-    private suspend fun reverseGeocode(latitude: Double, longitude: Double): String? =
-        withContext(Dispatchers.IO) {
+    private suspend fun reverseGeocode(latitude: Double, longitude: Double): String? {
+        val phone = withContext(Dispatchers.IO) {
             runCatching {
                 @Suppress("DEPRECATION")
                 Geocoder(app, Locale.getDefault()).getFromLocation(latitude, longitude, 1)?.firstOrNull()?.getAddressLine(0)
             }.getOrNull()
         }
+        if (!phone.isNullOrBlank()) return phone
+        var label: String? = null
+        repo.placesReverseApi(headers(), JSONObject().put("latitude", latitude).put("longitude", longitude))
+            .isRequestCallSuspendSuccess(success = { r -> label = r?.data?.label })
+        return label
+    }
 
     // ---------------------------------------------------------------------------------------
     // Search

@@ -58,9 +58,11 @@ fun BookingScaffold(
     step: Int? = null,
     bottom: (@Composable () -> Unit)? = null,
     success: Boolean = false,
+    followKeyboard: Boolean = true,
     content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit
 ) {
     MyProfileScaffold(
+        followKeyboard = followKeyboard,
         success = success,
         title = title,
         subtitle = subtitle,

@@ -492,3 +492,9 @@ data class ActiveTrack(
     val eta_minutes: Int? = null,
     val crane_location: CraneLocation? = null
 )
+
+// ---- POST /places/search and /places/reverse (address search for the location step) ----
+
+data class PlaceHit(val label: String? = null, val latitude: Double? = null, val longitude: Double? = null)
+
+data class PlaceLabel(val label: String? = null)

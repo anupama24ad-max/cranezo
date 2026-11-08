@@ -70,6 +70,8 @@ fun MyProfileScaffold(
     topContent: (@Composable () -> Unit)? = null,
     action: (@Composable () -> Unit)? = null,
     success: Boolean = false,
+    // true: with the keyboard open the page jumps to its bottom (good for forms, bad when a field at the top is being used)
+    followKeyboard: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
     ScreenBackground(darkImageRes = R.drawable.app_bg) {
@@ -101,7 +103,7 @@ fun MyProfileScaffold(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .verticalScroll(rememberImeScrollState())
+                    .verticalScroll(if (followKeyboard) rememberImeScrollState() else androidx.compose.foundation.rememberScrollState())
                     .padding(horizontal = dimen_20),
                 verticalArrangement = Arrangement.spacedBy(dimen_12),
                 content = content
