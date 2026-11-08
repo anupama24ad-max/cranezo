@@ -10,9 +10,9 @@
     </style>
 
     <!-- Launch theme for SplashActivity: Android 12+ system splash (and the compat splash below 12)
-         shows the Cranezo logo on white, then installSplashScreen() switches to Theme.Cranezo. -->
+         shows the Cranezo logo on dark (the splash has no light mode), then installSplashScreen() switches to Theme.Cranezo. -->
     <style name="Theme.Cranezo.Starting" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenBackground">@color/splash_dark</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/android_12_splash</item>
         <item name="postSplashScreenTheme">@style/Theme.Cranezo</item>
     </style>

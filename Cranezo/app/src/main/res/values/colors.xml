@@ -7,6 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- launch splash background: dark, matches the night-sky splash picture -->
+    <color name="splash_dark">#FF0B0F17</color>
     <color name="push_accent">#FFB300</color>
     <!-- date / time pickers -->
     <color name="picker_amber">#FFA000</color>
