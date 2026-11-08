@@ -112,7 +112,11 @@ class MainHomeViewModel @Inject constructor(
                                 todaysJobs = int(d, "todays_jobs"),
                                 todaysEarnings = com.cranezo.utils.rupees(earnings),
                                 craneRequests = int(d, "crane_requests"),
-                                jobsNeedingOperator = int(d, "jobs_needing_operator")
+                                jobsNeedingOperator = int(d, "jobs_needing_operator"),
+                                dueAmount = d.getAsJsonObject("operator_dues")?.get("amount")?.takeIf { v -> !v.isJsonNull }?.asDouble ?: 0.0,
+                                dueOperators = int(d.getAsJsonObject("operator_dues"), "operators"),
+                                dueJobs = int(d.getAsJsonObject("operator_dues"), "jobs"),
+                                dueJobsNoCommission = int(d.getAsJsonObject("operator_dues"), "jobs_without_commission")
                             )
                         )
                     }

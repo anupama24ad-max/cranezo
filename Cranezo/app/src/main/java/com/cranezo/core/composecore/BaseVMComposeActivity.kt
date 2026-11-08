@@ -253,6 +253,8 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                         )
                         // job updates (crane arrived, completion code, ...) as a bottom sheet over this screen
                         JobAlertHost()
+                        // force update: a dialog that cannot be closed when this version is too old
+                        com.cranezo.update.UpdateHost()
                     }
                 }
             }

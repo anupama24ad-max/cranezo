@@ -41,6 +41,9 @@ import com.cranezo.ui.mainhome.model.Dest
 import com.cranezo.ui.mainhome.model.MainHomeUiState
 import com.cranezo.ui.theme.*
 import com.cranezo.ui.components.Textview
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.ui.draw.clip
 
 @Composable
 fun OwnerHomeScreen(
@@ -82,6 +85,48 @@ fun OwnerHomeScreen(
             .padding(top = dimen_16, bottom = dimen_16),
         verticalArrangement = Arrangement.spacedBy(dimen_16)
     ) {
+
+        // Money to pay the operators: first thing on the dashboard, highlighted with a badge while something is unpaid
+        val dueContext = androidx.compose.ui.platform.LocalContext.current
+        if (state.owner.dueOperators > 0) {
+            GlassCard(
+                contentPadding = dimen_14, borderColor = androidx.compose.ui.graphics.Color(0xFFEF4444),
+                onClick = {
+                    dueContext.startActivity(
+                        com.cranezo.ui.finance.FinanceActivity.intent(dueContext, com.cranezo.ui.finance.FinanceRoutes.OPERATOR_DUES)
+                    )
+                }
+            ) {
+                androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(
+                            stringResource(R.string.home_pay_operators_title), size = font_16, color = appColors.textPrimary,
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        )
+                        Textview(
+                            text = if (state.owner.dueAmount > 0) stringResource(
+                                R.string.home_pay_operators_amount, com.cranezo.utils.formatAmount(state.owner.dueAmount),
+                                state.owner.dueOperators, state.owner.dueJobs
+                            ) else stringResource(R.string.home_pay_operators_set_commission, state.owner.dueJobsNoCommission),
+                            size = font_12, color = appColors.textSecondary
+                        )
+                    }
+                    // red badge: how many operators are waiting to be paid
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier.size(dimen_28).clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(androidx.compose.ui.graphics.Color(0xFFEF4444)),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        Textview(state.owner.dueOperators.toString(), size = font_13, color = androidx.compose.ui.graphics.Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.width(dimen_8))
+                    androidx.compose.material3.Icon(
+                        androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null, tint = androidx.compose.ui.graphics.Color(0xFFEF4444)
+                    )
+                }
+            }
+        }
 
         // Fleet Overview: its own panel (deep navy in dark mode, glass in light mode) holding the 4 tiles
         GlassCard(

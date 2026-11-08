@@ -72,6 +72,27 @@ object AppModule {
         // Full request logs only in debug builds: release builds must not print tokens or personal data
         loggingInterceptor.setLevel(if (com.cranezo.BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE)
         val builder = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                // the server refuses an app below its minimum version with 426 (see UpdateHost)
+                val response = chain.proceed(
+                    chain.request().newBuilder()
+                        .header("X-App-Version-Code", com.cranezo.BuildConfig.VERSION_CODE.toString())
+                        .header("X-App-Platform", "android").build()
+                )
+                if (response.code == 426) {
+                    val info = runCatching {
+                        val data = org.json.JSONObject(response.peekBody(64 * 1024).string()).optJSONObject("data")
+                        com.cranezo.update.UpdateInfo(
+                            update_required = true,
+                            latest_version_name = data?.optString("latest_version_name")?.takeIf { it != "null" },
+                            store_url = data?.optString("store_url")?.takeIf { it.isNotBlank() },
+                            message = data?.optString("message")?.takeIf { it.isNotBlank() }
+                        )
+                    }.getOrDefault(com.cranezo.update.UpdateInfo(update_required = true))
+                    android.os.Handler(android.os.Looper.getMainLooper()).post { com.cranezo.update.AppUpdate.show(info) }
+                }
+                response
+            }
             .addInterceptor(loggingInterceptor)
             .connectionPool(pool)
             // a call fails in seconds instead of hanging for minutes; a stale connection is retried on a new one

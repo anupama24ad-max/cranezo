@@ -212,4 +212,14 @@
     <string name="op_reach_site_toast">You are %1$s from the site. Reach the site to continue.</string>
     <string name="op_location_off_toast">Turn on location so we can see you have reached the site.</string>
     <string name="op_reach_site_hint">You can continue once you are within %1$s of the site.</string>
+    <string name="home_pay_operators_title">Pay your operators</string>
+    <string name="home_pay_operators_amount">₹%1$s is due to %2$d operator(s) for %3$d job(s)</string>
+    <string name="home_pay_operators_set_commission">Set the commission for %1$d job(s), then pay your operators</string>
+    <string name="home_pay_operators_cta">Pay now</string>
+    <string name="update_required_title">Update required</string>
+    <string name="update_available_title">Update available</string>
+    <string name="update_default_message">A new version of Cranezo is available. Please update to continue.</string>
+    <string name="update_version">Latest version: %1$s</string>
+    <string name="update_now">Update now</string>
+    <string name="update_later">Later</string>
 </resources>

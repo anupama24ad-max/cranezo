@@ -211,4 +211,14 @@
     <string name="op_reach_site_toast">आप साइट से %1$s दूर हैं। आगे बढ़ने के लिए साइट पर पहुँचें।</string>
     <string name="op_location_off_toast">लोकेशन चालू करें ताकि हम देख सकें कि आप साइट पर पहुँच गए।</string>
     <string name="op_reach_site_hint">साइट से %1$s के भीतर पहुँचने पर आप आगे बढ़ सकते हैं।</string>
+    <string name="home_pay_operators_title">अपने ऑपरेटरों को भुगतान करें</string>
+    <string name="home_pay_operators_amount">%2$d ऑपरेटर को %3$d जॉब के ₹%1$s देने हैं</string>
+    <string name="home_pay_operators_set_commission">%1$d जॉब का कमीशन तय करें, फिर ऑपरेटरों को भुगतान करें</string>
+    <string name="home_pay_operators_cta">अभी भुगतान करें</string>
+    <string name="update_required_title">अपडेट ज़रूरी है</string>
+    <string name="update_available_title">नया अपडेट उपलब्ध है</string>
+    <string name="update_default_message">Cranezo का नया संस्करण उपलब्ध है। जारी रखने के लिए अपडेट करें।</string>
+    <string name="update_version">नवीनतम संस्करण: %1$s</string>
+    <string name="update_now">अभी अपडेट करें</string>
+    <string name="update_later">बाद में</string>
 </resources>

@@ -270,6 +270,9 @@ interface RestApi {
     suspend fun opStatusApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OnlineStatus>>
 
     @POST
+    suspend fun appVersionApi(@Url url: String, @Body body: RequestBody): Response<ApiResult<com.cranezo.update.UpdateInfo>>
+
+    @POST
     suspend fun placesSearchApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.booking.model.PlaceHit>>>
 
     @POST
