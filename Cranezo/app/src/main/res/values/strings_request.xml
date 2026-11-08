@@ -222,4 +222,5 @@
     <string name="update_version">Latest version: %1$s</string>
     <string name="update_now">Update now</string>
     <string name="update_later">Later</string>
+    <string name="upload_images_only">Only pictures and PDF documents can be uploaded. Videos are not allowed.</string>
 </resources>

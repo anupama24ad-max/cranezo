@@ -261,6 +261,12 @@ class AppMethods {
         }
 
         fun getFileFromUri(context: Context, uri: Uri): File? {
+            // only pictures and PDF documents can be uploaded: no videos or other files
+            val type = context.contentResolver.getType(uri).orEmpty()
+            if (type.isNotEmpty() && !type.startsWith("image/") && !type.contains("pdf")) {
+                com.cranezo.ui.components.AppMessages.error(context.getString(com.cranezo.R.string.upload_images_only))
+                return null
+            }
             return try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     // Create a temporary file in cache directory
@@ -273,7 +279,8 @@ class AppMethods {
                     FileOutputStream(file).use { outputStream ->
                         inputStream.copyTo(outputStream)
                     }
-                    file
+                    // pictures are shrunk here, so every upload in the app is at most Full HD and 2 MB
+                    if (type.startsWith("image/")) ImageCompressor.shrink(context, file) else file
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -295,7 +302,8 @@ class AppMethods {
 
         fun createRequestBody(file: File, context: Context, uri: Uri): RequestBody? {
             return try {
-                val mimeType = context.contentResolver.getType(uri) ?: "*/*"
+                // a shrunk picture is a JPEG whatever the original was
+                val mimeType = if (file.name.endsWith(".jpg")) "image/jpeg" else (context.contentResolver.getType(uri) ?: "*/*")
                 file.asRequestBody(mimeType.toMediaTypeOrNull())
             } catch (e: Exception) {
                 e.printStackTrace()

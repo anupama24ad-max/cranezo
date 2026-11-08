@@ -221,4 +221,5 @@
     <string name="update_version">नवीनतम संस्करण: %1$s</string>
     <string name="update_now">अभी अपडेट करें</string>
     <string name="update_later">बाद में</string>
+    <string name="upload_images_only">केवल फोटो और PDF दस्तावेज़ अपलोड किए जा सकते हैं। वीडियो की अनुमति नहीं है।</string>
 </resources>
