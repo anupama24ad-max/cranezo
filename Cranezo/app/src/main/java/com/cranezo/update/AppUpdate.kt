@@ -24,7 +24,8 @@ import org.json.JSONObject
 data class UpdateInfo(
     val update_required: Boolean? = null,
     val update_available: Boolean? = null,
-    val latest_version_name: String? = null,
+    val latest_version: String? = null,
+    val min_supported_version: String? = null,
     val store_url: String? = null,
     val message: String? = null
 )
@@ -37,20 +38,26 @@ object AppUpdate {
     var state by mutableStateOf<UpdateInfo?>(null)
         private set
     private var skipped = false
-    private var lastCheck = 0L
 
-    /** Asked at the start of the app and now and then; at most once every 30 minutes */
-    suspend fun check(repo: Repository, force: Boolean = false) {
-        if (!force && System.currentTimeMillis() - lastCheck < 30 * 60 * 1000) return
-        lastCheck = System.currentTimeMillis()
-        repo.appVersionApi(JSONObject().put("version_code", BuildConfig.VERSION_CODE).put("platform", "android"))
-            .isRequestCallSuspendSuccess(success = { r -> r?.data?.let { show(it) } })
+    /**
+     * Asked on every launch and every time the app comes back from the background (the answer is never kept).
+     * When the call fails nothing happens: a failing check never blocks the app.
+     */
+    suspend fun check(repo: Repository) {
+        var answer: UpdateInfo? = null
+        repo.appVersionApi(JSONObject().put("platform", "android").put("current_version", BuildConfig.VERSION_NAME))
+            .isRequestCallSuspendSuccess(success = { r -> answer = r?.data })
+        val info = answer ?: return
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { show(info) }
     }
 
     /** Also called when any call is answered with 426 (the server refuses this old version) */
     fun show(info: UpdateInfo) {
-        if (info.update_required == true) state = info.copy(update_required = true)
-        else if (info.update_available == true && !skipped) state = info
+        state = when {
+            info.update_required == true -> info.copy(update_required = true)
+            info.update_available == true && !skipped -> info
+            else -> null // up to date, or the admin lowered the minimum: the dialog goes away
+        }
     }
 
     fun skip() {
@@ -77,7 +84,7 @@ fun UpdateHost() {
         text = {
             Column {
                 Text(info.message?.takeIf { it.isNotBlank() } ?: stringResource(R.string.update_default_message))
-                info.latest_version_name?.takeIf { it.isNotBlank() }?.let { Text(stringResource(R.string.update_version, it)) }
+                info.latest_version?.takeIf { it.isNotBlank() }?.let { Text(stringResource(R.string.update_version, it)) }
             }
         },
         confirmButton = { TextButton(onClick = { AppUpdate.open(context, info) }) { Text(stringResource(R.string.update_now)) } },

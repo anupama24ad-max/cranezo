@@ -76,7 +76,7 @@ object AppModule {
                 // the server refuses an app below its minimum version with 426 (see UpdateHost)
                 val response = chain.proceed(
                     chain.request().newBuilder()
-                        .header("X-App-Version-Code", com.cranezo.BuildConfig.VERSION_CODE.toString())
+                        .header("X-App-Version", com.cranezo.BuildConfig.VERSION_NAME)
                         .header("X-App-Platform", "android").build()
                 )
                 if (response.code == 426) {
@@ -84,7 +84,7 @@ object AppModule {
                         val data = org.json.JSONObject(response.peekBody(64 * 1024).string()).optJSONObject("data")
                         com.cranezo.update.UpdateInfo(
                             update_required = true,
-                            latest_version_name = data?.optString("latest_version_name")?.takeIf { it != "null" },
+                            latest_version = data?.optString("latest_version")?.takeIf { it.isNotBlank() && it != "null" },
                             store_url = data?.optString("store_url")?.takeIf { it.isNotBlank() },
                             message = data?.optString("message")?.takeIf { it.isNotBlank() }
                         )
