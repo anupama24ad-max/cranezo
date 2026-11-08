@@ -48,6 +48,7 @@ enum class ProfileDocument(
 ) {
     OPERATOR_LICENSE_FRONT(R.string.doc_license_front, "operator_license_front", true),
     OPERATOR_LICENSE_BACK(R.string.doc_license_back, "operator_license_back", true),
+    VOTER_ID(R.string.doc_voter_id, "voter_id_file", true),
     AADHAAR_CARD(R.string.doc_aadhaar, "aadhar_card_file", false),
     PAN_CARD(R.string.doc_pan, "pan_card_file", false),
     OTHER(R.string.doc_other, "other_document_file", false);

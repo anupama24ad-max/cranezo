@@ -160,7 +160,7 @@ fun OperatorJobFlow(
     when (job.next_action) {
         NextAction.ACCEPT_JOB, NextAction.START_JOURNEY -> JobRequestScreen(job, onIntent, onClose)
         NextAction.WAIT_OWNER -> MessageScreen(stringResource(R.string.op_waiting_owner), onClose)
-        NextAction.MARK_ARRIVED -> JourneyScreen(job, onIntent, onClose)
+        NextAction.MARK_ARRIVED -> JourneyScreen(job, state, onIntent, onClose)
         NextAction.SITE_PHOTOS -> SitePhotoScreen(job, state, onIntent, onClose)
         NextAction.CHECKLIST -> ChecklistScreen(job, state, onIntent, onClose)
         NextAction.WAIT_CUSTOMER -> ArrivalWaitScreen(job, onIntent, onClose)
@@ -301,6 +301,11 @@ private fun InfoRow(
 private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     val accepted = job.next_action == NextAction.START_JOURNEY
+    // the new job rings (buzzer tone) until the operator accepts or declines it
+    androidx.compose.runtime.DisposableEffect(job.booking_id, accepted) {
+        if (!accepted) com.cranezo.push.BuzzerPlayer.start(context)
+        onDispose { com.cranezo.push.BuzzerPlayer.stop() }
+    }
     // Decline asks once more on the page itself (no popup): the bottom bar turns into Cancel / Yes, decline
     var confirmDecline by remember { mutableStateOf(false) }
 
@@ -402,7 +407,7 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
 // ---------------------------------------------------------------------------------------------
 
 @Composable
-private fun JourneyScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
+private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     // Location is shared while on the way, so the permission is asked here
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
@@ -414,6 +419,15 @@ private fun JourneyScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Uni
         bottom = { CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
     ) {
         OperatorStepHeader(job.next_action)
+        // where the customer's site is, and where the operator is now (updates as they drive)
+        Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
+            com.cranezo.ui.booking.request.SiteMap(
+                latitude = job.job_site?.latitude, longitude = job.job_site?.longitude, address = job.job_site?.address,
+                modifier = Modifier.matchParentSize(),
+                craneLatitude = state.myLatitude, craneLongitude = state.myLongitude,
+                craneTitle = job.assigned_crane?.model_name
+            )
+        }
         GlassCard(contentPadding = dimen_14) {
             InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
             InfoRow(Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address)
