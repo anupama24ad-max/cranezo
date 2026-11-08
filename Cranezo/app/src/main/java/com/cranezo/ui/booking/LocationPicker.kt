@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,6 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +51,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import com.cranezo.BuildConfig
 import com.cranezo.R
+import com.cranezo.ui.booking.request.PickupPin
 import com.cranezo.ui.components.CommonGradientButton
+import com.cranezo.ui.components.SearchInput
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.theme.*
 import com.cranezo.utils.fetchCurrentLocation
@@ -57,7 +62,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.delay
@@ -67,22 +72,22 @@ import kotlinx.coroutines.launch
 private val DEFAULT_CENTER = LatLng(16.5, 80.6)
 
 /**
- * A small map in the location step showing the chosen spot. It does not move (so the page can still
- * scroll); tapping it opens the full-screen picker. Without a Maps key nothing is shown.
+ * A small map in the location step showing the chosen pickup point with its address under it (the same
+ * look as a ride app). It does not move, so the page can still scroll; tapping it opens the full-screen
+ * picker. Without a Maps key nothing is shown.
  */
 @Composable
-fun LocationMapPreview(latitude: Double?, longitude: Double?, onOpen: () -> Unit) {
+fun LocationMapPreview(latitude: Double?, longitude: Double?, address: String, onOpen: () -> Unit) {
     if (!BuildConfig.HAS_MAPS_KEY) return
     val spot = if (latitude != null && longitude != null) LatLng(latitude, longitude) else null
     val camera = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(spot ?: DEFAULT_CENTER, if (spot != null) 15f else 6f)
+        position = CameraPosition.fromLatLngZoom(spot ?: DEFAULT_CENTER, if (spot != null) 16f else 6f)
     }
     LaunchedEffect(spot) {
-        if (spot != null) runCatching { camera.animate(CameraUpdateFactory.newLatLngZoom(spot, 15f), 600) }
+        if (spot != null) runCatching { camera.animate(CameraUpdateFactory.newLatLngZoom(spot, 16f), 600) }
     }
-    Box(
-        modifier = Modifier.fillMaxWidth().height(160.dp).clip(RoundedCornerShape(dimen_16))
-    ) {
+    val pickupLabel = stringResource(R.string.bk_pickup_point)
+    Box(modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(dimen_16))) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = camera,
@@ -92,34 +97,42 @@ fun LocationMapPreview(latitude: Double?, longitude: Double?, onOpen: () -> Unit
                 myLocationButtonEnabled = false, compassEnabled = false
             )
         ) {
-            if (spot != null) Marker(state = MarkerState(position = spot))
+            if (spot != null) MarkerComposable(state = MarkerState(position = spot)) { PickupPin(pickupLabel) }
         }
         // a tap anywhere opens the picker
         Box(modifier = Modifier.fillMaxSize().clickable(onClick = onOpen))
+        // the address under the map, in a soft green pill
         Row(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(dimen_10)
-                .shadow(dimen_4, CircleShape).clip(CircleShape).background(appColors.screenBottom)
-                .padding(horizontal = dimen_14, vertical = dimen_8),
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(dimen_10)
+                .clip(RoundedCornerShape(dimen_20))
+                .background(Brush.horizontalGradient(listOf(SuccessGreen.copy(alpha = 0.22f), appColors.screenBottom)))
+                .background(appColors.screenBottom.copy(alpha = 0.75f))
+                .padding(horizontal = dimen_14, vertical = dimen_10),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.LocationOn, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_16))
-            Spacer(modifier = Modifier.width(dimen_6))
             Textview(
-                stringResource(if (spot != null) R.string.bk_adjust_on_map else R.string.bk_pick_on_map),
-                size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+                text = if (address.isNotBlank()) address else stringResource(R.string.bk_pick_on_map),
+                size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                modifier = Modifier.weight(1f)
             )
+            Spacer(modifier = Modifier.width(dimen_8))
+            Textview(stringResource(R.string.bk_adjust_on_map), size = font_11, color = AmberPrimary, fontWeight = FontWeight.Bold)
         }
     }
 }
 
 /**
- * Full-screen map picker (like Rapido): the pin stays in the middle, the customer moves the map under it,
- * the address under the pin is looked up when the map stops, and Confirm saves that spot.
+ * Full-screen "Select pickup" (like a ride app): a search box on top, the pin stays in the middle, the
+ * customer moves the map under it, the address under the pin is looked up when the map stops, and
+ * "Set address" saves that spot.
  */
 @Composable
 fun LocationPickerDialog(
     initialLatitude: Double?,
     initialLongitude: Double?,
+    suggestions: List<BookingViewModel.AddressSuggestion>,
+    onQuery: (String) -> Unit,
+    onClearSuggestions: () -> Unit,
     resolveAddress: suspend (Double, Double) -> String?,
     onConfirm: (Double, Double, String?) -> Unit,
     onDismiss: () -> Unit
@@ -133,6 +146,7 @@ fun LocationPickerDialog(
     var address by remember { mutableStateOf<String?>(null) }
     var finding by remember { mutableStateOf(false) }
     var locating by remember { mutableStateOf(false) }
+    var query by remember { mutableStateOf("") }
 
     fun goToMe() {
         scope.launch {
@@ -174,16 +188,53 @@ fun LocationPickerDialog(
             }
             // the pin: its tip sits exactly on the middle of the map
             Icon(
-                Icons.Default.LocationOn, contentDescription = null, tint = Red,
-                modifier = Modifier.align(Alignment.Center).size(44.dp).offset(y = (-22).dp)
+                Icons.Default.LocationOn, contentDescription = null, tint = SuccessGreen,
+                modifier = Modifier.align(Alignment.Center).size(48.dp).offset(y = (-24).dp)
             )
-            // back
-            Box(
-                modifier = Modifier.statusBarsPadding().padding(dimen_16).size(dimen_40).shadow(dimen_4, CircleShape)
-                    .clip(CircleShape).background(appColors.screenBottom).clickable { onDismiss() },
-                contentAlignment = Alignment.Center
-            ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = appColors.textPrimary) }
-            // bottom card
+
+            // top: title, close and the address search
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth().shadow(dimen_8, RoundedCornerShape(bottomStart = dimen_24, bottomEnd = dimen_24))
+                    .clip(RoundedCornerShape(bottomStart = dimen_24, bottomEnd = dimen_24))
+                    .background(appColors.screenBottom).statusBarsPadding().padding(dimen_16),
+                verticalArrangement = Arrangement.spacedBy(dimen_10)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Textview(
+                        stringResource(R.string.bk_select_pickup), size = font_16, color = appColors.textPrimary,
+                        fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
+                    )
+                    Box(
+                        modifier = Modifier.size(dimen_36).clip(CircleShape).background(appColors.subtleFill).clickable { onDismiss() },
+                        contentAlignment = Alignment.Center
+                    ) { Icon(Icons.Default.Close, contentDescription = null, tint = appColors.textPrimary, modifier = Modifier.size(dimen_20)) }
+                }
+                SearchInput(
+                    value = query,
+                    onValueChange = {
+                        query = it
+                        onQuery(it)
+                    },
+                    placeholder = stringResource(R.string.bk_search_address)
+                )
+                // results: tapping one moves the map there (the customer can still fine-tune the pin)
+                suggestions.forEach { s ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            query = ""
+                            onClearSuggestions()
+                            scope.launch { runCatching { camera.animate(CameraUpdateFactory.newLatLngZoom(LatLng(s.latitude, s.longitude), 16f), 700) } }
+                        }.padding(vertical = dimen_8),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.LocationOn, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_18))
+                        Spacer(modifier = Modifier.width(dimen_10))
+                        Textview(s.label, size = font_13, color = appColors.textPrimary, maxLines = 2)
+                    }
+                }
+            }
+
+            // bottom: my location, the address under the pin and "Set address"
             Column(
                 modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().navigationBarsPadding().padding(dimen_16),
                 verticalArrangement = Arrangement.spacedBy(dimen_10)
@@ -208,7 +259,7 @@ fun LocationPickerDialog(
                         size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 3
                     )
                     CommonGradientButton(
-                        text = stringResource(R.string.bk_confirm_location),
+                        text = stringResource(R.string.bk_set_address),
                         enabled = !camera.isMoving && !finding && BuildConfig.HAS_MAPS_KEY,
                         onClick = {
                             val t = camera.position.target

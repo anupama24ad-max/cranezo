@@ -105,7 +105,16 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
     val booking by bookingVm.uiState.collectAsStateWithLifecycle()
     val showFind = e != null && (e.found ?: 0) > 0
     MapSheetPage(
-        map = { m -> SiteMap(booking.latitude, booking.longitude, booking.siteAddress, m, radiusKm = e?.search_radius_km) },
+        map = { m ->
+            SiteMap(
+                booking.latitude, booking.longitude, booking.siteAddress, m, radiusKm = e?.search_radius_km,
+                nearbyCranes = e?.nearby_cranes.orEmpty().mapNotNull { c ->
+                    val la = c.latitude ?: return@mapNotNull null
+                    val lo = c.longitude ?: return@mapNotNull null
+                    com.google.android.gms.maps.model.LatLng(la, lo)
+                }
+            )
+        },
         onBack = onBack,
         bottom = {
             if (showFind) {

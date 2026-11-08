@@ -57,6 +57,8 @@ data class OperatorJobState(
     // The operator's own position while on the way (shown on the map)
     val myLatitude: Double? = null,
     val myLongitude: Double? = null,
+    // the road route from the operator to the site (yellow line)
+    val route: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
 
     // Set while the OTP was sent and the customer has to read it out
     val otpSent: Boolean = false
@@ -71,6 +73,7 @@ sealed interface OperatorJobIntent {
 
     data object StartJourney : OperatorJobIntent
     data object Arrived : OperatorJobIntent
+    data class LoadRoute(val fromLat: Double, val fromLng: Double, val toLat: Double, val toLng: Double) : OperatorJobIntent
 
     data class AddSitePhoto(val uri: String) : OperatorJobIntent
     data object RemoveSitePhoto : OperatorJobIntent

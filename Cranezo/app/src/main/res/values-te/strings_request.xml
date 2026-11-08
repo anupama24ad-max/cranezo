@@ -204,4 +204,11 @@
     <string name="bk_confirm_location">లొకేషన్ నిర్ధారించండి</string>
     <string name="bk_finding_address">చిరునామా వెతుకుతున్నాం…</string>
     <string name="bk_map_needs_key">ఈ బిల్డ్‌లో మ్యాప్ అందుబాటులో లేదు.</string>
+    <string name="bk_pickup_point">పికప్ పాయింట్</string>
+    <string name="bk_select_pickup">పికప్ ఎంచుకోండి</string>
+    <string name="bk_search_address">చిరునామా వెతకండి</string>
+    <string name="bk_set_address">చిరునామా సెట్ చేయండి</string>
+    <string name="op_reach_site_toast">మీరు సైట్ నుండి %1$s దూరంలో ఉన్నారు. కొనసాగడానికి సైట్‌కు చేరుకోండి.</string>
+    <string name="op_location_off_toast">మీరు సైట్‌కు చేరుకున్నారని తెలుసుకోవడానికి లొకేషన్ ఆన్ చేయండి.</string>
+    <string name="op_reach_site_hint">సైట్‌కు %1$s లోపు చేరుకున్న తర్వాత మీరు కొనసాగవచ్చు.</string>
 </resources>

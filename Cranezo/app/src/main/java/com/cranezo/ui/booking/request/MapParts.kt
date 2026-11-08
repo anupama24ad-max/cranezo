@@ -62,10 +62,23 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.cranezo.R
+import com.google.android.gms.maps.model.JointType
+import com.google.android.gms.maps.model.RoundCap
+import com.google.maps.android.compose.MarkerComposable
 
 /**
- * The map at the top of the booking screens: the job site, an optional search radius and an optional
- * crane position joined to the site by a straight line. Without a Maps key it shows a plain location card.
+ * The map at the top of the booking screens, in the style of a ride app:
+ *  - the job site as a green "Pickup point" pin,
+ *  - an optional search radius (a green disc inside a green ring),
+ *  - nearby cranes as small crane icons,
+ *  - the crane that is coming, turned the way it is driving, with a yellow route along the roads.
+ * Without a Maps key it shows a plain location card.
  */
 @Composable
 fun SiteMap(
@@ -76,7 +89,9 @@ fun SiteMap(
     radiusKm: Double? = null,
     craneLatitude: Double? = null,
     craneLongitude: Double? = null,
-    craneTitle: String? = null
+    craneTitle: String? = null,
+    route: List<LatLng> = emptyList(),
+    nearbyCranes: List<LatLng> = emptyList()
 ) {
     if (!BuildConfig.HAS_MAPS_KEY || latitude == null || longitude == null) {
         LocationCard(address, modifier)
@@ -86,13 +101,14 @@ fun SiteMap(
     val zoom = when {
         radiusKm != null && radiusKm >= 15 -> 10f
         radiusKm != null -> 11.5f
+        nearbyCranes.isNotEmpty() -> 13f
         else -> 14f
     }
     val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(site, zoom) }
     val crane = if (craneLatitude != null && craneLongitude != null) LatLng(craneLatitude, craneLongitude) else null
     var loaded by remember { mutableStateOf(false) }
-    // Rapido style: when a crane position is known, the map frames the crane and the site together and
-    // glides to the new position every time it moves
+    // when a crane position is known, the map frames the crane and the site together (and the route)
+    // and glides to the new position every time it moves
     LaunchedEffect(crane, loaded) {
         if (crane == null || !loaded) return@LaunchedEffect
         runCatching {
@@ -100,28 +116,75 @@ fun SiteMap(
             camera.animate(CameraUpdateFactory.newLatLngBounds(bounds, 140), 900)
         }
     }
+    val pickupLabel = stringResource(R.string.bk_pickup_point)
     GoogleMap(
         modifier = modifier,
         cameraPositionState = camera,
         onMapLoaded = { loaded = true },
         uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, myLocationButtonEnabled = false)
     ) {
-        Marker(state = MarkerState(position = site), title = address)
         if (radiusKm != null) {
+            // outer ring and a stronger disc in the middle, like the "searching" look of ride apps
             Circle(
-                center = site,
-                radius = radiusKm * 1000,
-                fillColor = AmberPrimary.copy(alpha = 0.10f),
-                strokeColor = AmberPrimary.copy(alpha = 0.6f),
-                strokeWidth = 3f
+                center = site, radius = radiusKm * 1000,
+                fillColor = SuccessGreen.copy(alpha = 0.10f), strokeColor = SuccessGreen.copy(alpha = 0.45f), strokeWidth = 3f
+            )
+            Circle(
+                center = site, radius = radiusKm * 1000 * 0.35,
+                fillColor = SuccessGreen.copy(alpha = 0.18f), strokeColor = SuccessGreen.copy(alpha = 0.0f), strokeWidth = 0f
             )
         }
-        if (crane != null) {
-            // the crane in orange, the site keeps the default red pin
-            Marker(state = MarkerState(position = crane), title = craneTitle, icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+        // the road route in yellow, with a dark edge so it stands out on the map
+        if (route.size > 1) {
+            Polyline(points = route, color = Color(0xFF1F2937).copy(alpha = 0.55f), width = 22f, jointType = JointType.ROUND, startCap = RoundCap(), endCap = RoundCap(), zIndex = 1f)
+            Polyline(points = route, color = Color(0xFFFFC107), width = 14f, jointType = JointType.ROUND, startCap = RoundCap(), endCap = RoundCap(), zIndex = 2f)
+        } else if (crane != null) {
             Polyline(points = listOf(crane, site), color = Color(0xFF6B7280), width = 8f)
         }
+        nearbyCranes.forEachIndexed { i, spot ->
+            CraneMarker(position = spot, bearing = (i * 53f) % 360f, title = null)
+        }
+        MarkerComposable(state = MarkerState(position = site), title = address, zIndex = 3f) { PickupPin(pickupLabel) }
+        if (crane != null) {
+            val next = route.firstOrNull { distanceBetween(crane, it) > 25 } ?: site
+            CraneMarker(position = crane, bearing = bearingTo(crane, next), title = craneTitle, zIndex = 4f)
+        }
     }
+}
+
+/** A crane icon on the map; the picture is drawn facing up, so [bearing] (0 = north) turns it the way it drives */
+@Composable
+private fun CraneMarker(position: LatLng, bearing: Float, title: String?, zIndex: Float = 2f) {
+    MarkerComposable(
+        state = MarkerState(position = position), title = title, rotation = bearing, flat = true,
+        anchor = Offset(0.5f, 0.5f), zIndex = zIndex
+    ) {
+        Image(painter = painterResource(R.drawable.ic_crane_top), contentDescription = null, modifier = Modifier.size(width = 24.dp, height = 62.dp))
+    }
+}
+
+/** The green "Pickup point" bubble over a green pin (the tip of the pin is the exact spot) */
+@Composable
+fun PickupPin(label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(SuccessGreen).padding(horizontal = 12.dp, vertical = 6.dp)) {
+            androidx.compose.material3.Text(label, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        }
+        Icon(Icons.Default.LocationOn, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(34.dp))
+    }
+}
+
+private fun distanceBetween(a: LatLng, b: LatLng): Double =
+    com.cranezo.utils.distanceKm(a.latitude, a.longitude, b.latitude, b.longitude) * 1000
+
+/** Compass direction from one point to another, in degrees clockwise from north */
+private fun bearingTo(from: LatLng, to: LatLng): Float {
+    val dLon = Math.toRadians(to.longitude - from.longitude)
+    val lat1 = Math.toRadians(from.latitude)
+    val lat2 = Math.toRadians(to.latitude)
+    val y = Math.sin(dLon) * Math.cos(lat2)
+    val x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon)
+    return ((Math.toDegrees(Math.atan2(y, x)) + 360) % 360).toFloat()
 }
 
 /** Shown instead of the map when no Maps key is set: a soft card with the pin and the address */

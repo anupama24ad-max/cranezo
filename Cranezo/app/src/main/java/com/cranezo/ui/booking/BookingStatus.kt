@@ -354,6 +354,15 @@ fun TrackScreen(
 
         // The live map: the crane moves towards the site as the operator drives (updated every 5 seconds)
         val craneAt = track.crane_location
+        val route = vm?.route?.collectAsStateWithLifecycle()?.value.orEmpty()
+        // the road route, asked again only when the crane has moved about 100 m
+        LaunchedEffect(craneAt?.latitude?.let { Math.round(it * 1000) }, craneAt?.longitude?.let { Math.round(it * 1000) }, track.site?.latitude) {
+            val la = craneAt?.latitude
+            val lo = craneAt?.longitude
+            val sla = track.site?.latitude
+            val slo = track.site?.longitude
+            if (la != null && lo != null && sla != null && slo != null) vm?.loadRoute(la, lo, sla, slo)
+        }
         androidx.compose.foundation.layout.Box(
             modifier = Modifier.fillMaxWidth().height(dimen_220).clip(androidx.compose.foundation.shape.RoundedCornerShape(dimen_16))
         ) {
@@ -361,7 +370,8 @@ fun TrackScreen(
                 latitude = track.site?.latitude, longitude = track.site?.longitude, address = track.site?.address,
                 modifier = Modifier.matchParentSize(),
                 craneLatitude = craneAt?.latitude, craneLongitude = craneAt?.longitude,
-                craneTitle = track.crane?.title
+                craneTitle = track.crane?.title,
+                route = route
             )
         }
 

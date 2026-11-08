@@ -204,4 +204,11 @@
     <string name="bk_confirm_location">लोकेशन पक्की करें</string>
     <string name="bk_finding_address">पता ढूँढ रहे हैं…</string>
     <string name="bk_map_needs_key">इस बिल्ड में नक्शा उपलब्ध नहीं है।</string>
+    <string name="bk_pickup_point">पिकअप पॉइंट</string>
+    <string name="bk_select_pickup">पिकअप चुनें</string>
+    <string name="bk_search_address">पता खोजें</string>
+    <string name="bk_set_address">पता सेट करें</string>
+    <string name="op_reach_site_toast">आप साइट से %1$s दूर हैं। आगे बढ़ने के लिए साइट पर पहुँचें।</string>
+    <string name="op_location_off_toast">लोकेशन चालू करें ताकि हम देख सकें कि आप साइट पर पहुँच गए।</string>
+    <string name="op_reach_site_hint">साइट से %1$s के भीतर पहुँचने पर आप आगे बढ़ सकते हैं।</string>
 </resources>

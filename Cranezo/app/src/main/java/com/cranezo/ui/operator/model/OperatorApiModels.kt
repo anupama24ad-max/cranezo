@@ -97,6 +97,9 @@ data class JobCustomer(
     val country_code: String? = null
 )
 
+/** true: the operator must reach the site (within radius_km) before marking arrival */
+data class ArrivalRule(val required: Boolean? = null, val radius_km: Double? = null)
+
 data class JobSite(
     val name: String? = null,
     val address: String? = null,
@@ -183,6 +186,7 @@ data class OperatorJob(
     // booking for someone else: call this person at the site
     val site_contact: com.cranezo.ui.ownerjobs.model.SiteContact? = null,
     val job_site: JobSite? = null,
+    val arrival_rule: ArrivalRule? = null,
     val schedule: BookingSchedule? = null,
     val duration: BookingDuration? = null,
     val estimated_earnings: Double? = null,

@@ -205,4 +205,11 @@
     <string name="bk_confirm_location">Confirm location</string>
     <string name="bk_finding_address">Finding the address…</string>
     <string name="bk_map_needs_key">The map is not available on this build.</string>
+    <string name="bk_pickup_point">Pickup point</string>
+    <string name="bk_select_pickup">Select pickup</string>
+    <string name="bk_search_address">Search address</string>
+    <string name="bk_set_address">Set address</string>
+    <string name="op_reach_site_toast">You are %1$s from the site. Reach the site to continue.</string>
+    <string name="op_location_off_toast">Turn on location so we can see you have reached the site.</string>
+    <string name="op_reach_site_hint">You can continue once you are within %1$s of the site.</string>
 </resources>

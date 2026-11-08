@@ -498,3 +498,5 @@ data class ActiveTrack(
 data class PlaceHit(val label: String? = null, val latitude: Double? = null, val longitude: Double? = null)
 
 data class PlaceLabel(val label: String? = null)
+
+data class RouteInfo(val points: List<PlaceHit>? = null, val distance_km: Double? = null, val duration_minutes: Int? = null)

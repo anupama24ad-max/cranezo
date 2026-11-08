@@ -353,6 +353,7 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
     if (showPicker) {
         LocationPickerDialog(
             initialLatitude = state.latitude, initialLongitude = state.longitude,
+            suggestions = suggestions, onQuery = { vm?.suggestAddresses(it) }, onClearSuggestions = { vm?.clearSuggestions() },
             resolveAddress = { la, lo -> vm?.addressAt(la, lo) },
             onConfirm = { la, lo, address ->
                 vm?.pickOnMap(la, lo, address)
@@ -425,7 +426,7 @@ fun LocationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
         }
 
         // the chosen spot on a map; tap it to move the pin
-        LocationMapPreview(latitude = state.latitude, longitude = state.longitude, onOpen = { showPicker = true })
+        LocationMapPreview(latitude = state.latitude, longitude = state.longitude, address = state.siteAddress, onOpen = { showPicker = true })
 
         GlassInputField(
             label = stringResource(R.string.bk_site_name),

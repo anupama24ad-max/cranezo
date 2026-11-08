@@ -90,6 +90,11 @@ class OperatorJobViewModel @Inject constructor(
                 act("jobs/arrived", b)
             }
 
+            is OperatorJobIntent.LoadRoute -> viewModelScope.launch {
+                val points = com.cranezo.utils.loadRoutePoints(repo, headers(), intent.fromLat, intent.fromLng, intent.toLat, intent.toLng)
+                if (points.isNotEmpty()) _uiState.update { it.copy(route = points) }
+            }
+
             is OperatorJobIntent.AddSitePhoto -> addPhoto(intent.uri, site = true)
             OperatorJobIntent.RemoveSitePhoto -> _uiState.update { it.copy(sitePhotos = emptyList()) }
             OperatorJobIntent.SaveSitePhotos -> saveSitePhotos()

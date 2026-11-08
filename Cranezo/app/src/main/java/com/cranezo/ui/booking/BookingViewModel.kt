@@ -226,6 +226,22 @@ class BookingViewModel @Inject constructor(
         }
     }
 
+    fun clearSuggestions() {
+        _suggestions.value = emptyList()
+    }
+
+    // ---- the yellow route along the roads (crane to site) ----
+
+    private val _route = MutableStateFlow<List<com.google.android.gms.maps.model.LatLng>>(emptyList())
+    val route: StateFlow<List<com.google.android.gms.maps.model.LatLng>> = _route.asStateFlow()
+
+    fun loadRoute(fromLat: Double, fromLng: Double, toLat: Double, toLng: Double) {
+        viewModelScope.launch {
+            val points = com.cranezo.utils.loadRoutePoints(repo, headers(), fromLat, fromLng, toLat, toLng)
+            if (points.isNotEmpty()) _route.value = points
+        }
+    }
+
     fun pickSuggestion(s: AddressSuggestion) {
         _suggestions.value = emptyList()
         _uiState.update {

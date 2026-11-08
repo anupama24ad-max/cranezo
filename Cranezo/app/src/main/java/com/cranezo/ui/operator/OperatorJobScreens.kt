@@ -409,6 +409,24 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
 @Composable
 private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
+    // The rule from the server: when true the operator must reach the site before "arrived" works
+    // (and the Google Maps button is shown); when false there is no check.
+    val rule = job.arrival_rule
+    val required = rule?.required != false
+    val radiusKm = rule?.radius_km ?: 1.0
+    val siteLat = job.job_site?.latitude
+    val siteLng = job.job_site?.longitude
+    val distKm = if (state.myLatitude != null && state.myLongitude != null && siteLat != null && siteLng != null)
+        com.cranezo.utils.distanceKm(state.myLatitude, state.myLongitude, siteLat, siteLng) else null
+    val tooFar = required && (distKm == null || distKm > radiusKm)
+    val tooFarMessage = if (distKm == null) stringResource(R.string.op_location_off_toast)
+        else stringResource(R.string.op_reach_site_toast, com.cranezo.utils.distanceLabel(distKm))
+    // the yellow road route, asked again when the operator has moved about 100 m
+    LaunchedEffect(state.myLatitude?.let { Math.round(it * 1000) }, state.myLongitude?.let { Math.round(it * 1000) }) {
+        val la = state.myLatitude
+        val lo = state.myLongitude
+        if (la != null && lo != null && siteLat != null && siteLng != null) onIntent(OperatorJobIntent.LoadRoute(la, lo, siteLat, siteLng))
+    }
     // Location is shared while on the way, so the permission is asked here
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) { permission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
@@ -416,7 +434,15 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     BookingScaffold(
         onBack = onClose,
         title = stringResource(R.string.op_on_the_way),
-        bottom = { CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
+        bottom = {
+            CommonGradientButton(
+                text = stringResource(R.string.op_reached_button),
+                gradientColors = if (tooFar) listOf(appColors.subtleFill, appColors.subtleFill) else listOf(AmberPrimary, AmberSecondary),
+                textColor = if (tooFar) appColors.textHint else Color.Black,
+                // too far: the button explains why instead of doing nothing
+                onClick = { if (tooFar) com.cranezo.ui.components.AppMessages.error(tooFarMessage) else onIntent(OperatorJobIntent.Arrived) }
+            )
+        }
     ) {
         OperatorStepHeader(job.next_action)
         // where the customer's site is, and where the operator is now (updates as they drive)
@@ -425,7 +451,8 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
                 latitude = job.job_site?.latitude, longitude = job.job_site?.longitude, address = job.job_site?.address,
                 modifier = Modifier.matchParentSize(),
                 craneLatitude = state.myLatitude, craneLongitude = state.myLongitude,
-                craneTitle = job.assigned_crane?.model_name
+                craneTitle = job.assigned_crane?.model_name,
+                route = state.route
             )
         }
         GlassCard(contentPadding = dimen_14) {
@@ -454,12 +481,16 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
                 )
             }
         }
-        // Turn-by-turn directions open in the Google Maps app (voice guidance in the phone's language)
-        CommonGradientButton(
-            text = stringResource(R.string.op_open_google_maps), leftIcon = Icons.Default.Navigation, onClick = { openMaps(context, job.job_site, true) },
-            enabled = job.job_site?.latitude != null, height = dimen_56,
-            gradientColors = listOf(InfoBlue, InfoBlue), textColor = Color.White
-        )
+        // Turn-by-turn directions open in the Google Maps app (voice guidance in the phone's language).
+        // Shown only when the operator has to reach the site; with the rule off there is nothing to navigate to.
+        if (required) {
+            CommonGradientButton(
+                text = stringResource(R.string.op_open_google_maps), leftIcon = Icons.Default.Navigation, onClick = { openMaps(context, job.job_site, true) },
+                enabled = job.job_site?.latitude != null, height = dimen_56,
+                gradientColors = listOf(InfoBlue, InfoBlue), textColor = Color.White
+            )
+            Textview(stringResource(R.string.op_reach_site_hint, com.cranezo.utils.distanceLabel(radiusKm)), size = font_12, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        }
         Textview(stringResource(R.string.op_location_shared), size = font_12, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         if (job.customer?.mobile_number != null) {
             CommonGradientButton(

@@ -6,6 +6,8 @@ import com.cranezo.ui.finance.model.BillLine
 
 data class AmountRange(val min: Double? = null, val max: Double? = null)
 
+data class NearbyCrane(val latitude: Double? = null, val longitude: Double? = null)
+
 data class RequestEstimate(
     val found: Int? = null,
     val search_radius_km: Double? = null,
@@ -15,6 +17,8 @@ data class RequestEstimate(
     // crane hire + travel charge, and how far the nearest free crane is
     val total_range: AmountRange? = null,
     val nearest_km: Double? = null,
+    // where the free cranes nearby are (no names), for the map
+    val nearby_cranes: List<NearbyCrane>? = null,
     val free_km: Double? = null,
     val min_offer: Double? = null,
     val suggested_offer: Double? = null,

@@ -273,6 +273,9 @@ interface RestApi {
     suspend fun placesSearchApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.booking.model.PlaceHit>>>
 
     @POST
+    suspend fun placesRouteApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.booking.model.RouteInfo>>
+
+    @POST
     suspend fun placesReverseApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.booking.model.PlaceLabel>>
 
     @POST

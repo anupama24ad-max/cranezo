@@ -248,6 +248,9 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun placesSearchApi(h: Map<String, String>, body: JSONObject) =
         safeApiCall(conflictAsError = true) { api.placesSearchApi("places/search", h, json(body)) }
 
+    suspend fun placesRouteApi(h: Map<String, String>, body: JSONObject) =
+        safeApiCall(conflictAsError = true) { api.placesRouteApi("places/route", h, json(body)) }
+
     suspend fun placesReverseApi(h: Map<String, String>, body: JSONObject) =
         safeApiCall(conflictAsError = true) { api.placesReverseApi("places/reverse", h, json(body)) }
 
