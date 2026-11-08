@@ -262,7 +262,7 @@
     <string name="crane_status_under_review">Under Review</string>
     <string name="crane_status_rejected">Rejected</string>
     <string name="crane_banner_review_title">Under review</string>
-    <string name="crane_banner_review_default">Your crane is under review. Approval usually takes 24 to 48 hours.</string>
+    <string name="crane_banner_review_default">Your crane is under review. Approval usually takes 12 to 24 hours.</string>
     <string name="crane_banner_rejected_title">Crane rejected</string>
     <string name="crane_banner_rejected_default">Your crane was rejected. Fix the details and save it again to resubmit.</string>
     <string name="crane_rejection_reason">Reason for rejection</string>
@@ -349,7 +349,7 @@
 
     <!-- Owner cranes: Crane Submitted -->
     <string name="crane_submitted_title">Crane Submitted!</string>
-    <string name="crane_submitted_default_message">Your crane is under review. Approval usually takes 24 to 48 hours.</string>
+    <string name="crane_submitted_default_message">Your crane is under review. Approval usually takes 12 to 24 hours.</string>
     <string name="crane_view_details">View Details</string>
     <string name="crane_back_to_list">Back to My Cranes</string>
 

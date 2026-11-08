@@ -72,6 +72,8 @@ import com.cranezo.R
 import com.google.android.gms.maps.model.JointType
 import com.google.android.gms.maps.model.RoundCap
 import com.google.maps.android.compose.MarkerComposable
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Fullscreen
 
 /**
  * The map at the top of the booking screens, in the style of a ride app:
@@ -92,7 +94,10 @@ fun SiteMap(
     craneLongitude: Double? = null,
     craneTitle: String? = null,
     route: List<LatLng> = emptyList(),
-    nearbyCranes: List<LatLng> = emptyList()
+    nearbyCranes: List<LatLng> = emptyList(),
+    // a button that opens the same map full screen (move and zoom freely with the fingers)
+    expandable: Boolean = true,
+    fullScreen: Boolean = false
 ) {
     if (!BuildConfig.HAS_MAPS_KEY || latitude == null || longitude == null) {
         LocationCard(address, modifier)
@@ -118,11 +123,35 @@ fun SiteMap(
         }
     }
     val pickupLabel = stringResource(R.string.bk_pickup_point)
+    var expanded by remember { mutableStateOf(false) }
+    if (expanded) {
+        androidx.compose.ui.window.Dialog(
+            onDismissRequest = { expanded = false },
+            properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                SiteMap(
+                    latitude, longitude, address, Modifier.fillMaxSize(), radiusKm, craneLatitude, craneLongitude, craneTitle,
+                    route, nearbyCranes, expandable = false, fullScreen = true
+                )
+                Box(
+                    modifier = Modifier.statusBarsPadding().padding(16.dp).size(44.dp).shadow(4.dp, androidx.compose.foundation.shape.CircleShape)
+                        .clip(androidx.compose.foundation.shape.CircleShape).background(appColors.screenBottom).clickable { expanded = false },
+                    contentAlignment = Alignment.Center
+                ) { Icon(Icons.Default.Close, contentDescription = null, tint = appColors.textPrimary) }
+            }
+        }
+    }
+    Box(modifier = modifier) {
     GoogleMap(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         cameraPositionState = camera,
         onMapLoaded = { loaded = true },
-        uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, myLocationButtonEnabled = false)
+        uiSettings = MapUiSettings(
+            // full screen: every gesture and the + / - buttons; in a page the map keeps the gestures too
+            zoomControlsEnabled = fullScreen, mapToolbarEnabled = false, myLocationButtonEnabled = false,
+            zoomGesturesEnabled = true, scrollGesturesEnabled = true, rotationGesturesEnabled = fullScreen, tiltGesturesEnabled = false
+        )
     ) {
         if (radiusKm != null) {
             // outer ring and a stronger disc in the middle, like the "searching" look of ride apps
@@ -150,6 +179,14 @@ fun SiteMap(
             val next = route.firstOrNull { distanceBetween(crane, it) > 25 } ?: site
             CraneMarker(position = crane, bearing = bearingTo(crane, next), title = craneTitle, zIndex = 4f)
         }
+    }
+    if (expandable) {
+        Box(
+            modifier = Modifier.align(Alignment.TopEnd).padding(10.dp).size(40.dp).shadow(4.dp, androidx.compose.foundation.shape.CircleShape)
+                .clip(androidx.compose.foundation.shape.CircleShape).background(appColors.screenBottom).clickable { expanded = true },
+            contentAlignment = Alignment.Center
+        ) { Icon(Icons.Default.Fullscreen, contentDescription = null, tint = appColors.textPrimary) }
+    }
     }
 }
 
