@@ -158,11 +158,13 @@ private fun SubscriptionContent(
 
     val monthly = offer?.plans?.firstOrNull { it.plan == "monthly" }
     val yearly = offer?.plans?.firstOrNull { it.plan == "yearly" }
-    monthly?.let { PlanCard(it, stringResource(R.string.sub_per_month, formatPrice(it.price)), null, has, state.busy, onBuy) }
+    // the plan running now stays locked until it is due soon (red), so nobody pays twice by mistake
+    val running = info?.state == "active" && info.level != "red"
+    monthly?.let { PlanCard(it, stringResource(R.string.sub_per_month, formatPrice(it.price)), null, has, state.busy, onBuy, current = running && info?.plan == it.plan) }
     yearly?.let {
         // what the owner saves compared with paying monthly for a year
         val save = if (monthly?.price != null && monthly.price > 0 && it.price != null) (((monthly.price * 12 - it.price) / (monthly.price * 12)) * 100).toInt() else 0
-        PlanCard(it, stringResource(R.string.sub_per_year, formatPrice(it.price)), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy)
+        PlanCard(it, stringResource(R.string.sub_per_year, formatPrice(it.price)), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy, current = running && info?.plan == it.plan)
     }
     Textview(stringResource(R.string.sub_fee_note), size = font_11, color = appColors.textHint)
 }
@@ -170,7 +172,7 @@ private fun SubscriptionContent(
 private fun formatPrice(value: Double?): String = com.cranezo.utils.formatAmount(value ?: 0.0)
 
 @Composable
-private fun PlanCard(q: PlanQuote, title: String, badge: String?, renew: Boolean, busy: Boolean, onBuy: (String) -> Unit) {
+private fun PlanCard(q: PlanQuote, title: String, badge: String?, renew: Boolean, busy: Boolean, onBuy: (String) -> Unit, current: Boolean = false) {
     GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
@@ -189,8 +191,9 @@ private fun PlanCard(q: PlanQuote, title: String, badge: String?, renew: Boolean
         }
         Spacer(modifier = Modifier.height(dimen_10))
         CommonGradientButton(
-            text = stringResource(if (renew) R.string.sub_pay_extend else R.string.sub_pay, rupees(q.total)),
-            enabled = !busy,
+            text = if (current) stringResource(R.string.sub_current_plan)
+            else stringResource(if (renew) R.string.sub_pay_extend else R.string.sub_pay, rupees(q.total)),
+            enabled = !busy && !current,
             onClick = { q.plan?.let(onBuy) }
         )
     }

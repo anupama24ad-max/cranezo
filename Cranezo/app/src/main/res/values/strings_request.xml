@@ -274,4 +274,5 @@
     <string name="bk_price_note">This is the full price. Nothing else is added later.</string>
     <string name="as_offline">Offline</string>
     <string name="as_all_offline">No operator is online right now. Ask your operator to switch Online on, then come back.</string>
+    <string name="sub_current_plan">Your current plan</string>
 </resources>

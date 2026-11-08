@@ -273,4 +273,5 @@
     <string name="bk_price_note">यह पूरी कीमत है। बाद में कुछ और नहीं जुड़ेगा।</string>
     <string name="as_offline">ऑफ़लाइन</string>
     <string name="as_all_offline">अभी कोई ऑपरेटर ऑनलाइन नहीं है। अपने ऑपरेटर से ऑनलाइन करने को कहें, फिर वापस आएँ।</string>
+    <string name="sub_current_plan">आपका मौजूदा प्लान</string>
 </resources>
