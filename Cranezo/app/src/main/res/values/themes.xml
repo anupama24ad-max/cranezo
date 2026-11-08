@@ -9,6 +9,14 @@
         <item name="android:timePickerDialogTheme">@style/Theme.Cranezo.Picker</item>
     </style>
 
+    <!-- Launch theme for SplashActivity: Android 12+ system splash (and the compat splash below 12)
+         shows the Cranezo logo on white, then installSplashScreen() switches to Theme.Cranezo. -->
+    <style name="Theme.Cranezo.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/android_12_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.Cranezo</item>
+    </style>
+
     <style name="Theme.Cranezo.Picker" parent="android:Theme.Material.Light.Dialog">
         <item name="android:colorAccent">@color/picker_amber</item>
         <item name="android:colorPrimary">@color/picker_amber</item>

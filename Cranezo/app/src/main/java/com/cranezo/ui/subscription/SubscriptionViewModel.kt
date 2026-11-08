@@ -39,6 +39,9 @@ class SubscriptionViewModel @Inject constructor(
 
     private fun headers() = AppMethods.getToken(sm)
 
+    private fun fail(message: String?) =
+        showError(message?.takeIf { it.isNotBlank() } ?: string(R.string.crane_msg_generic_error), autoHideMs = 2500L)
+
     private fun <T> call(path: String, body: JSONObject, type: Class<T>, onOk: (T?) -> Unit) {
         _state.update { it.copy(busy = true) }
         runWhenOnline {

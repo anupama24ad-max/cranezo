@@ -22,6 +22,7 @@ import com.cranezo.core.composecore.BaseVMComposeActivity
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.Textview
+import com.cranezo.ui.mainhome.components.SuccessGreen
 import com.cranezo.ui.myprofile.components.MyProfileScaffold
 import com.cranezo.ui.profile.ProfileActivity
 import com.cranezo.ui.theme.*

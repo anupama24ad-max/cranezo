@@ -62,7 +62,7 @@
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
-            android:theme="@style/Theme.Cranezo" >
+            android:theme="@style/Theme.Cranezo.Starting" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
