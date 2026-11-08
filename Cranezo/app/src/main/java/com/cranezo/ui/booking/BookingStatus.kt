@@ -352,6 +352,19 @@ fun TrackScreen(
     BookingScaffold(onBack = onBack, title = stringResource(R.string.bk_track_title)) {
         if (track == null) return@BookingScaffold
 
+        // The live map: the crane moves towards the site as the operator drives (updated every 5 seconds)
+        val craneAt = track.crane_location
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier.fillMaxWidth().height(dimen_220).clip(androidx.compose.foundation.shape.RoundedCornerShape(dimen_16))
+        ) {
+            com.cranezo.ui.booking.request.SiteMap(
+                latitude = track.site?.latitude, longitude = track.site?.longitude, address = track.site?.address,
+                modifier = Modifier.matchParentSize(),
+                craneLatitude = craneAt?.latitude, craneLongitude = craneAt?.longitude,
+                craneTitle = track.crane?.title
+            )
+        }
+
         GlassCard(contentPadding = dimen_12) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {

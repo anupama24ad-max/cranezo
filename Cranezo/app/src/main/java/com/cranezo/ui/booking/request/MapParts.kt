@@ -33,7 +33,11 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +50,10 @@ import androidx.compose.ui.text.style.TextAlign
 import com.cranezo.BuildConfig
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.theme.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
@@ -68,7 +75,8 @@ fun SiteMap(
     modifier: Modifier = Modifier,
     radiusKm: Double? = null,
     craneLatitude: Double? = null,
-    craneLongitude: Double? = null
+    craneLongitude: Double? = null,
+    craneTitle: String? = null
 ) {
     if (!BuildConfig.HAS_MAPS_KEY || latitude == null || longitude == null) {
         LocationCard(address, modifier)
@@ -81,9 +89,21 @@ fun SiteMap(
         else -> 14f
     }
     val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(site, zoom) }
+    val crane = if (craneLatitude != null && craneLongitude != null) LatLng(craneLatitude, craneLongitude) else null
+    var loaded by remember { mutableStateOf(false) }
+    // Rapido style: when a crane position is known, the map frames the crane and the site together and
+    // glides to the new position every time it moves
+    LaunchedEffect(crane, loaded) {
+        if (crane == null || !loaded) return@LaunchedEffect
+        runCatching {
+            val bounds = LatLngBounds.builder().include(site).include(crane).build()
+            camera.animate(CameraUpdateFactory.newLatLngBounds(bounds, 140), 900)
+        }
+    }
     GoogleMap(
         modifier = modifier,
         cameraPositionState = camera,
+        onMapLoaded = { loaded = true },
         uiSettings = MapUiSettings(zoomControlsEnabled = false, mapToolbarEnabled = false, myLocationButtonEnabled = false)
     ) {
         Marker(state = MarkerState(position = site), title = address)
@@ -96,9 +116,9 @@ fun SiteMap(
                 strokeWidth = 3f
             )
         }
-        if (craneLatitude != null && craneLongitude != null) {
-            val crane = LatLng(craneLatitude, craneLongitude)
-            Marker(state = MarkerState(position = crane))
+        if (crane != null) {
+            // the crane in orange, the site keeps the default red pin
+            Marker(state = MarkerState(position = crane), title = craneTitle, icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
             Polyline(points = listOf(crane, site), color = Color(0xFF6B7280), width = 8f)
         }
     }

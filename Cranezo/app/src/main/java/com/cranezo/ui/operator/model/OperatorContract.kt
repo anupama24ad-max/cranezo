@@ -54,6 +54,10 @@ data class OperatorJobState(
     val checklist: Checklist? = null,
     val breakdownTypes: List<SelectOption> = emptyList(),
 
+    // The operator's own position while on the way (shown on the map)
+    val myLatitude: Double? = null,
+    val myLongitude: Double? = null,
+
     // Set while the OTP was sent and the customer has to read it out
     val otpSent: Boolean = false
 )

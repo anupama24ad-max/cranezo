@@ -204,6 +204,7 @@ class OperatorJobViewModel @Inject constructor(
             while (true) {
                 if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     fetchCurrentLocation(app)?.let { fix ->
+                        _uiState.update { it.copy(myLatitude = fix.latitude, myLongitude = fix.longitude) }
                         val b = JSONObject().put("latitude", fix.latitude).put("longitude", fix.longitude).put("booking_id", bookingId)
                         repo.opLocation(headers(), b).isRequestCallSuspendSuccess()
                     }
