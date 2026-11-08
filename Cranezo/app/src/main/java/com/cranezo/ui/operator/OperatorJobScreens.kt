@@ -409,8 +409,8 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
 @Composable
 private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
-    // The rule from the server: when true the operator must reach the site before "arrived" works
-    // (and the Google Maps button is shown); when false there is no check.
+    // The rule from the server (ARRIVAL_CHECK_REQUIRED in its .env): when true the operator must reach the site
+    // before "arrived" works, and the map and the Google Maps button are shown; when false none of that.
     val rule = job.arrival_rule
     val required = rule?.required != false
     val radiusKm = rule?.radius_km ?: 1.0
@@ -445,8 +445,8 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
         }
     ) {
         OperatorStepHeader(job.next_action)
-        // where the customer's site is, and where the operator is now (updates as they drive)
-        Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
+        // where the customer's site is, and where the operator is now (updates as they drive); only when the operator has to reach the site
+        if (required) Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
             com.cranezo.ui.booking.request.SiteMap(
                 latitude = job.job_site?.latitude, longitude = job.job_site?.longitude, address = job.job_site?.address,
                 modifier = Modifier.matchParentSize(),
