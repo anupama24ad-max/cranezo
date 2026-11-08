@@ -42,6 +42,18 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/push_accent" />
 
+        <!-- Tapping a push while the app is in the background or closed: opens Home and the push's screen -->
+        <activity
+            android:name=".push.PushRouterActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="com.cranezo.OPEN_PUSH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.profiletheme.ProfileThemeActivity"
             android:exported="false"
