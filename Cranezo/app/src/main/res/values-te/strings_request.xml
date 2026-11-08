@@ -243,4 +243,16 @@
     <string name="sub_menu_title">నా సబ్‌స్క్రిప్షన్</string>
     <string name="sub_menu_sub">ప్లాన్, గడువు తేదీ మరియు చెల్లింపు</string>
     <string name="sub_home_action">ప్లాన్‌లు చూడండి</string>
+    <string name="as_title">ఆపరేటర్‌ను కేటాయించండి</string>
+    <string name="as_choose">1. ఆపరేటర్‌ను ఎంచుకోండి</string>
+    <string name="as_earn">2. ఆపరేటర్‌కు ఎంత వస్తుంది?</string>
+    <string name="as_other">ఇతర ఆపరేటర్: ID నమోదు చేయండి</string>
+    <string name="as_other_hint">ఆపరేటర్ యాప్‌లో కనిపించే ID (OP తో మొదలవుతుంది) అడగండి. వారు ఈ ఒక్క జాబ్ మాత్రమే చేస్తారు.</string>
+    <string name="as_no_operators">మీకు ఇంకా ఆపరేటర్లు లేరు. క్రింద ఆపరేటర్ ID నమోదు చేయండి.</string>
+    <string name="as_change_later">మీరు దీన్ని తర్వాత జాబ్ నుండి మార్చవచ్చు.</string>
+    <string name="as_assign_btn">ఆపరేటర్‌ను కేటాయించండి</string>
+    <string name="as_pick_first">ముందు ఆపరేటర్‌ను ఎంచుకోండి</string>
+    <string name="as_done_title">ఆపరేటర్ కేటాయించబడ్డారు</string>
+    <string name="as_done_body">%1$s కు ఈ జాబ్‌కు %2$s వస్తుంది. వారికి తెలియజేయబడింది.</string>
+    <string name="as_done_back">జాబ్‌కు తిరిగి వెళ్ళండి</string>
 </resources>

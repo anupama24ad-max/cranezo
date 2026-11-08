@@ -144,17 +144,6 @@ fun OwnerJobDetailsScreen(
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: OwnerJobDetailState(job = previewDetail, loaded = true)
     val job = state.job
     val context = LocalContext.current
-    var pickOperator by remember { mutableStateOf(false) }
-    // after picking an operator, the payment settle screen opens by itself
-    var assigning by remember { mutableStateOf(false) }
-    val assignedName = job?.assigned_operator?.full_name
-    LaunchedEffect(assignedName) {
-        val id = job?.booking_id
-        if (assigning && assignedName != null && id != null) {
-            assigning = false
-            context.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.COMMISSION, id))
-        }
-    }
     // back from the payment settle screen (or anywhere): show the latest
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OwnerJobDetailIntent.Poll) }
     // a push about a job, request or payment: show the change right away
@@ -173,10 +162,6 @@ fun OwnerJobDetailsScreen(
             delay(30_000)
             vm?.onIntent(OwnerJobDetailIntent.Poll)
         }
-    }
-
-    if (pickOperator) {
-        LaunchedEffect(Unit) { vm?.onIntent(OwnerJobDetailIntent.LoadOperators) }
     }
 
     BookingScaffold(
@@ -289,27 +274,17 @@ fun OwnerJobDetailsScreen(
                     Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_22).clickable { openDialer(context, operator.country_code, operator.mobile_number) })
                 }
             }
-            if (job.tab == "upcoming" && !pickOperator) {
+            // one screen: choose the operator and set what they earn
+            if (job.tab == "upcoming") {
                 Spacer(modifier = Modifier.height(dimen_8))
                 CommonGradientButton(
                     text = stringResource(if (operator == null) R.string.oj_assign_operator else R.string.oj_change_operator),
-                    onClick = { pickOperator = true }, height = dimen_40, textSize = font_12,
+                    onClick = {
+                        job.booking_id?.let { id ->
+                            context.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.ASSIGN, id))
+                        }
+                    }, height = dimen_40, textSize = font_12,
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = AmberPrimary
-                )
-            }
-            // Choose the operator for THIS job, right here on the page (no popup)
-            if (job.tab == "upcoming" && pickOperator) {
-                Spacer(modifier = Modifier.height(dimen_10))
-                OperatorChooser(
-                    suggested = job.suggested_operator,
-                    operators = state.operators,
-                    loaded = state.operatorsLoaded,
-                    onPick = { id, byCode ->
-                        assigning = true
-                        vm?.onIntent(OwnerJobDetailIntent.AssignOperator(id, byCode))
-                        pickOperator = false
-                    },
-                    onCancel = { pickOperator = false }
                 )
             }
             // booking for someone else: the person at the site
@@ -572,61 +547,6 @@ fun EvidenceScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
-    }
-}
-
-/**
- * Choose the operator for this one job: the crane's usual operator first, then the owner's operators,
- * or any operator by their ID (OP...) - an outside operator works this job only, then is free again.
- */
-@Composable
-private fun OperatorChooser(
-    suggested: com.cranezo.ui.ownerjobs.model.SuggestedOperator?,
-    operators: List<com.cranezo.ui.cranes.model.Operator>,
-    loaded: Boolean,
-    onPick: (String, Boolean) -> Unit,
-    onCancel: () -> Unit
-) {
-    var code by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf("") }
-    Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
-        Textview(stringResource(R.string.rq_operator_by_id), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
-            com.cranezo.ui.components.GlassInputField(
-                label = "", value = code, onValueChange = { code = it.uppercase().filter { c -> c.isLetterOrDigit() }.take(14) },
-                placeholder = "OP497309", modifier = Modifier.weight(1f)
-            )
-            CommonGradientButton(
-                text = stringResource(R.string.rq_assign), modifier = Modifier.width(dimen_100), height = dimen_52,
-                enabled = code.length >= 4, onClick = { onPick(code, true) }
-            )
-        }
-        Textview(stringResource(R.string.rq_operator_by_id_hint), size = font_11, color = appColors.textSecondary)
-
-        val list = buildList {
-            suggested?.let { s -> s.id?.let { id -> add(Triple(id, s.full_name.orEmpty(), s.member_id.orEmpty()) to true) } }
-            operators.filter { it.id != suggested?.id }.forEach { o -> o.id?.let { add(Triple(it, o.full_name.orEmpty(), o.member_id.orEmpty()) to false) } }
-        }
-        if (list.isNotEmpty()) Textview(stringResource(R.string.rq_your_operators), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-        if (loaded && list.isEmpty()) Textview(stringResource(R.string.oj_no_operators), size = font_12, color = appColors.textSecondary)
-        list.forEach { (o, isSuggested) ->
-            Row(
-                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_12)).background(appColors.subtleFill)
-                    .clickable { onPick(o.first, false) }.padding(dimen_10),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconBadge(icon = Icons.Default.Person, accent = AmberPrimary, size = dimen_32)
-                Spacer(modifier = Modifier.width(dimen_10))
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(o.second, size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                    Textview(o.third, size = font_11, color = appColors.textSecondary)
-                }
-                if (isSuggested) BookingTag(stringResource(R.string.rq_usual_operator), SuccessGreen)
-            }
-        }
-        Textview(
-            stringResource(R.string.fin_cancel), size = font_13, color = appColors.textSecondary,
-            modifier = Modifier.clickable { onCancel() }.padding(vertical = dimen_6)
-        )
     }
 }
 

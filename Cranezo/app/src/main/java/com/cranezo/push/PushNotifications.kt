@@ -150,6 +150,8 @@ object PushNotifications {
                 }
             }
             "owner_job" -> bookingId?.let { OwnerJobActivity.intent(context, it) }
+            // the customer paid the advance: straight to the one screen that assigns the operator
+            "owner_assign" -> bookingId?.let { com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.ASSIGN, it) }
             "operator_job" -> bookingId?.let { OperatorActivity.intent(context, it) }
             "announcement" -> SupportActivity.intent(context, SupportRoutes.NOTIFICATIONS)
             // the support request itself (its chat), or the list when the id is missing

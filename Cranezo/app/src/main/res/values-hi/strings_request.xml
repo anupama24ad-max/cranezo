@@ -243,4 +243,16 @@
     <string name="sub_menu_title">मेरा सब्सक्रिप्शन</string>
     <string name="sub_menu_sub">प्लान, देय तिथि और भुगतान</string>
     <string name="sub_home_action">प्लान देखें</string>
+    <string name="as_title">ऑपरेटर चुनें</string>
+    <string name="as_choose">1. ऑपरेटर चुनें</string>
+    <string name="as_earn">2. ऑपरेटर को कितना मिलेगा?</string>
+    <string name="as_other">दूसरा ऑपरेटर: ID डालें</string>
+    <string name="as_other_hint">ऑपरेटर से उनके ऐप में दिखने वाली ID (OP से शुरू) माँगें। वे सिर्फ़ यही एक जॉब करेंगे।</string>
+    <string name="as_no_operators">आपके पास अभी कोई ऑपरेटर नहीं है। नीचे ऑपरेटर ID डालें।</string>
+    <string name="as_change_later">आप इसे बाद में जॉब से बदल सकते हैं।</string>
+    <string name="as_assign_btn">ऑपरेटर चुनें</string>
+    <string name="as_pick_first">पहले ऑपरेटर चुनें</string>
+    <string name="as_done_title">ऑपरेटर तय हो गया</string>
+    <string name="as_done_body">%1$s को इस जॉब के %2$s मिलेंगे। उन्हें बता दिया गया है।</string>
+    <string name="as_done_back">जॉब पर वापस जाएँ</string>
 </resources>

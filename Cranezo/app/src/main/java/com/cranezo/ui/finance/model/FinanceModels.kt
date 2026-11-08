@@ -52,7 +52,9 @@ data class OwnerJobMoney(
     val job_location: JobLocationRef? = null,
     val bill: BillBlock? = null,
     val operator_commission: Commission? = null,
-    val assigned_operator: AssignedOperatorRef? = null
+    val assigned_operator: AssignedOperatorRef? = null,
+    // the crane's usual operator (suggested first on the Assign operator screen)
+    val suggested_operator: com.cranezo.ui.ownerjobs.model.SuggestedOperator? = null
 )
 
 // ---------------------------------------------------------------- owner billing settings

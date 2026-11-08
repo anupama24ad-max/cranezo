@@ -19,6 +19,8 @@ object FinanceRoutes {
     // owner
     const val BILLING = "billing"
     const val COMMISSION = "commission"
+    // assign an operator and set what they earn, on one screen
+    const val ASSIGN = "assign_operator"
     const val OPERATOR_DUES = "operator_dues"
     const val PAY_OPERATOR = "pay_operator"
     const val PLATFORM = "platform"
@@ -48,7 +50,7 @@ class FinanceActivity : BaseVMComposeActivity<FinanceViewModel>(FinanceViewModel
         private const val EXTRA_ROUTE = "route"
         private const val EXTRA_ID = "id"
 
-        /** [id] is the booking id for COMMISSION and COMPLAINT_NEW, the complaint id for COMPLAINT */
+        /** [id] is the booking id for COMMISSION, ASSIGN and COMPLAINT_NEW, the complaint id for COMPLAINT */
         fun intent(context: Context, route: String = FinanceRoutes.HUB, id: String? = null): Intent =
             Intent(context, FinanceActivity::class.java).putExtra(EXTRA_ROUTE, route).putExtra(EXTRA_ID, id)
     }
@@ -81,6 +83,7 @@ class FinanceActivity : BaseVMComposeActivity<FinanceViewModel>(FinanceViewModel
             composable(FinanceRoutes.HUB) { FinanceHubScreen(role, leave, open) }
 
             composable(FinanceRoutes.BILLING) { OwnerBillingScreen(vm, leave) }
+            composable(FinanceRoutes.ASSIGN) { AssignOperatorScreen(vm, startId.orEmpty(), leave) }
             composable(FinanceRoutes.COMMISSION) { OwnerCommissionScreen(vm, startId.orEmpty(), leave) }
             composable(FinanceRoutes.OPERATOR_DUES) {
                 OperatorDuesScreen(vm, leave) { id, name ->

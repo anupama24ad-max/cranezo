@@ -48,6 +48,8 @@ data class FinanceUiState(
     // owner
     val billing: BillingSettings? = null,
     val jobMoney: OwnerJobMoney? = null,
+    // the owner's operators, for the Assign operator screen
+    val operators: List<com.cranezo.ui.cranes.model.Operator> = emptyList(),
     val dues: OperatorDues? = null,
     val dueJobs: PendingJobs? = null,
     val platform: PendingJobs? = null,
@@ -216,6 +218,40 @@ class FinanceViewModel @Inject constructor(
         call<OwnerJobMoney>("owner/jobs/get", JSONObject().put("booking_id", bookingId), typeOf<OwnerJobMoney>(), page = "job_money") { d ->
             _ui.update { it.copy(jobMoney = d) }
         }
+
+    fun loadOperators() {
+        runWhenOnline {
+            repo.ownerOperatorsApi(headers(), JSONObject().put("min", 0).put("max", 100)).isRequestCallSuspendSuccess(
+                success = { r -> _ui.update { it.copy(operators = r?.data.orEmpty()) } },
+                failure = { _, _, m -> fail(m) }
+            )
+            markLoaded("operators")
+        }
+    }
+
+    /** One call: the operator for this job and what they earn for it. The operator is told with the amount. */
+    fun assignOperator(bookingId: String, operator: String, byCode: Boolean, type: String, value: String, onDone: () -> Unit) {
+        val amount = value.toDoubleOrNull()
+        if (amount == null) {
+            fail(string(R.string.fin_enter_amount))
+            return
+        }
+        _ui.update { it.copy(saving = true, notice = null) }
+        runWhenOnline {
+            val body = JSONObject().put("booking_id", bookingId).put("commission_type", type).put("commission_value", amount)
+            if (byCode) body.put("operator_code", operator.trim().uppercase()) else body.put("operator_id", operator)
+            repo.ownerAssignOperator(headers(), body).isRequestCallSuspendSuccess(
+                success = {
+                    _ui.update { it.copy(saving = false) }
+                    onDone()
+                },
+                failure = { _, _, m ->
+                    _ui.update { it.copy(saving = false) }
+                    fail(m)
+                }
+            )
+        }
+    }
 
     fun saveCommission(bookingId: String, type: String, value: String, onSaved: () -> Unit = {}) {
         val amount = value.toDoubleOrNull()

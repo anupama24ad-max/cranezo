@@ -244,4 +244,16 @@
     <string name="sub_menu_title">My subscription</string>
     <string name="sub_menu_sub">Plan, due date and payment</string>
     <string name="sub_home_action">View plans</string>
+    <string name="as_title">Assign operator</string>
+    <string name="as_choose">1. Choose the operator</string>
+    <string name="as_earn">2. What will the operator earn?</string>
+    <string name="as_other">Other operator: enter the ID</string>
+    <string name="as_other_hint">Ask the operator for the ID shown in their app (it starts with OP). They work this one job only.</string>
+    <string name="as_no_operators">You have no operators yet. Enter an operator ID below.</string>
+    <string name="as_change_later">You can change this later from the job.</string>
+    <string name="as_assign_btn">Assign operator</string>
+    <string name="as_pick_first">Choose an operator</string>
+    <string name="as_done_title">Operator assigned</string>
+    <string name="as_done_body">%1$s will earn %2$s for this job. They have been told.</string>
+    <string name="as_done_back">Back to the job</string>
 </resources>
