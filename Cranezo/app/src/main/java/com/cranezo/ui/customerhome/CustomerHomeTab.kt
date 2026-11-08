@@ -145,21 +145,19 @@ fun CustomerHomeTab(
     com.cranezo.push.OnPush { vm?.refresh() }
     val home = state.home
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+    com.cranezo.ui.mainhome.components.HomeScreenColumn(
+        spacing = dimen_12,
+        hero = {
+            val name = home?.greeting_name?.takeIf { it.isNotBlank() }
+            HomeHeader(
+                name = name ?: stringResource(R.string.ch_welcome),
+                // "#100001": the ID is small (CUST100001 shows as #100001)
+                tag = home?.member_id?.takeIf { it.isNotBlank() }?.let { "#" + it.removePrefix("CUST") },
+                subtitle = stringResource(R.string.home_customer_subtitle),
+                unread = home?.unread_notifications ?: 0
+            )
+        }
     ) {
-        val name = home?.greeting_name?.takeIf { it.isNotBlank() }
-        HomeHeader(
-            name = name ?: stringResource(R.string.ch_welcome),
-            // "#100001": the ID is small (CUST100001 shows as #100001)
-            tag = home?.member_id?.takeIf { it.isNotBlank() }?.let { "#" + it.removePrefix("CUST") },
-            subtitle = stringResource(R.string.home_customer_subtitle),
-            unread = home?.unread_notifications ?: 0
-        )
 
         BannerCarousel(home?.banners.orEmpty().sortedBy { it.sort_order ?: 0 }) { runBannerAction(context, it, onProfile) }
 

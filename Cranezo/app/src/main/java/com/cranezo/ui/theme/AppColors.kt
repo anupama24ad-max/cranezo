@@ -51,7 +51,16 @@ data class AppColors(
     // Plain screen gradient used when a screen has no background image
     val screenTop: Color,
     val screenBottom: Color,
-    val screenGlow: Color
+    val screenGlow: Color,
+    // Curved hero header on home screens: navy gradient with an amber glow in the corner
+    val heroTop: Color,
+    val heroBottom: Color,
+    val heroGlow: Color,
+    // Light mode page body: champagne gold at the top fading to white, with a soft shine (dark mode uses bgBase)
+    val bodyTop: Color,
+    val bodyMid: Color,
+    val bodyBottom: Color,
+    val bodyShine: Color
 )
 
 val DarkAppColors = AppColors(
@@ -82,12 +91,19 @@ val DarkAppColors = AppColors(
     imageVeil = Color.Transparent,
     screenTop = Color(0xFF0B1F3F),
     screenBottom = Color(0xFF050810),
-    screenGlow = Color(0x33FFA000)
+    screenGlow = Color(0x33FFA000),
+    heroTop = Color(0xFF0E2A55),
+    heroBottom = Color(0xFF060D1C),
+    heroGlow = Color(0xFFF59E0B),
+    bodyTop = Color(0xFF040810),
+    bodyMid = Color(0xFF040810),
+    bodyBottom = Color(0xFF040810),
+    bodyShine = Color.Transparent
 )
 
 val LightAppColors = AppColors(
     isDark = false,
-    bgBase = Color(0xFFF6F7FB),
+    bgBase = Color(0xFFFFFFFF),
     bgCenter = Color(0xFFF6F7FB),
     bgEdge = Color(0xFFF6F7FB),
     glowBlue = Color(0xFF2563EB),
@@ -112,7 +128,14 @@ val LightAppColors = AppColors(
     imageVeil = Color(0xFFFFFFFF),
     screenTop = Color(0xFFEAF1FB),
     screenBottom = Color(0xFFF9FBFE),
-    screenGlow = Color(0x33FFA000)
+    screenGlow = Color(0x33FFA000),
+    heroTop = Color(0xFF0B1F3F),
+    heroBottom = Color(0xFF050A15),
+    heroGlow = Color(0xFFF59E0B),
+    bodyTop = Color(0xFFF1D88A),
+    bodyMid = Color(0xFFFBF1D2),
+    bodyBottom = Color(0xFFFFFFFF),
+    bodyShine = Color(0xFFFFFFFF)
 )
 
 val LocalAppColors = staticCompositionLocalOf { DarkAppColors }

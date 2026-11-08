@@ -57,7 +57,6 @@ import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.cranes.components.CraneImage
-import com.cranezo.ui.mainhome.components.HomeHeader
 import com.cranezo.ui.mainhome.components.InfoBlue
 import com.cranezo.ui.mainhome.components.OwnerRequestHost
 import com.cranezo.ui.mainhome.components.SuccessGreen
@@ -138,7 +137,6 @@ fun OwnerJobsTab(
             .padding(horizontal = dimen_20, vertical = dimen_16),
         verticalArrangement = Arrangement.spacedBy(dimen_12)
     ) {
-        HomeHeader(name = userName, subtitle = stringResource(R.string.home_owner_subtitle))
         Column {
             Textview(stringResource(R.string.op_jobs_title), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.oj_jobs_subtitle), size = font_11, color = appColors.textSecondary)

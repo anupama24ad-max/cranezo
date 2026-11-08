@@ -136,7 +136,8 @@ abstract class BaseVMComposeActivity<VM : BaseViewModel>(
                     WindowCompat.getInsetsController(window, view).apply {
                         // Light mode needs dark icons (isAppearanceLightStatusBars = true)
                         // Dark mode needs light icons (isAppearanceLightStatusBars = false)
-                        isAppearanceLightStatusBars = !isDark
+                        // a navy header behind the status bar needs light icons in both themes
+                        isAppearanceLightStatusBars = !isDark && !HeroStatusBar.isShown
                         isAppearanceLightNavigationBars = !isDark
                     }
                 }
@@ -317,3 +318,14 @@ fun LoadingOverlay() {
 }
 
 
+
+/**
+ * Tracks whether a navy header is drawn behind the status bar. While it is, the status bar keeps
+ * light icons even in light mode. A count is used so two screens during a transition do not clash.
+ */
+object HeroStatusBar {
+    private var count by androidx.compose.runtime.mutableIntStateOf(0)
+    val isShown: Boolean get() = count > 0
+    fun show() { count++ }
+    fun hide() { if (count > 0) count-- }
+}

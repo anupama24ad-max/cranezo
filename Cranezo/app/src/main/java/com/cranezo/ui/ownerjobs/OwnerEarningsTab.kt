@@ -60,7 +60,6 @@ import com.cranezo.ui.booking.components.PriceLine
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.cranes.components.CraneImage
-import com.cranezo.ui.mainhome.components.HomeHeader
 import com.cranezo.ui.mainhome.components.SuccessGreen
 import com.cranezo.ui.ownerjobs.model.ComparedToPrevious
 import com.cranezo.ui.ownerjobs.model.EarningJobCrane
@@ -119,7 +118,6 @@ fun OwnerEarningsTab(
             .padding(horizontal = dimen_20, vertical = dimen_16),
         verticalArrangement = Arrangement.spacedBy(dimen_14)
     ) {
-        HomeHeader(name = userName, subtitle = stringResource(R.string.home_owner_subtitle))
 
         // Title
         Column {

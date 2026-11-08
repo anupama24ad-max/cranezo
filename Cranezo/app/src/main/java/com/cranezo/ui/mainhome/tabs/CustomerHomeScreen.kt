@@ -55,19 +55,17 @@ fun CustomerHomeScreen(
 ) {
     val displayName = state.userName.ifBlank { stringResource(R.string.home_customer_default_name) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_16)
+    com.cranezo.ui.mainhome.components.HomeScreenColumn(
+        spacing = dimen_16,
+        hero = {
+            HomeHeader(
+                name = displayName,
+                // the customer ID is small: CUST100001 shows as #100001
+                tag = state.memberId.takeIf { it.isNotBlank() }?.let { "#" + it.removePrefix("CUST") },
+                subtitle = stringResource(R.string.home_customer_subtitle)
+            )
+        }
     ) {
-        HomeHeader(
-            name = displayName,
-            // the customer ID is small: CUST100001 shows as #100001
-            tag = state.memberId.takeIf { it.isNotBlank() }?.let { "#" + it.removePrefix("CUST") },
-            subtitle = stringResource(R.string.home_customer_subtitle)
-        )
 
         // Hero banner
         Box(

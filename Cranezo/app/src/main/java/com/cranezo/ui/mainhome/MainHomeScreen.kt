@@ -1,5 +1,7 @@
 package com.cranezo.ui.mainhome
 
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -164,8 +166,16 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
                 )
             }
         ) { inner ->
+            // Home draws its navy header behind the status bar, so it skips the top inset
+            val layoutDir = androidx.compose.ui.platform.LocalLayoutDirection.current
+            val contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                start = inner.calculateStartPadding(layoutDir),
+                end = inner.calculateEndPadding(layoutDir),
+                top = if (currentRoute == Dest.Home.route) androidx.compose.ui.unit.Dp(0f) else inner.calculateTopPadding(),
+                bottom = inner.calculateBottomPadding()
+            )
             NavHost(
-                modifier = Modifier.padding(inner),
+                modifier = Modifier.padding(contentPadding),
                 navController = nav,
                 startDestination = Dest.Home.route
             ) {

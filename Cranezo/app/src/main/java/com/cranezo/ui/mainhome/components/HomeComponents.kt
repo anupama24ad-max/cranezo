@@ -28,6 +28,16 @@ import com.cranezo.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.layout.layout
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -155,6 +165,80 @@ fun HomeHeader(
             }
         }
     }
+}
+
+/**
+ * Curved navy header at the top of a home screen, the same in light and dark mode.
+ * It runs edge to edge with rounded bottom corners. Everything inside is drawn with the dark
+ * tokens, so text and the bell stay readable on the navy.
+ */
+@Composable
+fun CurvedHero(
+    modifier: Modifier = Modifier,
+    bottomPadding: Dp = dimen_24,
+    content: @Composable () -> Unit
+) {
+    val colors = appColors
+    // the navy sits behind the status bar, so its icons must be light while this header is shown
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        com.cranezo.core.composecore.HeroStatusBar.show()
+        onDispose { com.cranezo.core.composecore.HeroStatusBar.hide() }
+    }
+    val shape = RoundedCornerShape(bottomStart = dimen_32, bottomEnd = dimen_32)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Brush.verticalGradient(listOf(colors.heroTop, colors.heroBottom)))
+            .drawBehind {
+                // amber glow in the top right corner
+                drawRect(
+                    Brush.radialGradient(
+                        colors = listOf(colors.heroGlow.copy(alpha = 0.32f), Color.Transparent),
+                        center = Offset(size.width, 0f),
+                        radius = size.width * 0.75f
+                    )
+                )
+            }
+            // the navy is drawn first, then this pushes the content below the status bar
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(start = dimen_20, end = dimen_20, top = dimen_16, bottom = bottomPadding)
+    ) {
+        CompositionLocalProvider(LocalAppColors provides DarkAppColors) { content() }
+    }
+}
+
+/**
+ * Scrolling home screen: the curved navy [hero] on top, then the [content] with side padding.
+ * The first card slides over the bottom of the hero.
+ */
+@Composable
+fun HomeScreenColumn(
+    spacing: Dp,
+    hero: @Composable () -> Unit,
+    content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(androidx.compose.foundation.rememberScrollState())
+    ) {
+        CurvedHero { hero() }
+        Column(
+            modifier = Modifier
+                .padding(horizontal = dimen_20)
+                .padding(top = dimen_16, bottom = dimen_16),
+            verticalArrangement = Arrangement.spacedBy(spacing),
+            content = content
+        )
+    }
+}
+
+/** Pulls the content up by [amount] so it overlaps the bottom of the hero above it */
+fun Modifier.pullUp(amount: Dp): Modifier = layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    val px = amount.roundToPx()
+    layout(placeable.width, placeable.height - px) { placeable.placeRelative(0, -px) }
 }
 
 @Composable

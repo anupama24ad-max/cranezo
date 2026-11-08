@@ -122,14 +122,10 @@ fun OperatorHomeTab(
     com.cranezo.push.OnPush { vm?.onIntent(OperatorTabsIntent.LoadHome) }
     val home = state.home
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+    com.cranezo.ui.mainhome.components.HomeScreenColumn(
+        spacing = dimen_12,
+        hero = { HomeHeader(name = home?.greeting_name.orEmpty(), subtitle = stringResource(R.string.op_home_subtitle)) }
     ) {
-        HomeHeader(name = home?.greeting_name.orEmpty(), subtitle = stringResource(R.string.op_home_subtitle))
 
         // A job the owner just gave: shown here on the page (sound + vibration), not as a popup
         state.incomingJob?.let { id ->

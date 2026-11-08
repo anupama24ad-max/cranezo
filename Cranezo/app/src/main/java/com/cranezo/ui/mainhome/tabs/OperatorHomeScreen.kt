@@ -55,17 +55,15 @@ fun OperatorHomeScreen(
 ) {
     val data = state.operator
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_16)
+    com.cranezo.ui.mainhome.components.HomeScreenColumn(
+        spacing = dimen_16,
+        hero = {
+            HomeHeader(
+                name = state.userName.ifBlank { stringResource(R.string.home_operator_default_name) },
+                subtitle = stringResource(R.string.home_operator_subtitle)
+            )
+        }
     ) {
-        HomeHeader(
-            name = state.userName.ifBlank { stringResource(R.string.home_operator_default_name) },
-            subtitle = stringResource(R.string.home_operator_subtitle)
-        )
 
         // Availability
         Row(

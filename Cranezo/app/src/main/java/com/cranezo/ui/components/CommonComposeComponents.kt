@@ -2465,17 +2465,24 @@ fun ScreenBackground(
                 .fillMaxSize()
                 .background(colors.bgBase)
                 .drawBehind {
-                    // Light mode (Blinkit style): a soft orange tint at the top that fades to plain white
+                    // Light mode: champagne gold at the top fading to white, with a soft shine
                     if (!colors.isDark) {
                         drawRect(
                             brush = Brush.verticalGradient(
                                 colorStops = arrayOf(
-                                    0f to Color(0xFFFFD9AE),
-                                    0.14f to Color(0xFFFFE8CF),
-                                    0.32f to Color(0xFFFFF5EA),
-                                    0.5f to Color.White,
-                                    1f to Color.White
+                                    0f to colors.bodyTop,
+                                    0.3f to colors.bodyMid,
+                                    0.7f to colors.bodyBottom,
+                                    1f to colors.bodyBottom
                                 )
+                            )
+                        )
+                        // shine: a bright soft glow from the top left corner
+                        drawRect(
+                            brush = Brush.radialGradient(
+                                colors = listOf(colors.bodyShine.copy(alpha = 0.65f), Color.Transparent),
+                                center = Offset(size.width * 0.1f, size.height * 0.04f),
+                                radius = size.width * 0.9f
                             )
                         )
                         return@drawBehind

@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.cranezo.ui.components.CommonGradientButton
 import com.cranezo.ui.components.GlassCard
 import com.cranezo.ui.components.ScreenBackground
+import com.cranezo.ui.mainhome.components.CurvedHero
 import com.cranezo.ui.mainhome.components.HomeHeader
 import com.cranezo.ui.mainhome.components.InfoBlue
 import com.cranezo.ui.mainhome.components.MetricCard
@@ -53,13 +54,34 @@ fun OwnerHomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = dimen_20, vertical = dimen_16),
+    ) {
+        CurvedHero {
+            Column {
+                HomeHeader(
+                    name = state.userName.ifBlank { stringResource(R.string.home_owner_default_name) },
+                    subtitle = stringResource(R.string.home_owner_subtitle)
+                )
+                Spacer(modifier = Modifier.height(dimen_16))
+                Textview(
+                    stringResource(R.string.home_todays_earnings_caption),
+                    size = font_11,
+                    color = appColors.textSecondary
+                )
+                Textview(
+                    state.owner.todaysEarnings,
+                    size = font_26,
+                    color = appColors.primaryText,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                )
+            }
+        }
+
+    Column(
+        modifier = Modifier
+            .padding(horizontal = dimen_20)
+            .padding(top = dimen_16, bottom = dimen_16),
         verticalArrangement = Arrangement.spacedBy(dimen_16)
     ) {
-        HomeHeader(
-            name = state.userName.ifBlank { stringResource(R.string.home_owner_default_name) },
-            subtitle = stringResource(R.string.home_owner_subtitle)
-        )
 
         // Fleet Overview: its own panel (deep navy in dark mode, glass in light mode) holding the 4 tiles
         GlassCard(
@@ -264,8 +286,7 @@ fun OwnerHomeScreen(
                 )
             }
         }
-
-
+    }
     }
 }
 
