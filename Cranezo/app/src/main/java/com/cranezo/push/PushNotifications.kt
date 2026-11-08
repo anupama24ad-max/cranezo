@@ -47,7 +47,7 @@ object PushNotifications {
         android.net.Uri.parse("android.resource://${context.packageName}/${R.raw.buzzer_tone}")
 
     private val URGENT_TYPES = setOf(
-        "booking_request", "job_assigned", "operator_arrived", "completion_requested",
+        "crane_approved", "crane_rejected", "document_rejected", "booking_request", "job_assigned", "operator_arrived", "completion_requested",
         "extension_requested", "breakdown_reported", "emergency"
     )
 
@@ -167,6 +167,9 @@ object PushNotifications {
             "owner_crane_requests" -> com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
             "crane_request" -> BookingActivity.intent(context, BookingRoutes.REQUEST)
             "subscription" -> com.cranezo.ui.subscription.SubscriptionActivity.intent(context)
+            // admin decisions: the crane that was approved or rejected, or the profile documents
+            "owner_crane" -> extras.getString("crane_id")?.let { com.cranezo.ui.cranes.CranesActivity.detailsIntent(context, it) }
+            "documents" -> com.cranezo.ui.myprofile.MyProfileActivity.intent(context, com.cranezo.ui.myprofile.ProfileRoutes.DOCUMENTS)
             // "owner_request": the request popup lives on Home, which is already opened
             else -> null
         }
