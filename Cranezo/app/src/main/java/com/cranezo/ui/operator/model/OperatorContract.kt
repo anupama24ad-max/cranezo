@@ -59,6 +59,9 @@ data class OperatorJobState(
     val myLongitude: Double? = null,
     // the road route from the operator to the site (yellow line)
     val route: List<com.google.android.gms.maps.model.LatLng> = emptyList(),
+    // km and minutes left along that road, at crane speed (from the server)
+    val liveDistanceKm: Double? = null,
+    val liveEtaMinutes: Int? = null,
 
     // Set while the OTP was sent and the customer has to read it out
     val otpSent: Boolean = false

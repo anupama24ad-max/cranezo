@@ -55,6 +55,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.cranezo.ui.components.ShimmerImage
 import com.cranezo.R
@@ -296,11 +297,14 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
     val accepted = job.next_action == NextAction.START_JOURNEY
     // the new job rings (buzzer tone) until the operator accepts or declines it
     androidx.compose.runtime.DisposableEffect(job.booking_id, accepted) {
+        com.cranezo.push.PushNotifications.cancelFor(context, job.booking_id)
         if (!accepted) com.cranezo.push.BuzzerPlayer.start(context)
         onDispose { com.cranezo.push.BuzzerPlayer.stop() }
     }
     // Decline asks once more on the page itself (no popup): the bottom bar turns into Cancel / Yes, decline
     var confirmDecline by remember { mutableStateOf(false) }
+    // before driving off: the operator confirms they are with the crane this job booked
+    var withCrane by rememberSaveable(job.booking_id) { mutableStateOf(false) }
 
     BookingScaffold(
         onBack = onClose,
@@ -309,6 +313,7 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
             if (accepted) {
                 CommonGradientButton(
                     text = stringResource(R.string.op_start_navigation),
+                    enabled = withCrane,
                     onClick = { onIntent(OperatorJobIntent.StartJourney) }
                 )
             } else if (confirmDecline) {
@@ -374,6 +379,35 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
                 }
             }
         }
+        if (accepted) {
+            // the crane the customer booked: type, capacity and the registration number to check on the vehicle
+            val crane = job.assigned_crane
+            GlassCard(contentPadding = dimen_14, borderColor = if (withCrane) SuccessGreen else AmberPrimary, onClick = { withCrane = !withCrane }) {
+                Textview(stringResource(R.string.op_with_crane_q), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(dimen_6))
+                Textview(
+                    listOfNotNull(crane?.capacity_name, crane?.crane_type_name).joinToString(" ").ifBlank { job.requested_crane?.title.orEmpty() },
+                    size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+                )
+                Textview(
+                    listOfNotNull(crane?.registration_number, crane?.model_name, crane?.crane_code).joinToString("  •  "),
+                    size = font_13, color = appColors.textSecondary
+                )
+                Spacer(modifier = Modifier.height(dimen_10))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        if (withCrane) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank, contentDescription = null,
+                        tint = if (withCrane) SuccessGreen else appColors.textSecondary, modifier = Modifier.size(dimen_28)
+                    )
+                    Spacer(modifier = Modifier.width(dimen_8))
+                    Textview(stringResource(R.string.op_with_crane_yes), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                }
+                if (!withCrane) {
+                    Spacer(modifier = Modifier.height(dimen_4))
+                    Textview(stringResource(R.string.op_with_crane_hint), size = font_12, color = appColors.textSecondary)
+                }
+            }
+        }
         if (accepted && job.customer?.mobile_number != null) {
             CommonGradientButton(
                 text = stringResource(R.string.op_call_customer), leftIcon = Icons.Default.Call, onClick = { dial(context, job.customer) },
@@ -393,11 +427,11 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     val context = LocalContext.current
     val siteLat = job.job_site?.latitude
     val siteLng = job.job_site?.longitude
-    // the yellow road route, asked again when the operator has moved about 100 m
-    LaunchedEffect(state.myLatitude?.let { Math.round(it * 1000) }, state.myLongitude?.let { Math.round(it * 1000) }) {
+    // the road route comes with every location update (main roads a crane can use); asked here only until then
+    LaunchedEffect(state.route.isEmpty(), state.myLatitude != null) {
         val la = state.myLatitude
         val lo = state.myLongitude
-        if (la != null && lo != null && siteLat != null && siteLng != null) onIntent(OperatorJobIntent.LoadRoute(la, lo, siteLat, siteLng))
+        if (state.route.isEmpty() && la != null && lo != null && siteLat != null && siteLng != null) onIntent(OperatorJobIntent.LoadRoute(la, lo, siteLat, siteLng))
     }
     // Location is shared while on the way, so the permission is asked here
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
@@ -410,14 +444,29 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
         bottom = { CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
     ) {
         OperatorStepHeader(job.next_action)
-        // where the customer's site is, and where the operator is now (updates as they drive)
-        Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
+        // where the customer's site is, and where the operator is now (moves smoothly as they drive)
+        Box(modifier = Modifier.fillMaxWidth().height(380.dp).clip(RoundedCornerShape(dimen_16))) {
             com.cranezo.ui.booking.request.SiteMap(
                 latitude = job.job_site?.latitude, longitude = job.job_site?.longitude, address = job.job_site?.address,
                 modifier = Modifier.matchParentSize(),
                 craneLatitude = state.myLatitude, craneLongitude = state.myLongitude,
                 craneTitle = job.assigned_crane?.model_name,
-                route = state.route
+                route = state.route,
+                follow = true
+            )
+        }
+        // turn-by-turn voice navigation in Google Maps, to the same site
+        if (siteLat != null && siteLng != null) {
+            CommonGradientButton(
+                text = stringResource(R.string.op_open_google_maps), leftIcon = Icons.Default.Navigation,
+                onClick = {
+                    val nav = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$siteLat,$siteLng&mode=d")).setPackage("com.google.android.apps.maps")
+                    runCatching { context.startActivity(nav) }.onFailure {
+                        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$siteLat,$siteLng&travelmode=driving"))) }
+                    }
+                },
+                height = dimen_48, textSize = font_14,
+                gradientColors = listOf(InfoBlue, InfoBlue), textColor = Color.White
             )
         }
         GlassCard(contentPadding = dimen_14) {
@@ -439,10 +488,13 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
                     }
                 )
             }
-            if (job.job_site?.distance_km != null) {
+            // km and minutes left along the road, at crane speed (live from the server once moving)
+            val km = state.liveDistanceKm ?: job.job_site?.distance_km
+            val eta = state.liveEtaMinutes ?: job.job_site?.eta_minutes
+            if (km != null) {
                 InfoRow(
                     Icons.Default.Navigation, stringResource(R.string.op_en_route),
-                    "${job.job_site.distance_km} km", sub = stringResource(R.string.op_eta_min, job.job_site.eta_minutes ?: 0)
+                    "$km km", sub = stringResource(R.string.op_eta_min, eta ?: 0)
                 )
             }
         }
@@ -681,8 +733,8 @@ private fun MonitorScreen(
         bottom = { CommonGradientButton(text = stringResource(R.string.op_finish_job), onClick = { finishing = true }) }
     ) {
         OperatorStepHeader(job.next_action)
-        // Fixed hours: the booked window and the time left, no running clock
-        FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration?.label)
+        // The real work time (ticking), against the booked hours
+        FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration?.label, timers = job.timers)
         // Hold / Resume: pauses the job (waiting for material, the site, the weather); the customer sees it
         val onHold = job.timers?.is_waiting == true
         GlassCard(contentPadding = dimen_14, borderColor = if (onHold) AmberPrimary else Color.Unspecified) {
@@ -928,15 +980,15 @@ private fun SummaryRows(summary: JobSummary?) {
         PriceLine(stringResource(R.string.op_end_time), formatServerTime(summary.end_time))
         if ((summary.extra_seconds ?: 0L) > 0) PriceLine(stringResource(R.string.op_extra_time), formatSeconds(summary.extra_seconds), valueColor = InfoBlue)
     }
-    GlassCard(contentPadding = dimen_14) {
-        Textview(stringResource(R.string.op_earnings_summary), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.height(dimen_6))
-        PriceLine(stringResource(R.string.op_base_amount, (summary.base_hours ?: 0.0).toInt()), rupees(summary.base_amount))
-        // Only the rows that carry money
-        if ((summary.waiting_charge ?: 0.0) > 0) PriceLine(stringResource(R.string.op_waiting_charge), rupees(summary.waiting_charge))
-        if ((summary.extra_amount ?: 0.0) > 0) PriceLine(stringResource(R.string.op_extra_amount), rupees(summary.extra_amount))
-        Spacer(modifier = Modifier.height(dimen_6))
-        PriceLine(stringResource(R.string.op_final_amount), rupees(summary.final_amount), bold = true)
+    // the operator sees only their own earning, never the customer's bill or the owner's prices
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Textview(stringResource(R.string.op_you_earn), size = font_14, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+            Textview(
+                summary.earnings_amount?.let { rupees(it) } ?: stringResource(R.string.op_commission_pending),
+                size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -969,7 +1021,7 @@ private fun OtpScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Unit, o
         // What was done, in two numbers
         GlassCard(contentPadding = dimen_14) {
             PriceLine(stringResource(R.string.fh_booked_hours), job.duration?.label ?: "-")
-            PriceLine(stringResource(R.string.op_final_amount), rupees(job.summary?.final_amount ?: job.settlement?.final_amount), bold = true)
+            PriceLine(stringResource(R.string.op_you_earn), (job.summary?.earnings_amount ?: job.settlement?.final_amount)?.let { rupees(it) } ?: stringResource(R.string.op_commission_pending), bold = true)
         }
         GlassCard(contentPadding = dimen_16, borderColor = AmberPrimary) {
             Textview(stringResource(R.string.op_code_sent), size = font_13, color = appColors.textSecondary)

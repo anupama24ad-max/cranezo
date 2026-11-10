@@ -247,52 +247,85 @@ fun BookingTag(text: String, color: Color) {
 private fun Modifier.androidxHeightIn(min: androidx.compose.ui.unit.Dp): Modifier = this.heightIn(min = min)
 
 /**
- * Bookings are sold in fixed hours, so job screens show the booked window instead of a running clock:
- * "8 Hours", "09:00 AM - 05:00 PM", a bar and "3h 20m left". The end time comes from the server and
- * already includes approved extra time. It refreshes every 30 seconds; nothing ticks every second.
+ * The work clock of a job: how long the crane has really worked (from "Start job", hold time not counted),
+ * ticking every second, against the booked hours. No "time left": the real time of work is what counts, and
+ * time beyond the booked hours is shown in red (it is charged at the booking's hourly rate).
+ * Before the work starts it shows the booked hours and window.
+ * [timers] come from the server (working_seconds at server time); the clock adds the time since they arrived.
  * Used by the customer (Job In Progress), owner (job monitoring) and operator (step 4).
  */
 @Composable
-fun FixedHoursCard(startAt: String?, endAt: String?, durationLabel: String?, modifier: Modifier = Modifier) {
+fun FixedHoursCard(
+    startAt: String?,
+    endAt: String?,
+    durationLabel: String?,
+    modifier: Modifier = Modifier,
+    timers: com.cranezo.ui.operator.model.JobTimers? = null
+) {
+    val started = timers?.work_started_at != null
+    val running = started && timers?.work_ended_at == null && timers?.is_waiting != true
+    // when these numbers arrived: the clock counts on from here
+    val receivedAt = remember(timers?.working_seconds, timers?.is_waiting, timers?.work_ended_at) { System.currentTimeMillis() }
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(endAt) {
-        while (true) {
-            delay(30_000)
+    LaunchedEffect(running) {
+        while (running) {
             now = System.currentTimeMillis()
+            delay(1_000)
         }
     }
     val start = serverMillis(startAt)
     val end = serverMillis(endAt)
-    val minutesLeft = end?.let { ((it - now) / 60_000L).toInt() }
-    val endingSoon = minutesLeft != null && minutesLeft in 0..15
-    val over = minutesLeft != null && minutesLeft < 0
-    val progress = if (start != null && end != null && end > start) ((now - start).toFloat() / (end - start)).coerceIn(0f, 1f) else 0f
+    // booked seconds: the booked window (it already includes approved extra time)
+    val bookedSeconds = if (start != null && end != null && end > start) (end - start) / 1000L else null
+    val worked = (timers?.working_seconds ?: 0L) + if (running) ((now - receivedAt) / 1000L).coerceAtLeast(0L) else 0L
+    val overSeconds = bookedSeconds?.let { worked - it } ?: 0L
+    val over = started && overSeconds > 0
+    val progress = if (bookedSeconds != null && bookedSeconds > 0) (worked.toFloat() / bookedSeconds).coerceIn(0f, 1f) else 0f
 
     GlassCard(modifier = modifier, contentPadding = dimen_20) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Textview(stringResource(R.string.fh_booked_hours), size = font_13, color = appColors.textSecondary)
-            Textview(durationLabel ?: "-", size = 32.sp, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Textview(
-                "${formatServerTime(startAt)}  –  ${formatServerTime(endAt)}",
-                size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
-            )
+            if (started) {
+                Textview(stringResource(R.string.fh_work_time), size = font_13, color = appColors.textSecondary)
+                Textview(clock(worked), size = 36.sp, color = if (over) Red else appColors.textPrimary, fontWeight = FontWeight.Bold)
+                Textview(
+                    stringResource(R.string.fh_of_booked, durationLabel ?: "-"),
+                    size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+                )
+            } else {
+                Textview(stringResource(R.string.fh_booked_hours), size = font_13, color = appColors.textSecondary)
+                Textview(durationLabel ?: "-", size = 32.sp, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                Textview(
+                    "${formatServerTime(startAt)}  –  ${formatServerTime(endAt)}",
+                    size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+                )
+            }
         }
-        if (minutesLeft != null) {
+        if (started) {
             Spacer(modifier = Modifier.height(dimen_16))
             LinearProgressIndicator(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(dimen_8).clip(CircleShape),
-                color = if (over || endingSoon) Red else AmberPrimary, trackColor = appColors.subtleFill
+                color = if (over) Red else AmberPrimary, trackColor = appColors.subtleFill
             )
             Spacer(modifier = Modifier.height(dimen_8))
             Textview(
                 text = when {
-                    over -> stringResource(R.string.fh_time_over)
-                    else -> stringResource(R.string.cj_time_left, compactMinutes(minutesLeft))
+                    over -> stringResource(R.string.fh_over_by, clock(overSeconds))
+                    timers?.is_waiting == true -> stringResource(R.string.fh_clock_paused)
+                    else -> stringResource(R.string.fh_started_at, formatServerTime(timers?.work_started_at))
                 },
-                size = font_14, color = if (over || endingSoon) Red else appColors.textPrimary, fontWeight = FontWeight.SemiBold,
+                size = font_14, color = if (over) Red else appColors.textSecondary, fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
             )
         }
     }
+}
+
+/** 2:05:09 / 05:09 */
+private fun clock(totalSeconds: Long): String {
+    val s = totalSeconds.coerceAtLeast(0L)
+    val h = s / 3600
+    val m = (s % 3600) / 60
+    val sec = s % 60
+    return if (h > 0) String.format(java.util.Locale.US, "%d:%02d:%02d", h, m, sec) else String.format(java.util.Locale.US, "%02d:%02d", m, sec)
 }

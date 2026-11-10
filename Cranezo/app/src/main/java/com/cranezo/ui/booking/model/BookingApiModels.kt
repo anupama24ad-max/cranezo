@@ -245,12 +245,23 @@ data class TrackInfo(
     val crane: BookingCrane? = null,
     val operator: BookingOperator? = null,
     val site: BookingSite? = null,
+    // null until the operator starts the journey (then it is the operator's live position)
     val crane_location: CraneLocation? = null,
     val distance_km: Double? = null,
     val eta_minutes: Int? = null,
     val expected_arrival_at: String? = null,
-    val start_at: String? = null
-)
+    val start_at: String? = null,
+    // the road route from the crane to the site (main roads), starting at the crane
+    val route: List<PlaceHit>? = null,
+    val can_track: Boolean? = null,
+    val speed_kmph: Double? = null
+) {
+    fun routePoints(): List<com.google.android.gms.maps.model.LatLng> = route.orEmpty().mapNotNull { p ->
+        val la = p.latitude ?: return@mapNotNull null
+        val lo = p.longitude ?: return@mapNotNull null
+        com.google.android.gms.maps.model.LatLng(la, lo)
+    }
+}
 
 // ---- Owner: Crane Requests ----
 

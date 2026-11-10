@@ -74,6 +74,8 @@ class MainHomeViewModel @Inject constructor(
     init {
         // Keep this phone's push token on the server (job requests, arrivals, payments arrive as push)
         com.cranezo.push.CranezoMessagingService.syncToken(viewModelScope, repo, sm)
+        // a fresh pair of tokens on every start: the 30-day sign-in keeps moving forward while the app is used
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) { com.cranezo.api.TokenRefresher.refreshNow(sm) }
         // One network check for both calls: calls started in parallel would cancel each other's
         val loadCranes = role == UserRole.CRANE_OWNER
         if (loadCranes) _cranes.update { it.copy(isLoading = true, error = null) }

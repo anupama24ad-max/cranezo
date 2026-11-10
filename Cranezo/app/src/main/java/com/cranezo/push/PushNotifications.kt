@@ -96,7 +96,8 @@ object PushNotifications {
             type in URGENT_TYPES -> CHANNEL_URGENT
             else -> CHANNEL_UPDATES
         }
-        val requestCode = (data["booking_id"] ?: type).hashCode()
+        // one notification per booking / request: a newer one about the same thing replaces it (no duplicates)
+        val requestCode = notificationId(data["booking_id"] ?: data["request_id"] ?: type)
         val extras = Bundle().apply { data.forEach { (k, v) -> putString(k, v) } }
 
         val pending = TaskStackBuilder.create(context)
@@ -122,6 +123,28 @@ object PushNotifications {
         val notification = builder.build()
         if (buzzer) notification.flags = notification.flags or android.app.Notification.FLAG_INSISTENT
         runCatching { NotificationManagerCompat.from(context).notify(requestCode, notification) }
+    }
+
+    private fun notificationId(key: String): Int = key.hashCode()
+
+    /** Stops the ringing notification about this booking / request (the screen it is about is open now) */
+    fun cancelFor(context: Context, key: String?) {
+        key ?: return
+        runCatching { NotificationManagerCompat.from(context).cancel(notificationId(key)) }
+    }
+
+    /** The phone's notification sound once, for an alert shown inside the open app (a sheet, not a notification) */
+    fun chime(context: Context) {
+        runCatching {
+            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            RingtoneManager.getRingtone(context.applicationContext, uri)?.apply {
+                audioAttributes = android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                play()
+            }
+        }
     }
 
     /**

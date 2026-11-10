@@ -160,6 +160,9 @@ fun CustomerHomeTab(
         }
     ) {
 
+        // the order happening now comes first, before anything else on Home
+        home?.current_order?.let { CurrentOrderCard(it) }
+
         BannerCarousel(home?.banners.orEmpty().sortedBy { it.sort_order ?: 0 }) { runBannerAction(context, it, onProfile) }
 
         // Quick Access: Track My Crane, My Jobs, Need Help? side by side
@@ -234,6 +237,75 @@ fun CustomerHomeTab(
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Current order: the open request / booking, with its step and the one thing to do next
+// ---------------------------------------------------------------------------------------------
+
+@Composable
+private fun CurrentOrderCard(order: com.cranezo.ui.customerhome.model.CurrentOrder) {
+    val context = LocalContext.current
+    val open: () -> Unit = {
+        runCatching {
+            context.startActivity(
+                when {
+                    order.can_track == true && order.booking_id != null -> BookingActivity.trackIntent(context, order.booking_id)
+                    order.kind == "request" || order.action == "pay_advance" -> BookingActivity.intent(context, BookingRoutes.REQUEST)
+                    order.booking_id != null -> BookingActivity.bookingIntent(context, order.booking_id)
+                    else -> BookingActivity.intent(context, BookingRoutes.BOOKINGS)
+                }
+            )
+        }
+    }
+    val step = (order.step ?: 1).coerceAtLeast(1)
+    val total = (order.steps_total ?: 6).coerceAtLeast(step)
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = open) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Textview(stringResource(R.string.ch_current_order), size = font_12, color = appColors.primaryText, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            order.code?.let { BookingTag(it, InfoBlue) }
+        }
+        Spacer(modifier = Modifier.height(dimen_10))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (!order.primary_photo.isNullOrBlank()) {
+                CraneImage(path = order.primary_photo, modifier = Modifier.size(dimen_56))
+                Spacer(modifier = Modifier.width(dimen_12))
+            } else {
+                IconBadge(icon = Icons.Default.LocationOn, accent = AmberPrimary, size = dimen_44)
+                Spacer(modifier = Modifier.width(dimen_12))
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                order.crane_title?.takeIf { it.isNotBlank() }?.let {
+                    Textview(it, size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+                Textview(order.message.orEmpty(), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 3)
+                order.operator_name?.let { Textview(stringResource(R.string.ch_operator_named, it), size = font_12, color = appColors.textSecondary, maxLines = 1) }
+                order.site?.let { Textview(it, size = font_11, color = appColors.textSecondary, maxLines = 1) }
+            }
+        }
+        Spacer(modifier = Modifier.height(dimen_12))
+        // the step bar: request -> advance -> confirmed -> on the way -> working -> done
+        Row(horizontalArrangement = Arrangement.spacedBy(dimen_4), modifier = Modifier.fillMaxWidth()) {
+            repeat(total) { i ->
+                Box(
+                    modifier = Modifier.weight(1f).height(dimen_6).clip(CircleShape)
+                        .background(if (i < step) (if (step >= total) SuccessGreen else AmberPrimary) else appColors.subtleFill)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(dimen_12))
+        CommonGradientButton(
+            text = stringResource(
+                when {
+                    order.can_track == true -> R.string.ch_track_live
+                    order.action == "pay_advance" -> R.string.ch_pay_advance
+                    order.action == "pay_balance" -> R.string.ch_pay_balance
+                    else -> R.string.ch_view_order
+                }
+            ),
+            onClick = open, height = dimen_44, textSize = font_14
+        )
     }
 }
 

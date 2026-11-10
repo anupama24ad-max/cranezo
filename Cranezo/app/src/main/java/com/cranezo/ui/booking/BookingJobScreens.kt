@@ -316,8 +316,8 @@ fun JobInProgressScreen(
             }
         }
     ) {
-        // Fixed hours: what was booked, until when, and how much is left. No running clock.
-        FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label)
+        // The real work time (ticking) against the booked hours
+        FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label, timers = booking.timers)
         // the operator put the job on hold
         if (booking.timers?.is_waiting == true) {
             GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
@@ -388,7 +388,7 @@ fun ExtraTimeRequestScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}
         }
     ) {
         // Where the booking stands now: the same booked-hours card as Job In Progress
-        FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label)
+        FixedHoursCard(booking.schedule?.start_at, booking.schedule?.end_at, booking.duration?.label, timers = booking.timers)
 
         GlassCard(contentPadding = dimen_14) {
             Textview(stringResource(R.string.cj_how_much_extra), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)

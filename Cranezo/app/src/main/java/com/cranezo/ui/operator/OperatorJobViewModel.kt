@@ -29,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -79,7 +80,18 @@ class OperatorJobViewModel @Inject constructor(
             OperatorJobIntent.Accept -> act("jobs/accept")
             is OperatorJobIntent.Decline -> decline(intent.reason)
 
-            OperatorJobIntent.StartJourney -> act("jobs/start-journey")
+            // the journey starts from where the operator (and the crane) is now
+            OperatorJobIntent.StartJourney -> viewModelScope.launch {
+                val fix = if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    fetchCurrentLocation(app)
+                } else null
+                val b = body()
+                fix?.let {
+                    b.put("latitude", it.latitude).put("longitude", it.longitude)
+                    _uiState.update { s -> s.copy(myLatitude = it.latitude, myLongitude = it.longitude) }
+                }
+                act("jobs/start-journey", b)
+            }
             // the server checks the phone is at the site before telling the customer
             OperatorJobIntent.Arrived -> viewModelScope.launch {
                 val fix = if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -203,19 +215,49 @@ class OperatorJobViewModel @Inject constructor(
     // Live location while on the way
     // ---------------------------------------------------------------------------------------
 
+    /**
+     * While on the way: the phone's position every 2 seconds moves the crane on the operator's own map at once,
+     * and every 4 seconds it goes to the server (customer and owner follow it). The answer brings the road route
+     * from here to the site and the km / minutes left at crane speed.
+     */
     private fun startLocationSharing() {
         if (locationJob?.isActive == true) return
         locationJob = viewModelScope.launch {
-            while (true) {
-                if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    fetchCurrentLocation(app)?.let { fix ->
-                        _uiState.update { it.copy(myLatitude = fix.latitude, myLongitude = fix.longitude) }
-                        val b = JSONObject().put("latitude", fix.latitude).put("longitude", fix.longitude).put("booking_id", bookingId)
-                        repo.opLocation(headers(), b).isRequestCallSuspendSuccess()
+            while (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                delay(3_000)
+            }
+            var lastSent = 0L
+            var sending = false
+            com.cranezo.utils.locationUpdates(app, 2_000L)
+                .catch { }
+                .collect { fix ->
+                    _uiState.update { it.copy(myLatitude = fix.latitude, myLongitude = fix.longitude) }
+                    val now = System.currentTimeMillis()
+                    if (!sending && now - lastSent >= 4_000L) {
+                        lastSent = now
+                        sending = true
+                        launch {
+                            val b = JSONObject().put("latitude", fix.latitude).put("longitude", fix.longitude).put("booking_id", bookingId)
+                            repo.opLocation(headers(), b).isRequestCallSuspendSuccess(success = { r ->
+                                r?.data?.let { ack ->
+                                    val points = ack.route.orEmpty().mapNotNull { p ->
+                                        val la = p.latitude ?: return@mapNotNull null
+                                        val lo = p.longitude ?: return@mapNotNull null
+                                        com.google.android.gms.maps.model.LatLng(la, lo)
+                                    }
+                                    _uiState.update {
+                                        it.copy(
+                                            route = if (points.size > 1) points else it.route,
+                                            liveDistanceKm = ack.distance_km ?: it.liveDistanceKm,
+                                            liveEtaMinutes = ack.eta_minutes ?: it.liveEtaMinutes
+                                        )
+                                    }
+                                }
+                            })
+                            sending = false
+                        }
                     }
                 }
-                delay(8_000)
-            }
         }
     }
 

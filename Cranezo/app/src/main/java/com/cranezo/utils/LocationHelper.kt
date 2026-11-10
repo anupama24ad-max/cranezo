@@ -42,3 +42,28 @@ suspend fun fetchCurrentLocation(context: Context): GpsFix? {
     }
     return GpsFix(location.latitude, location.longitude, address)
 }
+
+
+/**
+ * The phone's position every [intervalMs] while collected: high accuracy, no address lookup, so a moving crane
+ * (or a mock location app) gives a steady stream of points. The caller checks the location permission first.
+ */
+@SuppressLint("MissingPermission")
+fun locationUpdates(context: Context, intervalMs: Long = 2_000L): kotlinx.coroutines.flow.Flow<GpsFix> = kotlinx.coroutines.flow.callbackFlow {
+    val client = LocationServices.getFusedLocationProviderClient(context)
+    val request = com.google.android.gms.location.LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, intervalMs)
+        .setMinUpdateIntervalMillis(intervalMs / 2)
+        .setMinUpdateDistanceMeters(0f)
+        .build()
+    val callback = object : com.google.android.gms.location.LocationCallback() {
+        override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
+            result.lastLocation?.let { trySend(GpsFix(it.latitude, it.longitude, null)) }
+        }
+    }
+    try {
+        client.requestLocationUpdates(request, callback, android.os.Looper.getMainLooper())
+    } catch (e: SecurityException) {
+        close(e)
+    }
+    kotlinx.coroutines.channels.awaitClose { client.removeLocationUpdates(callback) }
+}

@@ -53,7 +53,14 @@ data class ActiveJob(val booking_id: String? = null, val booking_code: String? =
 
 data class OnlineStatus(val online: Boolean? = null, val online_label: String? = null)
 
-data class LocationAck(val updated: Boolean? = null, val distance_km: Double? = null, val eta_minutes: Int? = null)
+data class LocationAck(
+    val updated: Boolean? = null,
+    val distance_km: Double? = null,
+    val eta_minutes: Int? = null,
+    // road route from the crane to the site (main roads a crane can use), starting at the crane
+    val route: List<com.cranezo.ui.booking.model.PlaceHit>? = null,
+    val speed_kmph: Double? = null
+)
 
 // ---- Jobs list ----
 
@@ -158,7 +165,9 @@ data class JobSummary(
     val base_amount: Double? = null,
     val waiting_charge: Double? = null,
     val extra_amount: Double? = null,
-    val final_amount: Double? = null
+    val final_amount: Double? = null,
+    // the only amount the operator sees: what they earn on this job
+    val earnings_amount: Double? = null
 )
 
 data class JobCompletion(

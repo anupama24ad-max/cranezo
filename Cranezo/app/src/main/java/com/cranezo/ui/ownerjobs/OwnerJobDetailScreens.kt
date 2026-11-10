@@ -1,6 +1,7 @@
 package com.cranezo.ui.ownerjobs
 
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.IntrinsicSize
 import android.content.Context
 import android.content.Intent
@@ -363,8 +364,8 @@ fun OwnerJobDetailsScreen(
 
 @Composable
 private fun MonitoringBlock(job: OwnerJob, monitoring: Monitoring?) {
-    // Fixed hours: the booked window and time left, the same card the customer and operator see
-    FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration_label ?: job.duration?.label)
+    // The real work time against the booked hours, the same card the customer and operator see
+    FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration_label ?: job.duration?.label, timers = job.timers)
     if ((monitoring?.extra_seconds ?: 0L) > 0) {
         GlassCard(contentPadding = dimen_12) {
             PriceLine(stringResource(R.string.op_extra_time), formatSeconds(monitoring?.extra_seconds))
@@ -415,12 +416,18 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
 
     BookingScaffold(onBack = onBack, title = stringResource(R.string.oj_view_live_location)) {
         if (track == null) return@BookingScaffold
-        // where the crane is, on the map in the app (it can be opened full screen)
-        Box(modifier = Modifier.fillMaxWidth().height(dimen_220).clip(RoundedCornerShape(dimen_16))) {
+        // the owner follows the operator (live, once the journey started) and the customer's site; never their own place
+        if (track.crane_location == null) {
+            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
+                Textview(stringResource(R.string.oj_not_started_track), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+            }
+        }
+        Box(modifier = Modifier.fillMaxWidth().height(340.dp).clip(RoundedCornerShape(dimen_16))) {
             com.cranezo.ui.booking.request.SiteMap(
                 latitude = track.site?.latitude, longitude = track.site?.longitude, address = track.site?.address,
                 modifier = Modifier.matchParentSize(),
-                craneLatitude = track.crane_location?.latitude, craneLongitude = track.crane_location?.longitude, craneTitle = track.crane?.title
+                craneLatitude = track.crane_location?.latitude, craneLongitude = track.crane_location?.longitude, craneTitle = track.crane?.title,
+                route = track.routePoints()
             )
         }
         GlassCard(contentPadding = dimen_14) {
@@ -447,7 +454,7 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
             val live = track.crane_location?.is_live == true
             Spacer(modifier = Modifier.height(dimen_6))
             Textview(
-                stringResource(if (live) R.string.oj_live_position else R.string.oj_last_known_position), size = font_11,
+                stringResource(if (live) R.string.oj_live_position else R.string.oj_not_started_track), size = font_11,
                 color = if (live) SuccessGreen else AmberPrimary
             )
         }

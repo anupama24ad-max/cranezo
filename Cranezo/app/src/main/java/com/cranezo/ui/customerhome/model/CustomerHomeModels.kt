@@ -38,7 +38,31 @@ data class CustomerHome(
     val unread_notifications: Int? = null,
     val banners: List<HomeBanner>? = null,
     val quick_access: List<QuickAccessItem>? = null,
-    val recent_bookings: List<MyJobItem>? = null
+    val recent_bookings: List<MyJobItem>? = null,
+    // the order happening now (special card at the top), null when nothing is open
+    val current_order: CurrentOrder? = null
+)
+
+/** "Your current order": where the open request / booking stands, in one line and a step bar */
+data class CurrentOrder(
+    // booking or request
+    val kind: String? = null,
+    val booking_id: String? = null,
+    val request_id: String? = null,
+    val code: String? = null,
+    val crane_title: String? = null,
+    val primary_photo: String? = null,
+    val site: String? = null,
+    val start_at: String? = null,
+    val stage: String? = null,
+    // 1 request sent, 2 pay advance, 3 confirmed / operator, 4 on the way, 5 working, 6 done
+    val step: Int? = null,
+    val steps_total: Int? = null,
+    val message: String? = null,
+    val operator_name: String? = null,
+    val can_track: Boolean? = null,
+    // view, view_request, pay_advance, pay_balance
+    val action: String? = null
 )
 
 data class CustomerHomeState(

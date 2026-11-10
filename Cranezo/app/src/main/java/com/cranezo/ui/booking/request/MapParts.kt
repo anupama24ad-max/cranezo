@@ -74,6 +74,8 @@ import com.google.android.gms.maps.model.RoundCap
 import com.google.maps.android.compose.MarkerComposable
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Fullscreen
+import androidx.compose.material.icons.filled.MyLocation
+import kotlinx.coroutines.launch
 
 /**
  * The map at the top of the booking screens, in the style of a ride app:
@@ -97,7 +99,9 @@ fun SiteMap(
     nearbyCranes: List<LatLng> = emptyList(),
     // a button that opens the same map full screen (move and zoom freely with the fingers)
     expandable: Boolean = true,
-    fullScreen: Boolean = false
+    fullScreen: Boolean = false,
+    // the operator's own map: the camera follows the crane as it drives (until the map is moved by hand)
+    follow: Boolean = false
 ) {
     if (!BuildConfig.HAS_MAPS_KEY || latitude == null || longitude == null) {
         LocationCard(address, modifier)
@@ -113,15 +117,78 @@ fun SiteMap(
     val camera = rememberCameraPositionState { position = CameraPosition.fromLatLngZoom(site, zoom) }
     val crane = if (craneLatitude != null && craneLongitude != null) LatLng(craneLatitude, craneLongitude) else null
     var loaded by remember { mutableStateOf(false) }
-    // when a crane position is known, the map frames the crane and the site together (and the route)
-    // and glides to the new position every time it moves
-    LaunchedEffect(crane, loaded) {
-        if (crane == null || !loaded) return@LaunchedEffect
-        runCatching {
-            val bounds = LatLngBounds.builder().include(site).include(crane).build()
-            camera.animate(CameraUpdateFactory.newLatLngBounds(bounds, 140), 900)
+
+    // ---- the crane glides from one reported point to the next, at the pace the points arrive, so it keeps
+    // moving instead of jumping and stopping. Its marker state is updated directly (no recomposition per frame).
+    val craneMarker = remember { MarkerState(position = crane ?: site) }
+    val shownAt = remember { arrayOfNulls<LatLng>(1) }
+    val lastFixAt = remember { longArrayOf(0L) }
+    val heading = remember { androidx.compose.animation.core.Animatable(0f) }
+    LaunchedEffect(crane) {
+        val to = crane ?: return@LaunchedEffect
+        val from = shownAt[0]
+        val now = android.os.SystemClock.uptimeMillis()
+        val gap = if (lastFixAt[0] == 0L) 0L else now - lastFixAt[0]
+        lastFixAt[0] = now
+        // first point, or a jump of kilometres (GPS reset): place it straight away
+        if (from == null || distanceBetween(from, to) > 2_000) {
+            craneMarker.position = to
+            shownAt[0] = to
+            if (from == null) {
+                val ahead = route.firstOrNull { distanceBetween(to, it) > 25 } ?: site
+                heading.snapTo(bearingTo(to, ahead))
+            }
+            return@LaunchedEffect
+        }
+        // turn the shortest way towards where it is driving (only when it really moved)
+        if (distanceBetween(from, to) > 4) {
+            val want = bearingTo(from, to)
+            val cur = heading.value
+            val delta = ((want - cur + 540f) % 360f) - 180f
+            launch { heading.animateTo(cur + delta, androidx.compose.animation.core.tween(700)) }
+        }
+        val duration = gap.coerceIn(600L, 6_000L).toInt()
+        val move = androidx.compose.animation.core.Animatable(0f)
+        move.animateTo(1f, tween(durationMillis = duration, easing = LinearEasing)) {
+            val p = LatLng(
+                from.latitude + (to.latitude - from.latitude) * value,
+                from.longitude + (to.longitude - from.longitude) * value
+            )
+            craneMarker.position = p
+            shownAt[0] = p
         }
     }
+
+    // ---- camera: frames the crane and the site once; afterwards it moves only when needed (crane near the
+    // edge, or following on the operator's map), never on every update. Moving the map by hand stops it.
+    var handMoved by remember { mutableStateOf(false) }
+    LaunchedEffect(camera.isMoving) {
+        if (camera.isMoving && camera.cameraMoveStartedReason == com.google.maps.android.compose.CameraMoveStartedReason.GESTURE) handMoved = true
+    }
+    var framed by remember { mutableStateOf(false) }
+    LaunchedEffect(crane != null, loaded) {
+        if (crane == null || !loaded || framed) return@LaunchedEffect
+        framed = true
+        runCatching {
+            val bounds = LatLngBounds.builder().include(site).include(crane).build()
+            camera.animate(CameraUpdateFactory.newLatLngBounds(bounds, 160), 900)
+        }
+    }
+    LaunchedEffect(crane, loaded, handMoved) {
+        if (crane == null || !loaded || !framed || handMoved) return@LaunchedEffect
+        runCatching {
+            if (follow) {
+                camera.animate(CameraUpdateFactory.newLatLngZoom(crane, camera.position.zoom.coerceAtLeast(15f)), 1_200)
+            } else {
+                val visible = camera.projection?.visibleRegion?.latLngBounds
+                if (visible != null && !visible.contains(crane)) {
+                    val bounds = LatLngBounds.builder().include(site).include(crane).build()
+                    camera.animate(CameraUpdateFactory.newLatLngBounds(bounds, 160), 900)
+                }
+            }
+        }
+    }
+    val recenterScope = androidx.compose.runtime.rememberCoroutineScope()
     val pickupLabel = stringResource(R.string.bk_pickup_point)
     var expanded by remember { mutableStateOf(false) }
     if (expanded) {
@@ -132,7 +199,7 @@ fun SiteMap(
             Box(modifier = Modifier.fillMaxSize()) {
                 SiteMap(
                     latitude, longitude, address, Modifier.fillMaxSize(), radiusKm, craneLatitude, craneLongitude, craneTitle,
-                    route, nearbyCranes, expandable = false, fullScreen = true
+                    route, nearbyCranes, expandable = false, fullScreen = true, follow = follow
                 )
                 Box(
                     modifier = Modifier.statusBarsPadding().padding(16.dp).size(44.dp).shadow(4.dp, androidx.compose.foundation.shape.CircleShape)
@@ -166,19 +233,35 @@ fun SiteMap(
         }
         // the road route in yellow, with a dark edge so it stands out on the map
         if (route.size > 1) {
-            Polyline(points = route, color = Color(0xFF1F2937).copy(alpha = 0.55f), width = 22f, jointType = JointType.ROUND, startCap = RoundCap(), endCap = RoundCap(), zIndex = 1f)
-            Polyline(points = route, color = Color(0xFFFFC107), width = 14f, jointType = JointType.ROUND, startCap = RoundCap(), endCap = RoundCap(), zIndex = 2f)
+            Polyline(points = route, color = Color(0xFF1F2937).copy(alpha = 0.55f), width = 30f, jointType = JointType.ROUND, startCap = RoundCap(), endCap = RoundCap(), zIndex = 1f)
+            Polyline(points = route, color = Color(0xFFFFC107), width = 18f, jointType = JointType.ROUND, startCap = RoundCap(), endCap = RoundCap(), zIndex = 2f)
         } else if (crane != null) {
             Polyline(points = listOf(crane, site), color = Color(0xFF6B7280), width = 8f)
         }
         nearbyCranes.forEachIndexed { i, spot ->
-            CraneMarker(position = spot, bearing = (i * 53f) % 360f, title = null)
+            CraneMarker(state = remember(spot) { MarkerState(position = spot) }, bearing = (i * 53f) % 360f, title = null, size = 56.dp)
         }
-        MarkerComposable(state = MarkerState(position = site), title = address, zIndex = 3f) { PickupPin(pickupLabel) }
+        val siteMarker = remember(site) { MarkerState(position = site) }
+        MarkerComposable(state = siteMarker, title = address, zIndex = 3f) { PickupPin(pickupLabel) }
         if (crane != null) {
-            val next = route.firstOrNull { distanceBetween(crane, it) > 25 } ?: site
-            CraneMarker(position = crane, bearing = bearingTo(crane, next), title = craneTitle, zIndex = 4f)
+            CraneMarker(state = craneMarker, bearing = heading.value, title = craneTitle, zIndex = 4f, size = 84.dp)
         }
+    }
+    // back to the crane and the site after moving the map by hand
+    if (handMoved && crane != null) {
+        Box(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp).size(46.dp).shadow(4.dp, CircleShape)
+                .clip(CircleShape).background(appColors.screenBottom).clickable {
+                    handMoved = false
+                    recenterScope.launch {
+                        runCatching {
+                            if (follow) camera.animate(CameraUpdateFactory.newLatLngZoom(crane, 16f), 800)
+                            else camera.animate(CameraUpdateFactory.newLatLngBounds(LatLngBounds.builder().include(site).include(crane).build(), 160), 800)
+                        }
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) { Icon(Icons.Default.MyLocation, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(24.dp)) }
     }
     if (expandable) {
         Box(
@@ -190,14 +273,17 @@ fun SiteMap(
     }
 }
 
-/** A crane icon on the map; the picture is drawn facing up, so [bearing] (0 = north) turns it the way it drives */
+/**
+ * A crane icon on the map, big enough to see at street zoom. The picture (top view, boom pointing up) has
+ * empty space around it, so it is drawn in a square; [bearing] (0 = north) turns it the way it drives.
+ */
 @Composable
-private fun CraneMarker(position: LatLng, bearing: Float, title: String?, zIndex: Float = 2f) {
+private fun CraneMarker(state: MarkerState, bearing: Float, title: String?, zIndex: Float = 2f, size: androidx.compose.ui.unit.Dp = 84.dp) {
     MarkerComposable(
-        state = MarkerState(position = position), title = title, rotation = bearing, flat = true,
+        size, state = state, title = title, rotation = bearing, flat = true,
         anchor = Offset(0.5f, 0.5f), zIndex = zIndex
     ) {
-        Image(painter = painterResource(R.drawable.ic_crane_top), contentDescription = null, modifier = Modifier.size(width = 24.dp, height = 62.dp))
+        Image(painter = painterResource(R.drawable.ic_crane_top), contentDescription = null, modifier = Modifier.size(size))
     }
 }
 
@@ -205,10 +291,10 @@ private fun CraneMarker(position: LatLng, bearing: Float, title: String?, zIndex
 @Composable
 fun PickupPin(label: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(SuccessGreen).padding(horizontal = 12.dp, vertical = 6.dp)) {
-            androidx.compose.material3.Text(label, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        Box(modifier = Modifier.clip(RoundedCornerShape(16.dp)).background(SuccessGreen).padding(horizontal = 14.dp, vertical = 7.dp)) {
+            androidx.compose.material3.Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
         }
-        Icon(Icons.Default.LocationOn, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(34.dp))
+        Icon(Icons.Default.LocationOn, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(46.dp))
     }
 }
 

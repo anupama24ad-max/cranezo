@@ -42,7 +42,7 @@
     <string name="rq_pay_advance">అడ్వాన్స్ %1$s చెల్లించండి</string>
     <string name="rq_paying">చెల్లిస్తోంది…</string>
     <string name="rq_booked_title">మీ క్రేన్ బుక్ అయింది</string>
-    <string name="rq_booked_body">అడ్వాన్స్ అందింది. %1$s క్రేన్ మరియు ఆపరేటర్‌ను పంపుతారు.</string>
+    <string name="rq_booked_body">మీ ఆర్డర్ నిర్ధారించబడింది. క్రేన్‌కు ఆపరేటర్ కేటాయింపు కోసం వేచి ఉంది.</string>
     <string name="rq_view_booking">బుకింగ్ చూడండి</string>
     <string name="rq_expired_body">సమయానికి ఏ యజమానీ అంగీకరించలేదు. ఎక్కువ ధరతో మళ్లీ ప్రయత్నించండి, లేదా టీమ్‌కు పంపండి.</string>
     <string name="rq_payment_expired_body">సమయానికి అడ్వాన్స్ చెల్లించలేదు, కాబట్టి బుకింగ్ రద్దయింది మరియు క్రేన్ విడుదలైంది.</string>
@@ -274,4 +274,22 @@
     <string name="as_offline">ఆఫ్‌లైన్</string>
     <string name="as_all_offline">ప్రస్తుతం ఏ ఆపరేటర్ ఆన్‌లైన్‌లో లేరు. మీ ఆపరేటర్‌ను ఆన్‌లైన్ చేయమని చెప్పి, తర్వాత తిరిగి రండి.</string>
     <string name="sub_current_plan">మీ ప్రస్తుత ప్లాన్</string>
+    <string name="fh_work_time">పని సమయం</string>
+    <string name="fh_of_booked">బుక్ చేసిన %1$s లో</string>
+    <string name="fh_over_by">బుక్ చేసిన గంటల కంటే %1$s ఎక్కువ (గంట రేటుతో)</string>
+    <string name="fh_clock_paused">హోల్డ్‌లో ఉంది – గడియారం ఆగింది</string>
+    <string name="fh_started_at">%1$s కి ప్రారంభమైంది</string>
+    <string name="op_commission_pending">ఇంకా నిర్ణయించలేదు</string>
+    <string name="op_with_crane_q">మీరు ఈ క్రేన్ దగ్గర ఉన్నారా?</string>
+    <string name="op_with_crane_yes">అవును, నేను ఈ క్రేన్ దగ్గర ఉన్నాను</string>
+    <string name="op_with_crane_hint">నంబర్ ప్లేట్ చూసి, నావిగేషన్ ప్రారంభించడానికి ఇక్కడ నొక్కండి.</string>
+    <string name="bk_track_not_started">ఆపరేటర్ ఇంకా ప్రయాణం ప్రారంభించలేదు. ప్రారంభించిన వెంటనే మీరు క్రేన్‌ను లైవ్‌లో చూడవచ్చు.</string>
+    <string name="oj_not_started_track">ఆపరేటర్ ఇంకా ప్రయాణం ప్రారంభించలేదు</string>
+    <string name="rq_awaiting_operator">ఆపరేటర్ కేటాయింపు కోసం వేచి ఉంది</string>
+    <string name="ch_current_order">మీ ప్రస్తుత ఆర్డర్</string>
+    <string name="ch_operator_named">ఆపరేటర్: %1$s</string>
+    <string name="ch_track_live">లైవ్ ట్రాక్ చేయండి</string>
+    <string name="ch_pay_advance">అడ్వాన్స్ చెల్లించండి</string>
+    <string name="ch_pay_balance">బాకీ చెల్లించండి</string>
+    <string name="ch_view_order">ఆర్డర్ చూడండి</string>
 </resources>

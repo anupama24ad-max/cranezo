@@ -36,8 +36,17 @@ class CranezoMessagingService : FirebaseMessagingService() {
         val body = message.notification?.body ?: message.data["body"].orEmpty()
         // the screen on view reloads if the push is about what it shows
         PushEvents.emit(message.data)
-        // app open: job updates slide up as a sheet on the current screen instead of a system notification
-        if (!InAppAlerts.tryShow(title, body, message.data)) PushNotifications.show(applicationContext, title, body, message.data)
+        val ringing = message.data["buzzer"] == "true"
+        when {
+            // a new request (owner) or a new job (operator) always rings, app open or not; the sheet can show too
+            ringing -> {
+                PushNotifications.show(applicationContext, title, body, message.data)
+                InAppAlerts.tryShow(title, body, message.data)
+            }
+            // app open: job updates slide up as a sheet on the current screen, with the notification sound
+            InAppAlerts.tryShow(title, body, message.data) -> PushNotifications.chime(applicationContext)
+            else -> PushNotifications.show(applicationContext, title, body, message.data)
+        }
         // the bell on the home screen shows the new unread count straight away
         scope.launch { UnreadBadge.refresh(applicationContext) }
     }

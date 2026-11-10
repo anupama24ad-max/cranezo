@@ -43,7 +43,7 @@
     <string name="rq_pay_advance">Pay advance %1$s</string>
     <string name="rq_paying">Paying…</string>
     <string name="rq_booked_title">Your crane is booked</string>
-    <string name="rq_booked_body">Advance received. %1$s will send the crane and operator.</string>
+    <string name="rq_booked_body">Your order has been confirmed. Awaiting assignment of the crane to an operator.</string>
     <string name="rq_view_booking">View booking</string>
     <string name="rq_expired_body">No owner accepted in time. Try again with a higher price, or send your request to our team.</string>
     <string name="rq_payment_expired_body">The advance was not paid in time, so the booking was cancelled and the crane was released.</string>
@@ -275,4 +275,22 @@
     <string name="as_offline">Offline</string>
     <string name="as_all_offline">No operator is online right now. Ask your operator to switch Online on, then come back.</string>
     <string name="sub_current_plan">Your current plan</string>
+    <string name="fh_work_time">Work time</string>
+    <string name="fh_of_booked">of %1$s booked</string>
+    <string name="fh_over_by">%1$s over the booked hours (charged at the hourly rate)</string>
+    <string name="fh_clock_paused">On hold – the clock is paused</string>
+    <string name="fh_started_at">Started at %1$s</string>
+    <string name="op_commission_pending">Not set yet</string>
+    <string name="op_with_crane_q">Are you with this crane?</string>
+    <string name="op_with_crane_yes">Yes, I am with this crane</string>
+    <string name="op_with_crane_hint">Check the number plate, then tap here to start navigation.</string>
+    <string name="bk_track_not_started">The operator has not started the journey yet. You can follow the crane live once they start.</string>
+    <string name="oj_not_started_track">The operator has not started the journey yet</string>
+    <string name="rq_awaiting_operator">Awaiting operator assignment</string>
+    <string name="ch_current_order">YOUR CURRENT ORDER</string>
+    <string name="ch_operator_named">Operator: %1$s</string>
+    <string name="ch_track_live">Track live</string>
+    <string name="ch_pay_advance">Pay advance</string>
+    <string name="ch_pay_balance">Pay balance</string>
+    <string name="ch_view_order">View order</string>
 </resources>

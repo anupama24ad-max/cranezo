@@ -42,7 +42,7 @@
     <string name="rq_pay_advance">एडवांस %1$s दें</string>
     <string name="rq_paying">भुगतान हो रहा है…</string>
     <string name="rq_booked_title">आपकी क्रेन बुक हो गई</string>
-    <string name="rq_booked_body">एडवांस मिल गया। %1$s क्रेन और ऑपरेटर भेजेंगे।</string>
+    <string name="rq_booked_body">आपका ऑर्डर कन्फर्म हो गया है। क्रेन को ऑपरेटर असाइन होने की प्रतीक्षा है।</string>
     <string name="rq_view_booking">बुकिंग देखें</string>
     <string name="rq_expired_body">समय पर किसी मालिक ने स्वीकार नहीं किया। ज़्यादा कीमत के साथ फिर कोशिश करें, या टीम को भेजें।</string>
     <string name="rq_payment_expired_body">समय पर एडवांस नहीं दिया गया, इसलिए बुकिंग रद्द हुई और क्रेन छोड़ दी गई।</string>
@@ -274,4 +274,22 @@
     <string name="as_offline">ऑफ़लाइन</string>
     <string name="as_all_offline">अभी कोई ऑपरेटर ऑनलाइन नहीं है। अपने ऑपरेटर से ऑनलाइन करने को कहें, फिर वापस आएँ।</string>
     <string name="sub_current_plan">आपका मौजूदा प्लान</string>
+    <string name="fh_work_time">काम का समय</string>
+    <string name="fh_of_booked">बुक किए गए %1$s में से</string>
+    <string name="fh_over_by">बुक किए गए घंटों से %1$s ज़्यादा (प्रति घंटा दर से)</string>
+    <string name="fh_clock_paused">होल्ड पर – घड़ी रुकी है</string>
+    <string name="fh_started_at">%1$s पर शुरू हुआ</string>
+    <string name="op_commission_pending">अभी तय नहीं</string>
+    <string name="op_with_crane_q">क्या आप इस क्रेन के साथ हैं?</string>
+    <string name="op_with_crane_yes">हाँ, मैं इस क्रेन के साथ हूँ</string>
+    <string name="op_with_crane_hint">नंबर प्लेट जाँचें, फिर नेविगेशन शुरू करने के लिए यहाँ टैप करें।</string>
+    <string name="bk_track_not_started">ऑपरेटर ने अभी यात्रा शुरू नहीं की है। शुरू होते ही आप क्रेन को लाइव देख सकेंगे।</string>
+    <string name="oj_not_started_track">ऑपरेटर ने अभी यात्रा शुरू नहीं की है</string>
+    <string name="rq_awaiting_operator">ऑपरेटर असाइन होने की प्रतीक्षा</string>
+    <string name="ch_current_order">आपका वर्तमान ऑर्डर</string>
+    <string name="ch_operator_named">ऑपरेटर: %1$s</string>
+    <string name="ch_track_live">लाइव ट्रैक करें</string>
+    <string name="ch_pay_advance">एडवांस भुगतान करें</string>
+    <string name="ch_pay_balance">बकाया भुगतान करें</string>
+    <string name="ch_view_order">ऑर्डर देखें</string>
 </resources>

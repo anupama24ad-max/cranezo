@@ -306,7 +306,9 @@ fun RequestStatusScreen(
             "accepted" -> AcceptedBlock(vm, r, state.busy)
             "confirmed" -> {
                 FinSection(stringResource(R.string.rq_booked_title)) {
-                    Textview(stringResource(R.string.rq_booked_body, r.booking?.owner_name.orEmpty()), size = font_14, color = appColors.textPrimary)
+                    Textview(stringResource(R.string.rq_booked_body), size = font_14, color = appColors.textPrimary)
+                    Spacer(modifier = Modifier.height(dimen_8))
+                    BookingTag(stringResource(R.string.rq_awaiting_operator), AmberPrimary)
                 }
                 r.booking?.booking_id?.let { id -> CommonGradientButton(text = stringResource(R.string.rq_view_booking), onClick = { onBooked(id) }) }
             }

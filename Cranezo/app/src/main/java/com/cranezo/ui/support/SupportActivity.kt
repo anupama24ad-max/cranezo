@@ -75,44 +75,28 @@ class SupportActivity :
                     // The notification's own screen, by role
                     is SupportEffect.OpenTarget -> {
                         val target = effect.item.target
-                        val bookingId = target?.booking_id
-                        // same screens as tapping the push (PushNotifications.targetIntent)
-                        val shared = setOf("complaint", "owner_job_requests", "operator_job_requests", "operator_payments", "owner_settlements")
-                        if (target?.screen in shared) {
-                            val extras = android.os.Bundle().apply {
-                                putString("screen", target?.screen)
-                                target?.booking_id?.let { putString("booking_id", it) }
-                                target?.complaint_id?.let { putString("complaint_id", it) }
-                            }
-                            com.cranezo.push.PushNotifications.targetIntent(this@SupportActivity, extras, role)?.let { startActivity(it) }
-                            return@collect
-                        }
                         when (target?.screen) {
-                            "booking", "track", "receipt", "rate" -> bookingId?.let { id ->
-                                startActivity(
-                                    when (role) {
-                                        "CRANE_OWNER" -> OwnerJobActivity.intent(this@SupportActivity, id)
-                                        "OPERATOR" -> OperatorActivity.intent(this@SupportActivity, id)
-                                        else -> BookingActivity.bookingIntent(this@SupportActivity, id)
-                                    }
-                                )
-                            }
-                            "owner_job" -> bookingId?.let { startActivity(OwnerJobActivity.intent(this@SupportActivity, it)) }
-                            "operator_job" -> bookingId?.let { startActivity(OperatorActivity.intent(this@SupportActivity, it)) }
-                            // The request popup and tab live on the home screen
-                            "owner_request" -> finish()
-                            "owner_crane_requests" -> startActivity(
-                                com.cranezo.ui.finance.FinanceActivity.intent(this@SupportActivity, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
-                            )
-                            "crane_request" -> startActivity(
-                                BookingActivity.intent(this@SupportActivity, com.cranezo.ui.booking.BookingRoutes.REQUEST)
-                            )
+                            // these live in this screen
                             "announcement" -> nav.navigate(SupportRoutes.ANNOUNCEMENT)
                             "support_ticket" -> target.ticket_id?.let {
                                 vm.onIntent(SupportIntent.OpenTicket(it))
                                 nav.navigate(SupportRoutes.TICKET)
                             }
-                            else -> Unit
+                            // The request popup and tab live on the home screen
+                            "owner_request" -> finish()
+                            // everything else opens exactly the screen a tapped push opens (one routing table for both)
+                            else -> {
+                                val data = effect.item.data
+                                val extras = android.os.Bundle().apply {
+                                    putString("screen", target?.screen)
+                                    target?.booking_id?.let { putString("booking_id", it) }
+                                    target?.complaint_id?.let { putString("complaint_id", it) }
+                                    target?.ticket_id?.let { putString("ticket_id", it) }
+                                    target?.request_id?.let { putString("request_id", it) }
+                                    (data?.get("crane_id") as? String)?.let { putString("crane_id", it) }
+                                }
+                                com.cranezo.push.PushNotifications.targetIntent(this@SupportActivity, extras, role)?.let { runCatching { startActivity(it) } }
+                            }
                         }
                     }
                 }

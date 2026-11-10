@@ -1,6 +1,7 @@
 package com.cranezo.ui.booking
 
 import android.content.ClipData
+import androidx.compose.ui.unit.dp
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
@@ -361,17 +362,26 @@ fun TrackScreen(
 
         // The live map: the crane moves towards the site as the operator drives (updated every 5 seconds)
         val craneAt = track.crane_location
-        val route = vm?.route?.collectAsStateWithLifecycle()?.value.orEmpty()
-        // the road route, asked again only when the crane has moved about 100 m
-        LaunchedEffect(craneAt?.latitude?.let { Math.round(it * 1000) }, craneAt?.longitude?.let { Math.round(it * 1000) }, track.site?.latitude) {
+        // the road route comes with the tracking answer (main roads a crane can use, from the crane to the site)
+        val serverRoute = track.routePoints()
+        val fallbackRoute = vm?.route?.collectAsStateWithLifecycle()?.value.orEmpty()
+        val route = serverRoute.ifEmpty { fallbackRoute }
+        LaunchedEffect(craneAt?.latitude?.let { Math.round(it * 1000) }, craneAt?.longitude?.let { Math.round(it * 1000) }, serverRoute.isEmpty()) {
             val la = craneAt?.latitude
             val lo = craneAt?.longitude
             val sla = track.site?.latitude
             val slo = track.site?.longitude
-            if (la != null && lo != null && sla != null && slo != null) vm?.loadRoute(la, lo, sla, slo)
+            if (serverRoute.isEmpty() && la != null && lo != null && sla != null && slo != null) vm?.loadRoute(la, lo, sla, slo)
+        }
+        // the crane appears only once the operator starts the journey (never the owner's yard)
+        if (craneAt == null) {
+            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
+                Textview(stringResource(R.string.bk_track_not_started), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                if (!track.status_message.isNullOrBlank()) Textview(track.status_message, size = font_12, color = appColors.textSecondary)
+            }
         }
         androidx.compose.foundation.layout.Box(
-            modifier = Modifier.fillMaxWidth().height(dimen_220).clip(androidx.compose.foundation.shape.RoundedCornerShape(dimen_16))
+            modifier = Modifier.fillMaxWidth().height(340.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(dimen_16))
         ) {
             com.cranezo.ui.booking.request.SiteMap(
                 latitude = track.site?.latitude, longitude = track.site?.longitude, address = track.site?.address,
