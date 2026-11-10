@@ -3,10 +3,17 @@ package com.cranezo.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
+import android.os.Looper
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -49,21 +56,21 @@ suspend fun fetchCurrentLocation(context: Context): GpsFix? {
  * (or a mock location app) gives a steady stream of points. The caller checks the location permission first.
  */
 @SuppressLint("MissingPermission")
-fun locationUpdates(context: Context, intervalMs: Long = 2_000L): kotlinx.coroutines.flow.Flow<GpsFix> = kotlinx.coroutines.flow.callbackFlow {
+fun locationUpdates(context: Context, intervalMs: Long = 2_000L): Flow<GpsFix> = callbackFlow {
     val client = LocationServices.getFusedLocationProviderClient(context)
-    val request = com.google.android.gms.location.LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, intervalMs)
+    val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, intervalMs)
         .setMinUpdateIntervalMillis(intervalMs / 2)
         .setMinUpdateDistanceMeters(0f)
         .build()
-    val callback = object : com.google.android.gms.location.LocationCallback() {
-        override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
+    val callback = object : LocationCallback() {
+        override fun onLocationResult(result: LocationResult) {
             result.lastLocation?.let { trySend(GpsFix(it.latitude, it.longitude, null)) }
         }
     }
     try {
-        client.requestLocationUpdates(request, callback, android.os.Looper.getMainLooper())
+        client.requestLocationUpdates(request, callback, Looper.getMainLooper())
     } catch (e: SecurityException) {
         close(e)
     }
-    kotlinx.coroutines.channels.awaitClose { client.removeLocationUpdates(callback) }
+    awaitClose { client.removeLocationUpdates(callback) }
 }
