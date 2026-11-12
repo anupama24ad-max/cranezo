@@ -42,6 +42,8 @@ import com.cranezo.ui.mainhome.model.MainHomeUiState
 import com.cranezo.ui.theme.*
 import com.cranezo.ui.components.Textview
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
 
@@ -152,6 +154,10 @@ fun OwnerHomeScreen(
                 }
             }
         }
+
+        // The two things an owner acts on first, at the top: customer requests near the cranes (scroll sideways),
+        // and paid jobs still waiting for an operator
+        OwnerActionSection(state, onNavigate)
 
         // Fleet Overview: its own panel (deep navy in dark mode, glass in light mode) holding the 4 tiles
         GlassCard(
@@ -297,66 +303,101 @@ fun OwnerHomeScreen(
                 }
             )
         }
+    }
+    }
+}
 
-        // Customers near your cranes asking for a crane: accept first and the job is yours
-        val context = androidx.compose.ui.platform.LocalContext.current
-        GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = {
-            context.startActivity(
-                com.cranezo.ui.finance.FinanceActivity.intent(
-                    context,
-                    com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS
-                )
+/** Crane requests near you as side-scrolling cards, then the jobs that need an operator, in the same card style */
+@Composable
+private fun OwnerActionSection(state: MainHomeUiState, onNavigate: (String) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val bold = androidx.compose.ui.text.font.FontWeight.Bold
+    val openRequests = {
+        context.startActivity(
+            com.cranezo.ui.finance.FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.CRANE_REQUESTS)
+        )
+    }
+    val requests = state.owner.requests
+    Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
+        androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Textview(stringResource(R.string.rq_owner_title), size = font_16, color = appColors.textPrimary, fontWeight = bold)
+                Textview(stringResource(R.string.rq_owner_card_sub), size = font_12, color = appColors.textSecondary)
+            }
+            if (state.owner.craneRequests > 0) {
+                com.cranezo.ui.booking.components.BookingTag(state.owner.craneRequests.toString(), AmberPrimary)
+                Spacer(modifier = Modifier.width(dimen_8))
+            }
+            Textview(
+                stringResource(R.string.rq_see_all), size = font_13, color = appColors.primaryText, fontWeight = bold,
+                modifier = Modifier.clickable { openRequests() }.padding(vertical = dimen_4)
             )
-        }) {
-            androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(
-                        stringResource(R.string.rq_owner_title),
-                        size = font_16,
-                        color = appColors.textPrimary,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                    )
-                    Textview(
-                        stringResource(R.string.rq_owner_card_sub),
-                        size = font_12,
-                        color = appColors.textSecondary
-                    )
-                }
-                if (state.owner.craneRequests > 0) {
-                    com.cranezo.ui.booking.components.BookingTag(
-                        state.owner.craneRequests.toString(),
-                        AmberPrimary
-                    )
-                    Spacer(modifier = Modifier.width(dimen_8))
-                }
-                androidx.compose.material3.Icon(
-                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = AmberPrimary
-                )
+        }
+        if (requests.isEmpty()) {
+            GlassCard(contentPadding = dimen_14, onClick = openRequests) {
+                Textview(stringResource(R.string.rq_owner_none), size = font_13, color = appColors.textSecondary)
+            }
+        } else {
+            // several requests: the cards scroll sideways
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(dimen_12)
+            ) {
+                requests.forEach { OwnerRequestMiniCard(it, openRequests) }
             }
         }
-
-        // Paid bookings still waiting for an operator: open Jobs to assign one
         if (state.owner.jobsNeedingOperator > 0) {
-            GlassCard(
-                contentPadding = dimen_14,
-                borderColor = androidx.compose.ui.graphics.Color(0xFFEF4444),
-                onClick = { onNavigate(Dest.Jobs.route) }) {
-                Textview(
-                    stringResource(R.string.rq_jobs_need_operator, state.owner.jobsNeedingOperator),
-                    size = font_14,
-                    color = appColors.textPrimary,
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                )
-                Textview(
-                    stringResource(R.string.rq_jobs_need_operator_sub),
-                    size = font_12,
-                    color = appColors.textSecondary
-                )
+            val red = androidx.compose.ui.graphics.Color(0xFFEF4444)
+            GlassCard(contentPadding = dimen_14, borderColor = red, onClick = { onNavigate(Dest.Jobs.route) }) {
+                androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.rq_jobs_need_operator, state.owner.jobsNeedingOperator), size = font_15, color = appColors.textPrimary, fontWeight = bold)
+                        Textview(stringResource(R.string.rq_jobs_need_operator_sub), size = font_12, color = appColors.textSecondary)
+                    }
+                    Spacer(modifier = Modifier.width(dimen_10))
+                    com.cranezo.ui.booking.components.BookingTag(stringResource(R.string.rq_assign_now), red)
+                }
             }
         }
     }
+}
+
+/** One request as a card: code and time left, the crane asked for, where and when, the offer, and the button */
+@Composable
+private fun OwnerRequestMiniCard(item: com.cranezo.ui.booking.request.OwnerRequestItem, onOpen: () -> Unit) {
+    val bold = androidx.compose.ui.text.font.FontWeight.Bold
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = onOpen, modifier = Modifier.width(dimen_280)) {
+        androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            com.cranezo.ui.booking.components.BookingTag(item.request_code.orEmpty(), InfoBlue)
+            Spacer(modifier = Modifier.weight(1f))
+            item.seconds_left?.let { Textview(stringResource(R.string.rq_min_left, ((it + 59) / 60).toInt()), size = font_11, color = appColors.textSecondary, maxLines = 1) }
+        }
+        Spacer(modifier = Modifier.height(dimen_8))
+        Textview(item.crane_title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = bold, maxLines = 1)
+        Spacer(modifier = Modifier.height(dimen_4))
+        androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Default.LocationOn, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_14))
+            Spacer(modifier = Modifier.width(dimen_4))
+            Textview(item.site?.name ?: item.site?.address.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
+        }
+        androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            androidx.compose.material3.Icon(androidx.compose.material.icons.Icons.Default.AccessTime, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_14))
+            Spacer(modifier = Modifier.width(dimen_4))
+            Textview(
+                listOfNotNull(item.duration_label, item.schedule?.start_at?.let { com.cranezo.utils.formatServerDateTime(it) }).joinToString(" · "),
+                size = font_12, color = appColors.textSecondary, maxLines = 1
+            )
+        }
+        Spacer(modifier = Modifier.height(dimen_10))
+        androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Textview(com.cranezo.utils.formatAmount(item.offer_amount ?: 0.0), size = font_20, color = appColors.primaryText, fontWeight = bold)
+            if (item.raised == true) {
+                Spacer(modifier = Modifier.width(dimen_8))
+                com.cranezo.ui.booking.components.BookingTag(stringResource(R.string.rq_price_raised), SuccessGreen)
+            }
+        }
+        Spacer(modifier = Modifier.height(dimen_10))
+        CommonGradientButton(text = stringResource(R.string.rq_view_accept), onClick = onOpen, height = dimen_40, textSize = font_13)
     }
 }
 

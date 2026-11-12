@@ -89,6 +89,8 @@ data class OwnerHomeData(
     val todaysEarnings: String = "₹0",
     // customers asking for a crane like the owner's, and jobs still without an operator
     val craneRequests: Int = 0,
+    // the open requests near this owner, shown as cards on Home
+    val requests: List<com.cranezo.ui.booking.request.OwnerRequestItem> = emptyList(),
     val jobsNeedingOperator: Int = 0,
     // commission still to pay to operators (shown as a highlighted card with a badge)
     val dueAmount: Double = 0.0,

@@ -143,12 +143,7 @@ private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
                     )
                     if (booking.crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
                 }
-                booking.crane?.rating?.let {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Star, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_14))
-                        Textview(" ${String.format(Locale.US, "%.1f", it)} (${booking.crane.reviews_count ?: 0})", size = font_12, color = appColors.textPrimary)
-                    }
-                }
+                com.cranezo.ui.components.RatingChip(booking.crane?.rating, booking.crane?.reviews_count ?: 0, textSize = font_12)
                 Textview(
                     listOfNotNull(booking.crane?.capacity_name, booking.crane?.fuel_type_name, booking.duration?.label).joinToString("  •  "),
                     size = font_12, color = appColors.textSecondary
@@ -158,16 +153,14 @@ private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
         if (showOperator && booking.operator != null) {
             Spacer(modifier = Modifier.height(dimen_10))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconBadge(icon = Icons.Default.Call, accent = AmberPrimary, size = dimen_32)
+                // the operator's own photo (their first letter until they have one), name and rating on one level
+                com.cranezo.ui.components.Avatar(booking.operator.profile_image, booking.operator.full_name, size = dimen_40)
                 Spacer(modifier = Modifier.width(dimen_10))
                 Column(modifier = Modifier.weight(1f)) {
                     Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
-                    Textview(booking.operator.full_name ?: stringResource(R.string.bk_operator), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(booking.operator.full_name ?: stringResource(R.string.bk_operator), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
-                booking.operator.rating?.let {
-                    Icon(Icons.Default.Star, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_14))
-                    Textview(" ${String.format(Locale.US, "%.1f", it)}", size = font_11, color = appColors.textPrimary)
-                }
+                com.cranezo.ui.components.RatingChip(booking.operator.rating, booking.operator.reviews_count ?: 0, textSize = font_12)
             }
         }
     }

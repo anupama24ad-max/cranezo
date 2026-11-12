@@ -11,13 +11,14 @@ import java.io.File
 import java.io.FileOutputStream
 
 /**
- * Every picture is shrunk before it is uploaded: at most Full HD (1920 px on the long side) and at most
- * 2 MB, as a JPEG. A 2 to 10 MB camera picture ends up around 0.5 to 2 MB. A picture that is already
- * small enough is sent as it is. PDFs and other files are not touched.
+ * Every picture is shrunk before it is uploaded: at most 1600 px on the long side and at most 1 MB, as a JPEG.
+ * A 3 to 10 MB camera picture ends up around 0.3 to 0.9 MB, which uploads fast on a mobile network and still
+ * shows every detail of a crane, a plate or a document. A picture that is already small enough is sent as it
+ * is. PDFs are not touched.
  */
 object ImageCompressor {
-    const val MAX_BYTES = 2L * 1024 * 1024
-    private const val MAX_SIDE = 1920
+    const val MAX_BYTES = 1L * 1024 * 1024
+    private const val MAX_SIDE = 1600
 
     /** Returns the file to upload: the same file when it is already small, or a new smaller JPEG */
     fun shrink(context: Context, source: File): File {
@@ -41,11 +42,13 @@ object ImageCompressor {
         bitmap = onWhite(bitmap) // transparent parts of a PNG become white in a JPEG
 
         val out = File.createTempFile("upload_" + System.currentTimeMillis(), ".jpg", context.cacheDir)
+        android.util.Log.d("ImageCompressor", "${source.length() / 1024} KB, ${bounds.outWidth}x${bounds.outHeight} -> shrinking")
         var current = bitmap
         repeat(6) {
-            for (quality in intArrayOf(90, 80, 70, 60, 50)) {
+            for (quality in intArrayOf(85, 75, 65, 55, 45)) {
                 FileOutputStream(out).use { current.compress(Bitmap.CompressFormat.JPEG, quality, it) }
                 if (out.length() <= MAX_BYTES) {
+                    android.util.Log.d("ImageCompressor", "done: ${out.length() / 1024} KB at quality $quality")
                     source.delete()
                     return out
                 }

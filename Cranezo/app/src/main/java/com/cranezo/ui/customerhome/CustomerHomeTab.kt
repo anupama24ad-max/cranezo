@@ -159,6 +159,11 @@ fun CustomerHomeTab(
             )
         }
     ) {
+        // nothing could be loaded (usually no internet): the moving "connect to the network" page, not an empty Home
+        if (home == null && state.loaded) {
+            com.cranezo.ui.components.NoInternetState(onRetry = { vm?.refresh() })
+            return@HomeScreenColumn
+        }
 
         // the order happening now comes first, before anything else on Home
         home?.current_order?.let { CurrentOrderCard(it) }

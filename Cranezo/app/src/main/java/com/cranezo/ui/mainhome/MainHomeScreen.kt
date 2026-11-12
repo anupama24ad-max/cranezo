@@ -65,6 +65,9 @@ import com.cranezo.ui.operator.OperatorEarningsTab
 import com.cranezo.ui.operator.OperatorHomeTab
 import com.cranezo.ui.operator.OperatorJobsTab
 import com.cranezo.ui.operator.OperatorTabsViewModel
+import com.cranezo.ui.operator.model.OperatorTabsIntent
+import com.cranezo.ui.ownerjobs.model.OwnerEarningsIntent
+import com.cranezo.ui.ownerjobs.model.OwnerJobsIntent
 import com.cranezo.ui.mainhome.model.MyCranesState
 import com.cranezo.ui.mainhome.model.MainHomeIntent
 import com.cranezo.ui.mainhome.model.MainHomeTabs
@@ -88,7 +91,23 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
     val cranes = vm?.cranesState?.collectAsStateWithLifecycle()?.value ?: MyCranesState()
     val profile = vm?.profile?.collectAsStateWithLifecycle()?.value
     // owner home numbers (today's jobs, requests, jobs needing an operator) update when a push arrives
-    com.cranezo.push.OnPush { if (state.role == com.cranezo.ui.chooserole.UserRole.CRANE_OWNER) onIntent(MainHomeIntent.RefreshOwnerHome) }
+    // Every push moves what is on screen: the screens that show the thing the push is about reload by its type
+    com.cranezo.push.OnPush { data ->
+        val type = data["type"].orEmpty()
+        if (state.role == com.cranezo.ui.chooserole.UserRole.CRANE_OWNER) onIntent(MainHomeIntent.RefreshOwnerHome)
+        // the admin approved or rejected a crane: My Cranes and its numbers change
+        if (type in setOf("crane_approved", "crane_rejected", "operator_declined", "job_accepted")) onIntent(MainHomeIntent.RefreshCranes)
+        // documents or the account were reviewed: Profile and the verified badges change
+        if (type in setOf("document_verified", "document_rejected", "operator_verified", "account_status", "commission_updated", "subscription_due", "subscription_paid")) {
+            onIntent(MainHomeIntent.RefreshProfile)
+        }
+    }
+
+    // Coming back to the app: reload the tab on view, so nothing shows old numbers until the app is closed
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+        if (state.role == com.cranezo.ui.chooserole.UserRole.CRANE_OWNER) onIntent(MainHomeIntent.RefreshOwnerHome)
+        onIntent(MainHomeIntent.RefreshProfile)
+    }
 
     // Add Crane and Crane Details open in their own screen; reload the list if something changed there
     val context = LocalContext.current
@@ -190,6 +209,18 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
                                     else -> Unit
                                 }
                                 Dest.MyCranes -> onIntent(MainHomeIntent.RefreshCranes)
+                                // Jobs, Earnings and Profile used to keep what they loaded first until the app was closed
+                                Dest.Jobs -> when {
+                                    opVm != null -> opVm.onIntent(OperatorTabsIntent.LoadJobs(opVm.uiState.value.jobsTab))
+                                    ownerJobsVm != null -> ownerJobsVm.onIntent(OwnerJobsIntent.Refresh)
+                                    else -> Unit
+                                }
+                                Dest.Earnings -> when {
+                                    opVm != null -> opVm.onIntent(OperatorTabsIntent.LoadEarnings)
+                                    ownerEarningsVm != null -> ownerEarningsVm.onIntent(OwnerEarningsIntent.Load)
+                                    else -> Unit
+                                }
+                                Dest.Profile -> onIntent(MainHomeIntent.RefreshProfile)
                                 else -> Unit
                             }
                         }

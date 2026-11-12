@@ -47,8 +47,9 @@ class TokenAuthenticator(
             return when (val result = refresh()) {
                 is Refresh.Done -> request.newBuilder().header(AppStrings.Constants.authorization, result.bearer).build()
                 // the server said the sign-in is no longer valid: the session is over
-                Refresh.Rejected -> {
-                    SessionManagerEvent.show("", AppDialogType.SESSION_EXPIRED)
+                is Refresh.Rejected -> {
+                    // "signed in on another device": say so (the dialog shows the server's words), otherwise the usual text
+                    SessionManagerEvent.show(result.reason, AppDialogType.SESSION_EXPIRED)
                     null
                 }
                 // no network / server unreachable right now: this call fails, the user stays signed in
@@ -59,14 +60,14 @@ class TokenAuthenticator(
 
     private sealed interface Refresh {
         data class Done(val bearer: String) : Refresh
-        data object Rejected : Refresh
+        data class Rejected(val reason: String = "") : Refresh
         data object Unreachable : Refresh
     }
 
     /** A new "Bearer ..." value; Rejected only when the server refused the refresh token. */
     private fun refresh(): Refresh {
         val refreshToken = sm.getData(AppStrings.SessionValues.refreshToken, "")
-        if (refreshToken.isBlank()) return Refresh.Rejected
+        if (refreshToken.isBlank()) return Refresh.Rejected()
 
         val body = JSONObject().put(AppStrings.InputData.refresh_token, refreshToken).toString()
             .toRequestBody("application/json".toMediaTypeOrNull())
@@ -79,7 +80,7 @@ class TokenAuthenticator(
         return try {
             refreshClient.newCall(request).execute().use { res ->
                 // 401 / 403 / 400: the refresh token is expired or the account is gone
-                if (res.code in 400..499) return Refresh.Rejected
+                if (res.code in 400..499) return Refresh.Rejected(otherDeviceMessage(res.body?.string().orEmpty()))
                 // 5xx: the server is having a problem, not the user
                 if (!res.isSuccessful) return Refresh.Unreachable
                 val data = JSONObject(res.body?.string().orEmpty()).optJSONObject("data") ?: return Refresh.Unreachable
@@ -95,6 +96,11 @@ class TokenAuthenticator(
             Refresh.Unreachable
         }
     }
+
+    /** The server's own words, only when the sign-in ended because the account was opened on another device */
+    private fun otherDeviceMessage(body: String): String =
+        runCatching { JSONObject(body).optString("message") }.getOrDefault("")
+            .takeIf { it.contains("another device", ignoreCase = true) } ?: ""
 
     private fun bearer(token: String) =
         if (token.isBlank() || token.startsWith("Bearer ", ignoreCase = true)) token else "Bearer $token"

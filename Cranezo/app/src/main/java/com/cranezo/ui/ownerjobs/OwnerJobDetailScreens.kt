@@ -195,14 +195,15 @@ fun OwnerJobDetailsScreen(
             )
             Spacer(modifier = Modifier.weight(1f))
             Column(horizontalAlignment = Alignment.End) {
-                Textview(stringResource(R.string.op_booking_code, job.booking_code.orEmpty()), size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                Textview(stringResource(R.string.op_booking_code, job.booking_code.orEmpty()), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
+                Spacer(modifier = Modifier.height(dimen_2))
                 Textview(
                     when {
                         completed -> stringResource(R.string.oj_completed_on, formatServerDate(job.completed_at))
                         job.tab == "active" -> stringResource(R.string.oj_started_at, formatServerTime(job.monitoring?.start_time ?: job.started_at))
                         else -> stringResource(R.string.oj_accepted_on, formatServerDate(job.accepted_at))
                     },
-                    size = font_10, color = appColors.textSecondary
+                    size = font_12, color = appColors.textSecondary, maxLines = 1
                 )
             }
         }

@@ -28,6 +28,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CircularProgressIndicator
@@ -257,26 +260,101 @@ fun GlassSelectField(
                     modifier = Modifier.size(dimen_20)
                 )
             }
-            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                if (options.isEmpty()) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.common_no_options)) },
-                        onClick = { expanded = false }
-                    )
+            // a bottom sheet instead of the small popup menu: big rows to tap, the chosen one ticked, a search box for long lists
+            if (expanded) {
+                SelectSheet(
+                    title = label,
+                    options = options,
+                    selected = value,
+                    onDismiss = { expanded = false },
+                    onPick = {
+                        onSelected(it)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@Composable
+private fun SelectSheet(
+    title: String,
+    options: List<SelectOption>,
+    selected: String,
+    onDismiss: () -> Unit,
+    onPick: (SelectOption) -> Unit
+) {
+    var query by remember { mutableStateOf("") }
+    val shown = if (query.isBlank()) options else options.filter { it.name.contains(query.trim(), ignoreCase = true) }
+    androidx.compose.material3.ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(topStart = dimen_28, topEnd = dimen_28),
+        containerColor = appColors.screenBottom
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .androidx_navigationBarsPadding()
+                .padding(horizontal = dimen_20)
+                .padding(bottom = dimen_16)
+        ) {
+            Textview(title, size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(dimen_12))
+            if (options.size > 8) {
+                androidx.compose.material3.OutlinedTextField(
+                    value = query,
+                    onValueChange = { query = it },
+                    singleLine = true,
+                    placeholder = { Text(stringResource(R.string.ss_search)) },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                    shape = RoundedCornerShape(dimen_14),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(dimen_8))
+            }
+            androidx.compose.foundation.lazy.LazyColumn(modifier = Modifier.androidx_heightIn(max = dimen_400)) {
+                if (shown.isEmpty()) {
+                    item {
+                        Textview(
+                            stringResource(R.string.common_no_options), size = font_14, color = appColors.textSecondary,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = dimen_24)
+                        )
+                    }
                 }
-                options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option.name) },
-                        onClick = {
-                            onSelected(option)
-                            expanded = false
-                        }
-                    )
+                items(shown.size) { index ->
+                    val option = shown[index]
+                    val isSelected = option.name == selected
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(dimen_12))
+                            .background(if (isSelected) AmberPrimary.copy(alpha = 0.12f) else androidx.compose.ui.graphics.Color.Transparent)
+                            .androidx_clickable { onPick(option) }
+                            .padding(horizontal = dimen_14, vertical = dimen_14),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Textview(
+                            option.name,
+                            size = font_15,
+                            color = if (isSelected) appColors.primaryText else appColors.textPrimary,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (isSelected) Icon(Icons.Default.Check, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_20))
+                    }
+                    Spacer(modifier = Modifier.height(dimen_2))
                 }
             }
         }
     }
 }
+
+private fun Modifier.androidx_navigationBarsPadding(): Modifier = this.then(Modifier.navigationBarsPadding())
+private fun Modifier.androidx_heightIn(max: androidx.compose.ui.unit.Dp): Modifier = this.heightIn(max = max)
+private fun Modifier.androidx_clickable(onClick: () -> Unit): Modifier = this.clickable(onClick = onClick)
 
 /** "2031-05-20" -> "20-05-2031". Anything that isn't a yyyy-MM-dd date is shown as it is. */
 private fun String.toDisplayDate(): String {

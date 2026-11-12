@@ -31,10 +31,10 @@ object TokenRefresher {
 
     /** Call off the main thread. True when new tokens were stored. */
     @Synchronized
-    fun refreshNow(sm: SessionManager): Boolean {
+    fun refreshNow(sm: SessionManager, force: Boolean = false): Boolean {
         if (!sm.isUserLoggedIn()) return false
         val now = System.currentTimeMillis()
-        if (now - lastRun < MIN_GAP_MS) return false
+        if (!force && now - lastRun < MIN_GAP_MS) return false
         lastRun = now
         val refreshToken = sm.getData(AppStrings.SessionValues.refreshToken, "")
         if (refreshToken.isBlank()) return false
@@ -47,7 +47,16 @@ object TokenRefresher {
             .build()
         return try {
             client.newCall(request).execute().use { res ->
-                if (!res.isSuccessful) return false
+                if (!res.isSuccessful) {
+                    // signed in on another phone: show the "signed out" dialog now, not at the next call
+                    if (res.code in 400..499) {
+                        val msg = runCatching { JSONObject(res.body?.string().orEmpty()).optString("message") }.getOrDefault("")
+                        if (msg.contains("another device", ignoreCase = true)) {
+                            com.cranezo.utils.objects.SessionManagerEvent.show(msg, com.cranezo.utils.objects.AppDialogType.SESSION_EXPIRED)
+                        }
+                    }
+                    return false
+                }
                 val data = JSONObject(res.body?.string().orEmpty()).optJSONObject("data") ?: return false
                 val access = data.optString("access_token").ifBlank { data.optString("token") }
                 if (access.isBlank()) return false

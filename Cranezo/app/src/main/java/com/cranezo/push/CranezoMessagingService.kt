@@ -32,6 +32,11 @@ class CranezoMessagingService : FirebaseMessagingService() {
 
     /** App open: Android does not show the push by itself, so it is shown here. */
     override fun onMessageReceived(message: RemoteMessage) {
+        // this account was opened on another phone: check the sign-in now, the app then shows the signed-out dialog
+        if (message.data["type"] == "session_replaced") {
+            scope.launch { com.cranezo.api.TokenRefresher.refreshNow(SessionManager(applicationContext), force = true) }
+            return
+        }
         val title = message.notification?.title ?: message.data["title"] ?: return
         val body = message.notification?.body ?: message.data["body"].orEmpty()
         // the screen on view reloads if the push is about what it shows

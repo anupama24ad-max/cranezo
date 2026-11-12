@@ -123,11 +123,14 @@ class MyProfileViewModel @Inject constructor(
     // ---------------------------------------------------------------------------------------
 
     private fun loadPersonalInfo() {
+        // the profile saved from the last visit fills the form at once, the fresh copy replaces it a moment later
+        store.profile.value?.let { initForm(it) }
         runWhenOnline {
             setIsLoading(true)
             store.refresh(repo, sm, app) { fail(it) }
             loadOptions(dropdownTypes())
             initForm(store.profile.value)
+            _uiState.update { it.copy(personalLoadTried = true) }
             setIsLoading(false)
         }
     }

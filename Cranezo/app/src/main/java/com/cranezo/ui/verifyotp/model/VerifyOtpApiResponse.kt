@@ -16,5 +16,9 @@ data class VerifyOtpApiResponse(
     val refresh_token: String? = null,
     val token_type: String? = null,
     val expires_in: String? = null,
-    val token: String? = null
+    val token: String? = null,
+    // POST /auth/switchRole only: the role was opened / made now, and it has no profile yet
+    val switched: Boolean? = null,
+    val created: Boolean? = null,
+    val needs_profile: Boolean? = null
 )

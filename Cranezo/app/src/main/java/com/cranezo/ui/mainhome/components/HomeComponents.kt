@@ -178,13 +178,52 @@ fun CurvedHero(
     bottomPadding: Dp = dimen_8,
     content: @Composable () -> Unit
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = dimen_20, end = dimen_20, top = dimen_16, bottom = bottomPadding)
+            .padding(start = dimen_20, end = dimen_20, top = dimen_12, bottom = bottomPadding)
     ) {
+        // the Cranezo strip first, then the greeting
+        BrandStrip()
+        Spacer(modifier = Modifier.height(dimen_14))
         content()
+    }
+}
+
+/**
+ * The brand line at the top of every Home: a dark navy bar with the Cranezo emblem, the name and the tagline,
+ * a thin amber edge and a small map pin. Dark on both themes, so the logo colours (orange, blue, gold) always stand out.
+ */
+@Composable
+fun BrandStrip(modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(dimen_18)
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(androidx.compose.ui.graphics.Color(0xFF08101F), androidx.compose.ui.graphics.Color(0xFF16264A))))
+            .border(dimen_1, AmberPrimary.copy(alpha = 0.40f), shape)
+            .padding(horizontal = dimen_14, vertical = dimen_8),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        androidx.compose.foundation.Image(
+            painter = painterResource(R.drawable.brand_mark),
+            contentDescription = null,
+            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+            modifier = Modifier.size(width = dimen_52, height = dimen_40)
+        )
+        Spacer(modifier = Modifier.width(dimen_12))
+        Column(modifier = Modifier.weight(1f)) {
+            Textview(text = "Cranezo", size = font_20, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, maxLines = 1)
+            Textview(text = stringResource(R.string.brand_tagline), size = font_12, color = AmberPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+        }
+        androidx.compose.material3.Icon(
+            imageVector = androidx.compose.material.icons.Icons.Default.LocationOn,
+            contentDescription = null,
+            tint = AmberPrimary,
+            modifier = Modifier.size(dimen_24)
+        )
     }
 }
 
@@ -506,14 +545,17 @@ fun StatusChip(
     color: Color,
     modifier: Modifier = Modifier
 ) {
+    // the same pill as BookingTag: soft fill, thin border, room around one line of text
+    val pill = RoundedCornerShape(50)
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(dimen_10))
-            .background(color.copy(alpha = 0.16f))
-            .padding(horizontal = dimen_8, vertical = dimen_3),
+            .clip(pill)
+            .background(color.copy(alpha = 0.14f))
+            .border(dimen_1, color.copy(alpha = 0.38f), pill)
+            .padding(horizontal = dimen_10, vertical = dimen_4),
         contentAlignment = Alignment.Center
     ) {
-        Textview(text = text, size = font_11, color = color, fontWeight = FontWeight.SemiBold)
+        Textview(text = text, size = font_11, color = color, fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
 

@@ -350,6 +350,22 @@ fun TrackScreen(
         }
     }
 
+    // The crane arrived, the work started or the booking ended: this live map has nothing more to show, the booking's own
+    // screen has the next step (arrival code, start, payment). Any other push about it just reloads the map.
+    com.cranezo.push.OnPush { data ->
+        val id = bookingId ?: return@OnPush
+        if (data["booking_id"] != id) return@OnPush
+        when (data["type"]) {
+            "operator_arrived", "job_started", "job_completed", "booking_cancelled", "completion_requested" -> onBack()
+            else -> vm?.onIntent(BookingIntent.LoadTrack(id))
+        }
+    }
+    // The server says the work has started or finished: back to the booking
+    LaunchedEffect(track?.status) {
+        val st = track?.status ?: return@LaunchedEffect
+        if (st >= 6) onBack()
+    }
+
     BookingScaffold(onBack = onBack, title = stringResource(R.string.bk_track_title)) {
         if (track == null) {
             if (state.trackLoaded) {

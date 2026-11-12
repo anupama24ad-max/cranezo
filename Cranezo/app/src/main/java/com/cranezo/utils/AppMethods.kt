@@ -279,8 +279,9 @@ class AppMethods {
                     FileOutputStream(file).use { outputStream ->
                         inputStream.copyTo(outputStream)
                     }
-                    // pictures are shrunk here, so every upload in the app is at most Full HD and 2 MB
-                    if (type.startsWith("image/")) ImageCompressor.shrink(context, file) else file
+                    // Pictures are shrunk here, so every upload in the app is small. A file whose type the phone did not report
+                    // is tried as a picture too (shrink gives the file back unchanged when it is not one); only PDFs are skipped.
+                    if (type.contains("pdf") || file.name.endsWith(".pdf", ignoreCase = true)) file else ImageCompressor.shrink(context, file)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

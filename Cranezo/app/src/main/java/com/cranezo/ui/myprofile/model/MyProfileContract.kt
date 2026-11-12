@@ -71,6 +71,8 @@ data class MyProfileUiState(
 
     // Personal Information form. Values are what the user sees; ids are the dropdown ids to send.
     val formReady: Boolean = false,
+    // the first load of the form has finished (so "something went wrong" may show; until then the loader does)
+    val personalLoadTried: Boolean = false,
     val form: Map<String, String> = emptyMap(),
     val formIds: Map<String, Int> = emptyMap(),
     val isBusiness: Boolean = false,

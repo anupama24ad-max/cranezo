@@ -10,8 +10,8 @@ import com.cranezo.ui.cranes.model.Operator
 
 data class OwnerJobsState(
     val counts: OwnerJobCounts? = null,
-    // "new_requests", "upcoming", "active", "completed" or "closed"
-    val tab: String = "new_requests",
+    // "all", "new_requests", "upcoming", "active", "completed" or "closed"
+    val tab: String = "all",
     val newestFirst: Boolean = true,
     val jobs: List<OwnerJob> = emptyList(),
     val total: Int = 0,

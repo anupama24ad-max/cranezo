@@ -94,6 +94,21 @@ class MainHomeViewModel @Inject constructor(
     }
 
     /** Owner Home dashboard: live numbers from POST /owner/home */
+    /** The open crane requests near this owner (the same list as the Crane Requests screen), for the cards on Home */
+    private fun loadOwnerRequestCards() {
+        runWhenOnline {
+            repo.financePost("owner/crane-requests", AppMethods.getToken(sm)).isRequestCallSuspendSuccess(
+                success = { r ->
+                    val list = runCatching {
+                        com.google.gson.Gson().fromJson(r?.data, com.cranezo.ui.booking.request.OwnerRequestList::class.java)
+                    }.getOrNull()
+                    _uiState.update { it.copy(owner = it.owner.copy(requests = list?.items.orEmpty())) }
+                },
+                failure = { _, _, _ -> }
+            )
+        }
+    }
+
     private fun loadOwnerHome() {
         runWhenOnline {
             repo.financePost("owner/home", AppMethods.getToken(sm)).isRequestCallSuspendSuccess(
@@ -134,7 +149,7 @@ class MainHomeViewModel @Inject constructor(
         when (intent) {
             MainHomeIntent.RefreshCranes -> loadCranes(reset = true)
 
-            MainHomeIntent.RefreshOwnerHome -> loadOwnerHome()
+            MainHomeIntent.RefreshOwnerHome -> { loadOwnerHome(); loadOwnerRequestCards() }
 
             MainHomeIntent.LoadMoreCranes -> loadCranes(reset = false)
 

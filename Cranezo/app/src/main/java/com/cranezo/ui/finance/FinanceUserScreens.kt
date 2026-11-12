@@ -207,8 +207,18 @@ fun ComplaintsScreen(vm: FinanceViewModel, onBack: () -> Unit, onOpen: (String) 
         stringResource(R.string.fin_complaints_title), onBack,
         subtitle = stringResource(if (onNew != null) R.string.fin_complaints_customer_sub else R.string.fin_complaints_owner_sub)
     ) {
-        if (onNew != null) CommonGradientButton(text = stringResource(R.string.fin_new_complaint), onClick = onNew)
-        if ("complaints" in state.loaded && state.complaints.isEmpty()) EmptyText(stringResource(R.string.fin_no_complaints))
+        val empty = "complaints" in state.loaded && state.complaints.isEmpty()
+        if (onNew != null && !empty) CommonGradientButton(text = stringResource(R.string.fin_new_complaint), onClick = onNew)
+        if (empty) {
+            // nothing yet: a centered, friendly page with the one button that matters
+            com.cranezo.ui.components.EmptyState(
+                icon = androidx.compose.material.icons.Icons.Default.TaskAlt,
+                title = stringResource(R.string.fin_no_complaints),
+                body = stringResource(if (onNew != null) R.string.fin_complaints_empty_customer else R.string.fin_complaints_empty_owner),
+                actionText = if (onNew != null) stringResource(R.string.fin_new_complaint) else null,
+                onAction = onNew
+            )
+        }
         state.complaints.forEach { c ->
             GlassCard(contentPadding = dimen_12, minHeight = dimen_64, onClick = { c.id?.let(onOpen) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

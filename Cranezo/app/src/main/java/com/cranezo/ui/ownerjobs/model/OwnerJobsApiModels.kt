@@ -13,6 +13,7 @@ import com.cranezo.ui.operator.model.SitePhoto
 /** Response models of the Owner Jobs / Owner Earnings APIs. All fields nullable. */
 
 data class OwnerJobCounts(
+    val all: Int? = null,
     val new_requests: Int? = null,
     val upcoming: Int? = null,
     val active: Int? = null,

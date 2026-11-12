@@ -101,6 +101,18 @@ fun PersonalInfoScreen(
             }
         } else null
     ) {
+        // the loader shows while the profile is on its way; "something went wrong" only after a load really failed
+        var waitedLong by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            kotlinx.coroutines.delay(10_000)
+            waitedLong = true
+        }
+        if (!state.formReady && !state.personalLoadTried && !waitedLong) {
+            Box(modifier = Modifier.fillMaxWidth().padding(top = dimen_60), contentAlignment = Alignment.Center) {
+                com.cranezo.ui.components.CranezoLoader()
+            }
+            return@MyProfileScaffold
+        }
         if (!state.formReady) {
             Column(
                 modifier = Modifier
@@ -108,17 +120,8 @@ fun PersonalInfoScreen(
                     .padding(top = dimen_60),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Textview(
-                    text = stringResource(R.string.crane_msg_generic_error),
-                    size = font_14,
-                    color = appColors.textSecondary,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(dimen_16))
-                CommonGradientButton(
-                    text = stringResource(R.string.common_retry),
-                    onClick = { onIntent(MyProfileIntent.LoadPersonalInfo) }
-                )
+                // the moving "no internet" page (it is almost always the reason this form did not load)
+                com.cranezo.ui.components.NoInternetState(onRetry = { onIntent(MyProfileIntent.LoadPersonalInfo) })
             }
             return@MyProfileScaffold
         }

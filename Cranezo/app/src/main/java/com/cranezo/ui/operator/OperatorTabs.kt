@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -126,6 +129,10 @@ fun OperatorHomeTab(
         spacing = dimen_12,
         hero = { HomeHeader(name = home?.greeting_name.orEmpty(), subtitle = stringResource(R.string.op_home_subtitle)) }
     ) {
+        if (home == null && state.homeLoaded) {
+            com.cranezo.ui.components.NoInternetState(onRetry = { vm?.onIntent(OperatorTabsIntent.LoadHome) })
+            return@HomeScreenColumn
+        }
 
         // A job the owner just gave: shown here on the page (sound + vibration), not as a popup
         state.incomingJob?.let { id ->
@@ -138,34 +145,18 @@ fun OperatorHomeTab(
             )
         }
 
-        // Resume a job that is on the road or in progress
+        // Resume your job: the first thing on the page, in the same big card style as the owner's requests
         home?.active_job?.booking_id?.let { id ->
-            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary, onClick = { onOpenJob(id) }) {
+            GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = { onOpenJob(id) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Textview(stringResource(R.string.op_resume_job), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
-                        Textview(home.active_job.booking_code.orEmpty(), size = font_11, color = appColors.textSecondary)
-                    }
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = AmberPrimary)
-                }
-            }
-        }
-
-        // Owners give a job by this ID (one job at a time, then the operator is free for other work)
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val memberId = androidx.compose.runtime.remember {
-            com.cranezo.utils.SessionManager(context).getData(com.cranezo.utils.AppStrings.SessionValues.memberId, "")
-        }
-        if (memberId.isNotBlank()) {
-            GlassCard(contentPadding = dimen_12) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
+                    IconBadge(icon = Icons.Default.PlayArrow, accent = AmberPrimary, size = dimen_44)
                     Spacer(modifier = Modifier.width(dimen_12))
                     Column(modifier = Modifier.weight(1f)) {
-                        Textview(stringResource(R.string.rq_your_operator_id), size = font_12, color = appColors.textSecondary)
-                        Textview(memberId, size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                        Textview(stringResource(R.string.rq_your_operator_id_sub), size = font_11, color = appColors.textSecondary)
+                        Textview(stringResource(R.string.op_resume_job), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                        Textview(home.active_job.booking_code.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
                     }
+                    Spacer(modifier = Modifier.width(dimen_8))
+                    BookingTag(stringResource(R.string.op_continue), AmberPrimary)
                 }
             }
         }
@@ -217,6 +208,33 @@ fun OperatorHomeTab(
             }
         }
 
+        // Today's jobs: side-scrolling cards like the owner's requests (one card per job)
+        Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.op_todays_jobs), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(stringResource(R.string.op_todays_jobs_sub), size = font_12, color = appColors.textSecondary)
+                }
+                Textview(
+                    stringResource(R.string.common_view_all), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { onOpenJobs() }.padding(vertical = dimen_4)
+                )
+            }
+            val items = home?.today_jobs?.items.orEmpty()
+            if (items.isEmpty()) {
+                GlassCard(contentPadding = dimen_14, onClick = onOpenJobs) {
+                    Textview(stringResource(R.string.op_no_jobs_today), size = font_13, color = appColors.textSecondary)
+                }
+            } else {
+                Row(
+                    modifier = Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(dimen_12)
+                ) {
+                    items.forEach { job -> TodayJobCard(job, onOpenJob) }
+                }
+            }
+        }
+
         // Assigned crane
         GlassCard(contentPadding = dimen_14) {
             SectionTitle(
@@ -261,37 +279,6 @@ fun OperatorHomeTab(
             }
         }
 
-        // Today's jobs
-        GlassCard(contentPadding = dimen_14) {
-            SectionTitle(
-                text = stringResource(R.string.op_todays_jobs),
-                actionText = stringResource(R.string.common_view_all),
-                onActionClick = onOpenJobs
-            )
-            val items = home?.today_jobs?.items.orEmpty()
-            if (items.isEmpty()) {
-                Spacer(modifier = Modifier.height(dimen_8))
-                Textview(stringResource(R.string.op_no_jobs_today), size = font_13, color = appColors.textSecondary)
-            }
-            items.forEach { job ->
-                Spacer(modifier = Modifier.height(dimen_10))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    DateBlock(job.start_at)
-                    Spacer(modifier = Modifier.width(dimen_12))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Textview(job.customer_name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
-                        Textview(job.location.orEmpty(), size = font_11, color = appColors.textSecondary, maxLines = 1)
-                        Textview("${formatServerDateTime(job.start_at)} · ${job.duration_label.orEmpty()}", size = font_10, color = appColors.textSecondary, maxLines = 1)
-                    }
-                    Column(horizontalAlignment = Alignment.End) {
-                        BookingTag(tabLabel(job.tab_label), tabTagColor(job.tab_label))
-                        Spacer(modifier = Modifier.height(dimen_6))
-                        CraneSmallButton(text = stringResource(R.string.op_view_job), onClick = { job.booking_id?.let(onOpenJob) })
-                    }
-                }
-            }
-        }
-
         // Today's earnings
         GlassCard(contentPadding = dimen_14, onClick = onOpenEarnings) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -325,7 +312,50 @@ fun OperatorHomeTab(
                 Textview(stringResource(R.string.op_view_documents), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
         }
+        // Owners give a job by this ID (one job at a time, then the operator is free for other work)
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val memberId = androidx.compose.runtime.remember {
+            com.cranezo.utils.SessionManager(context).getData(com.cranezo.utils.AppStrings.SessionValues.memberId, "")
+        }
+        if (memberId.isNotBlank()) {
+            GlassCard(contentPadding = dimen_12) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
+                    Spacer(modifier = Modifier.width(dimen_12))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.rq_your_operator_id), size = font_12, color = appColors.textSecondary)
+                        Textview(memberId, size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.rq_your_operator_id_sub), size = font_11, color = appColors.textSecondary)
+                    }
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(dimen_8))
+    }
+}
+
+/** One job of today as a card: date, customer, place, time, its tag and the button */
+@Composable
+private fun TodayJobCard(job: com.cranezo.ui.operator.model.JobListItem, onOpenJob: (String) -> Unit) {
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = { job.booking_id?.let(onOpenJob) }, modifier = Modifier.width(dimen_280)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            DateBlock(job.start_at)
+            Spacer(modifier = Modifier.width(dimen_12))
+            Column(modifier = Modifier.weight(1f)) {
+                Textview(job.customer_name.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
+                Textview(job.location.orEmpty(), size = font_12, color = appColors.textSecondary, maxLines = 1)
+            }
+        }
+        Spacer(modifier = Modifier.height(dimen_8))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Default.AccessTime, contentDescription = null, tint = appColors.textSecondary, modifier = Modifier.size(dimen_14))
+            Spacer(modifier = Modifier.width(dimen_4))
+            Textview("${formatServerDateTime(job.start_at)} · ${job.duration_label.orEmpty()}", size = font_12, color = appColors.textSecondary, maxLines = 1, modifier = Modifier.weight(1f))
+            BookingTag(tabLabel(job.tab_label), tabTagColor(job.tab_label))
+        }
+        Spacer(modifier = Modifier.height(dimen_10))
+        CommonGradientButton(text = stringResource(R.string.op_view_job), onClick = { job.booking_id?.let(onOpenJob) }, height = dimen_40, textSize = font_13)
     }
 }
 

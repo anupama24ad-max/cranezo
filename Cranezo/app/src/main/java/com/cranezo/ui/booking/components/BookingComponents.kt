@@ -230,17 +230,22 @@ fun PriceLine(label: String, value: String, bold: Boolean = false, valueColor: C
     }
 }
 
-/** Small outlined tag such as "Available" or "Verified". */
+/**
+ * Status / info pill such as "Completed", "Verified" or "CRN018": a rounded pill with a soft tinted fill, a thin
+ * border in the same colour, room around the text and one line only, so neighbouring words never touch it.
+ */
 @Composable
-fun BookingTag(text: String, color: Color) {
+fun BookingTag(text: String, color: Color, modifier: Modifier = Modifier) {
+    val pill = RoundedCornerShape(50)
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(dimen_8))
-            .background(color.copy(alpha = 0.16f))
-            .border(dimen_1, color.copy(alpha = 0.5f), RoundedCornerShape(dimen_8))
-            .padding(horizontal = dimen_6, vertical = dimen_2)
+        modifier = modifier
+            .clip(pill)
+            .background(color.copy(alpha = 0.14f))
+            .border(dimen_1, color.copy(alpha = 0.38f), pill)
+            .padding(horizontal = dimen_10, vertical = dimen_4),
+        contentAlignment = Alignment.Center
     ) {
-        Textview(text = text, size = font_10, color = color, fontWeight = FontWeight.SemiBold, maxLines = 1)
+        Textview(text = text, size = font_11, color = color, fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
 

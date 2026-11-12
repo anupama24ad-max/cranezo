@@ -209,6 +209,23 @@ interface RestApi {
         @Body jsonObject: RequestBody? = null
     ): Response<ApiResult<Any>>
 
+    // ---- Feedback the operator / owner received (the path is operator/ratings or owner/ratings) ----
+    @POST
+    suspend fun ratingsApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.ratings.RatingsData>>
+
+    // ---- One phone number, up to three roles ----
+    @POST("auth/roles")
+    suspend fun rolesApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<List<com.cranezo.ui.switchrole.RoleAccount>>>
+
+    @POST("auth/switchRole")
+    suspend fun switchRoleApi(
+        @HeaderMap headers: Map<String, String>,
+        @Body jsonObject: RequestBody? = null
+    ): Response<ApiResult<com.cranezo.ui.verifyotp.model.VerifyOtpApiResponse>>
+
 
 
     // ---- Booking, Crane Requests, Notifications (all POST with a JSON body; the path is passed in) ----

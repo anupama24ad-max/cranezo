@@ -217,6 +217,15 @@ class Repository @Inject constructor(val api: RestApi) {
     ): Resource<ApiResult<Any>?> =
         safeApiCall(conflictAsError = true) { api.logoutApi(headers, json(jsonObj)) }
 
+    suspend fun ratingsApi(path: String, headers: Map<String, String>, jsonObj: JSONObject): Resource<ApiResult<com.cranezo.ui.ratings.RatingsData>?> =
+        safeApiCall(conflictAsError = true) { api.ratingsApi(path, headers, json(jsonObj)) }
+
+    suspend fun rolesApi(headers: Map<String, String>): Resource<ApiResult<List<com.cranezo.ui.switchrole.RoleAccount>>?> =
+        safeApiCall(conflictAsError = true) { api.rolesApi(headers, json(JSONObject())) }
+
+    suspend fun switchRoleApi(headers: Map<String, String>, jsonObj: JSONObject): Resource<ApiResult<com.cranezo.ui.verifyotp.model.VerifyOtpApiResponse>?> =
+        safeApiCall(conflictAsError = true) { api.switchRoleApi(headers, json(jsonObj)) }
+
     // ---- Booking, Crane Requests, Notifications ----
 
     suspend fun bookingOptionsApi(h: Map<String, String>): Resource<ApiResult<BookingOptions>?> =

@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.SupportAgent
@@ -158,6 +160,10 @@ fun HomeProfileScreen(
 
     val themeMode by AppThemeState.currentThemeMode
     var showLogout by remember { mutableStateOf(false) }
+    var showSwitchRole by remember { mutableStateOf(false) }
+    var showRatings by remember { mutableStateOf(false) }
+    if (showRatings) com.cranezo.ui.ratings.MyRatingsSheet(onDismiss = { showRatings = false })
+    if (showSwitchRole) com.cranezo.ui.switchrole.SwitchRoleSheet(onDismiss = { showSwitchRole = false })
     if (showLogout) {
         LogoutConfirmSheet(
             onCancel = { showLogout = false },
@@ -302,6 +308,25 @@ fun HomeProfileScreen(
                     title = stringResource(R.string.mp_appearance),
                     subtitle = appearanceName(themeMode),
                     onClick = { onOpen(ProfileRoutes.APPEARANCE) }
+                )
+            }
+
+            // one phone number can be an owner, an operator and a customer: switch between them without signing in again
+            MenuGroup {
+                // operators and owners read the feedback customers gave them, star by star
+                if (role == UserRole.OPERATOR || role == UserRole.CRANE_OWNER) {
+                    MenuRow(
+                        icon = Icons.Default.Star,
+                        title = stringResource(R.string.rt_row_title),
+                        subtitle = stringResource(R.string.rt_row_sub),
+                        onClick = { showRatings = true }
+                    )
+                }
+                MenuRow(
+                    icon = Icons.Default.SwapHoriz,
+                    title = stringResource(R.string.sw_row_title),
+                    subtitle = stringResource(R.string.sw_row_sub),
+                    onClick = { showSwitchRole = true }
                 )
             }
 

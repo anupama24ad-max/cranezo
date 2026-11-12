@@ -146,10 +146,12 @@ fun OwnerJobsTab(
         Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
             val counts = state.counts
             listOf(
+                Triple("all", R.string.jf_all, counts?.all),
                 Triple("new_requests", R.string.oj_tab_new_requests, counts?.new_requests),
                 Triple("upcoming", R.string.oj_tab_upcoming, counts?.upcoming),
                 Triple("active", R.string.oj_tab_active, counts?.active),
-                Triple("completed", R.string.op_tab_completed, counts?.completed)
+                Triple("completed", R.string.op_tab_completed, counts?.completed),
+                Triple("closed", R.string.oj_tab_closed, counts?.closed)
             ).forEach { (key, label, count) ->
                 val selected = key == state.tab
                 Row(
@@ -173,7 +175,7 @@ fun OwnerJobsTab(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Textview(
-                text = stringResource(R.string.oj_n_title, state.total, stringResource(tabTitle(state.tab))),
+                text = if (state.tab == "all") stringResource(R.string.oj_n_all, state.total) else stringResource(R.string.oj_n_title, state.total, stringResource(tabTitle(state.tab))),
                 size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
             )
             Row(
@@ -217,6 +219,7 @@ private fun tabTitle(tab: String): Int = when (tab) {
     "active" -> R.string.oj_tab_active
     "completed" -> R.string.op_tab_completed
     "closed" -> R.string.oj_tab_closed
+    "all" -> R.string.jf_all
     else -> R.string.oj_tab_new_requests
 }
 
