@@ -211,6 +211,14 @@ fun HomeScreenColumn(
             verticalArrangement = Arrangement.spacedBy(spacing),
             content = content
         )
+        // The brand artwork closes every Home, like the end of the Rapido home: it comes into view when you
+        // scroll to the bottom. Transparent, so it sits on the app background; the light and dark versions follow the app theme.
+        androidx.compose.foundation.Image(
+            painter = themePainter(R.drawable.home_footer_light, R.drawable.home_footer_dark),
+            contentDescription = null,
+            contentScale = androidx.compose.ui.layout.ContentScale.FillWidth,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
