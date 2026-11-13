@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -102,10 +104,11 @@ fun PersonalInfoScreen(
         } else null
     ) {
         // the loader shows while the profile is on its way; "something went wrong" only after a load really failed
-        var waitedLong by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+        val waitedLongState = androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+        val waitedLong = waitedLongState.value
         LaunchedEffect(Unit) {
             kotlinx.coroutines.delay(10_000)
-            waitedLong = true
+            waitedLongState.value = true
         }
         if (!state.formReady && !state.personalLoadTried && !waitedLong) {
             Box(modifier = Modifier.fillMaxWidth().padding(top = dimen_60), contentAlignment = Alignment.Center) {

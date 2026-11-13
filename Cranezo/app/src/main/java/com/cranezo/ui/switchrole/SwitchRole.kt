@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +45,7 @@ import com.cranezo.repository.Repository
 import com.cranezo.ui.chooserole.UserRole
 import com.cranezo.ui.components.Textview
 import com.cranezo.ui.mainhome.MainHomeActivity
+import com.cranezo.ui.mainhome.components.InfoBlue
 import com.cranezo.ui.mainhome.components.SuccessGreen
 import com.cranezo.ui.myprofile.ProfileStore
 import com.cranezo.ui.profile.ProfileActivity
