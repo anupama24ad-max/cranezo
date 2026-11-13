@@ -183,50 +183,12 @@ fun CurvedHero(
         modifier = modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = dimen_20, end = dimen_20, top = dimen_12, bottom = bottomPadding)
+            .padding(start = dimen_20, end = dimen_20, top = dimen_16, bottom = bottomPadding)
     ) {
-        // the Cranezo strip first, then the greeting
-        BrandStrip()
-        Spacer(modifier = Modifier.height(dimen_14))
         content()
     }
 }
 
-/**
- * The brand line at the top of every Home: a dark navy bar with the Cranezo emblem, the name and the tagline,
- * a thin amber edge and a small map pin. Dark on both themes, so the logo colours (orange, blue, gold) always stand out.
- */
-@Composable
-fun BrandStrip(modifier: Modifier = Modifier) {
-    val shape = RoundedCornerShape(dimen_18)
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(androidx.compose.ui.graphics.Brush.horizontalGradient(listOf(androidx.compose.ui.graphics.Color(0xFF08101F), androidx.compose.ui.graphics.Color(0xFF16264A))))
-            .border(dimen_1, AmberPrimary.copy(alpha = 0.40f), shape)
-            .padding(horizontal = dimen_14, vertical = dimen_8),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        androidx.compose.foundation.Image(
-            painter = painterResource(R.drawable.brand_mark),
-            contentDescription = null,
-            contentScale = androidx.compose.ui.layout.ContentScale.Fit,
-            modifier = Modifier.size(width = dimen_52, height = dimen_40)
-        )
-        Spacer(modifier = Modifier.width(dimen_12))
-        Column(modifier = Modifier.weight(1f)) {
-            Textview(text = "Cranezo", size = font_20, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold, maxLines = 1)
-            Textview(text = stringResource(R.string.brand_tagline), size = font_12, color = AmberPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
-        }
-        androidx.compose.material3.Icon(
-            imageVector = androidx.compose.material.icons.Icons.Default.LocationOn,
-            contentDescription = null,
-            tint = AmberPrimary,
-            modifier = Modifier.size(dimen_24)
-        )
-    }
-}
 
 /**
  * Scrolling home screen: the curved navy [hero] on top, then the [content] with side padding.

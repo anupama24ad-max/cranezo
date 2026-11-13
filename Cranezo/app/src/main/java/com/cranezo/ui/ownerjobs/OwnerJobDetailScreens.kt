@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
@@ -419,8 +420,16 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
         if (track == null) return@BookingScaffold
         // the owner follows the operator (live, once the journey started) and the customer's site; never their own place
         if (track.crane_location == null) {
-            GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
-                Textview(stringResource(R.string.oj_not_started_track), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+            // one tidy line: icon and text on the same level, centered in the card (it used to sit at the top of a tall empty box)
+            GlassCard(
+                contentPadding = dimen_12, borderColor = AmberPrimary, minHeight = dimen_52,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Schedule, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_20))
+                    Spacer(modifier = Modifier.width(dimen_10))
+                    Textview(stringResource(R.string.oj_not_started_track), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                }
             }
         }
         Box(modifier = Modifier.fillMaxWidth().height(340.dp).clip(RoundedCornerShape(dimen_16))) {
@@ -445,22 +454,22 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
                 }
             }
             if (!track.status_message.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(dimen_8))
+                Spacer(modifier = Modifier.height(dimen_10))
                 Textview(track.status_message, size = font_12, color = appColors.textSecondary)
             }
         }
-        GlassCard(contentPadding = dimen_12) {
+        GlassCard(contentPadding = dimen_14) {
             Textview(stringResource(R.string.op_job_site).uppercase(), size = font_10, color = appColors.textSecondary)
-            Textview(track.site?.name ?: track.site?.address.orEmpty(), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-            val live = track.crane_location?.is_live == true
-            Spacer(modifier = Modifier.height(dimen_6))
-            Textview(
-                stringResource(if (live) R.string.oj_live_position else R.string.oj_not_started_track), size = font_11,
-                color = if (live) SuccessGreen else AmberPrimary
-            )
+            Spacer(modifier = Modifier.height(dimen_2))
+            Textview(track.site?.name ?: track.site?.address.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+            // the "not started" message is the card on top; here only the live line, so nothing is said twice
+            if (track.crane_location?.is_live == true) {
+                Spacer(modifier = Modifier.height(dimen_6))
+                Textview(stringResource(R.string.oj_live_position), size = font_11, color = SuccessGreen)
+            }
         }
         track.operator?.let { operator ->
-            GlassCard(contentPadding = dimen_12) {
+            GlassCard(contentPadding = dimen_14) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
                         Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
