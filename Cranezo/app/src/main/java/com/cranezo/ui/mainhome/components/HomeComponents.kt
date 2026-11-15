@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.text.font.FontWeight
 import com.cranezo.ui.components.GlassCard
