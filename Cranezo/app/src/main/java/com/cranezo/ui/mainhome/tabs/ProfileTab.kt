@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.ui.platform.LocalContext
 import com.cranezo.ui.finance.FinanceActivity
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
@@ -241,11 +242,23 @@ fun HomeProfileScreen(
                         StatusChip(text = stringResource(R.string.common_verified), color = SuccessGreen)
                     }
                 }
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.Top)
+                        .clip(RoundedCornerShape(50))
+                        .background(AmberPrimary.copy(alpha = 0.16f))
+                        .clickable { onOpen(ProfileRoutes.PERSONAL) }
+                        .padding(horizontal = dimen_10, vertical = dimen_6),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_14))
+                    Spacer(modifier = Modifier.width(dimen_4))
+                    Textview(stringResource(R.string.common_edit), size = font_12, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                }
             }
         }
 
         if (role == UserRole.OPERATOR) {
-            AssignedCraneCard(profile?.operator, onOpen)
             DocumentsCard(profile?.operator?.documents.orEmpty(), onOpen)
 
             MenuGroup {
@@ -322,7 +335,8 @@ fun HomeProfileScreen(
                         onClick = { showRatings = true }
                     )
                 }
-                MenuRow(
+                // Switch role: second phase for crane owners (hidden for them)
+                if (role != UserRole.CRANE_OWNER) MenuRow(
                     icon = Icons.Default.SwapHoriz,
                     title = stringResource(R.string.sw_row_title),
                     subtitle = stringResource(R.string.sw_row_sub),

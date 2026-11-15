@@ -1,5 +1,6 @@
 package com.cranezo.ui.mainhome.components
 
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -119,7 +120,11 @@ fun HomeHeader(
                     kotlinx.coroutines.delay(30_000)
                 }
             }
-            val badge = unread ?: com.cranezo.push.UnreadBadge.count.value
+            // the live count (kept right after "mark all read" too); the home's own number only until the first answer
+            androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                kotlinx.coroutines.MainScope().launch { com.cranezo.push.UnreadBadge.refresh(context) }
+            }
+            val badge = com.cranezo.push.UnreadBadge.count.value ?: unread
             // outer box is not clipped, so the count sits on the edge of the round button, not inside it
             Box {
                 Box(
@@ -151,7 +156,7 @@ fun HomeHeader(
                             .offset(x = dimen_6, y = (-6).dp)
                             .size(dimen_18)
                             .clip(CircleShape)
-                            .background(androidx.compose.ui.graphics.Color(0xFFEF4444))
+                            .background(androidx.compose.ui.graphics.Color(0xFFB91C1C))
                             .border(dimen_1, androidx.compose.ui.graphics.Color.White, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
@@ -177,11 +182,41 @@ fun HomeHeader(
 fun CurvedHero(
     modifier: Modifier = Modifier,
     bottomPadding: Dp = dimen_8,
+    animated: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    // animated: two soft amber glows drift slowly behind the header (owner dashboard)
+    val drift = if (animated) {
+        androidx.compose.animation.core.rememberInfiniteTransition(label = "hero").animateFloat(
+            initialValue = 0f, targetValue = 1f,
+            animationSpec = androidx.compose.animation.core.infiniteRepeatable(
+                androidx.compose.animation.core.tween(7000, easing = androidx.compose.animation.core.LinearEasing),
+                androidx.compose.animation.core.RepeatMode.Reverse
+            ), label = "heroDrift"
+        ).value
+    } else 0f
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .then(
+                if (animated) Modifier.drawBehind {
+                    val glow = androidx.compose.ui.graphics.Color(0xFFFFA000)
+                    drawRect(
+                        androidx.compose.ui.graphics.Brush.radialGradient(
+                            listOf(glow.copy(alpha = 0.26f), androidx.compose.ui.graphics.Color.Transparent),
+                            center = androidx.compose.ui.geometry.Offset(size.width * (0.1f + 0.8f * drift), size.height * 0.25f),
+                            radius = size.width * 0.75f
+                        )
+                    )
+                    drawRect(
+                        androidx.compose.ui.graphics.Brush.radialGradient(
+                            listOf(glow.copy(alpha = 0.16f), androidx.compose.ui.graphics.Color.Transparent),
+                            center = androidx.compose.ui.geometry.Offset(size.width * (0.9f - 0.8f * drift), size.height * 0.85f),
+                            radius = size.width * 0.6f
+                        )
+                    )
+                } else Modifier
+            )
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(start = dimen_20, end = dimen_20, top = dimen_16, bottom = bottomPadding)
     ) {
@@ -513,12 +548,11 @@ fun StatusChip(
     Box(
         modifier = modifier
             .clip(pill)
-            .background(color.copy(alpha = 0.14f))
-            .border(dimen_1, color.copy(alpha = 0.38f), pill)
+            .background(com.cranezo.ui.theme.badgeFill(color))
             .padding(horizontal = dimen_10, vertical = dimen_4),
         contentAlignment = Alignment.Center
     ) {
-        Textview(text = text, size = font_11, color = color, fontWeight = FontWeight.SemiBold, maxLines = 1)
+        Textview(text = text, size = font_11, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
 

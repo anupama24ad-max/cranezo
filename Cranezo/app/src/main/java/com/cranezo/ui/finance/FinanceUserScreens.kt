@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.ReportProblem
@@ -52,6 +53,7 @@ fun FinanceHubScreen(role: String, onBack: () -> Unit, onOpen: (String) -> Unit)
     when (role) {
         "CRANE_OWNER" -> FinPage(stringResource(R.string.fin_hub_owner), onBack) {
             FinMenuRow(Icons.Filled.Search, stringResource(R.string.rq_owner_title), stringResource(R.string.rq_owner_card_sub)) { onOpen(FinanceRoutes.CRANE_REQUESTS) }
+            FinMenuRow(Icons.Filled.Assessment, stringResource(R.string.rep_title), stringResource(R.string.rep_sub)) { onOpen(FinanceRoutes.REPORT) }
             FinMenuRow(Icons.Filled.Groups, stringResource(R.string.fin_pay_operators), stringResource(R.string.fin_pay_operators_sub)) { onOpen(FinanceRoutes.OPERATOR_DUES) }
             FinMenuRow(Icons.Filled.AccountBalance, stringResource(R.string.fin_platform_title), stringResource(R.string.fin_platform_sub)) { onOpen(FinanceRoutes.PLATFORM) }
             FinMenuRow(Icons.Filled.Payments, stringResource(R.string.fin_payments_title), stringResource(R.string.fin_payments_sub)) { onOpen(FinanceRoutes.TRANSACTIONS) }

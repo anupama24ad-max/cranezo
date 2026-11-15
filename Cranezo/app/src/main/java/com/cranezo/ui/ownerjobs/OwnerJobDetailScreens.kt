@@ -209,23 +209,28 @@ fun OwnerJobDetailsScreen(
             }
         }
 
+        // the customer still has to pay the advance: shown first, with the same countdown the customer sees
+        job.advance_due?.let { AdvanceCountdown(it) }
+
+        // crane and job site in ONE compact card (they were two cards)
         GlassCard(contentPadding = dimen_12) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CraneImage(path = job.crane?.primary_photo, modifier = Modifier.size(dimen_70))
                 Spacer(modifier = Modifier.width(dimen_12))
                 Column {
                     Textview(job.crane?.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                    Textview(job.crane?.model_name.orEmpty(), size = font_11, color = appColors.textSecondary)
-                    if (!job.crane?.crane_code.isNullOrBlank()) BookingTag(job.crane?.crane_code.orEmpty(), InfoBlue)
+                    // model and crane number on one tight line
+                    Textview(
+                        listOfNotNull(job.crane?.crane_code?.takeIf { it.isNotBlank() }, job.crane?.model_name?.takeIf { it.isNotBlank() }).joinToString("  •  "),
+                        size = font_11, color = InfoBlue, fontWeight = FontWeight.SemiBold
+                    )
                     Textview(
                         listOfNotNull(job.crane?.capacity_name, job.crane?.crane_type_name, job.crane?.fuel_type_name).joinToString("  •  "),
                         size = font_10, color = appColors.textSecondary
                     )
                 }
             }
-        }
-
-        GlassCard(contentPadding = dimen_12) {
+            Spacer(modifier = Modifier.height(dimen_10))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconBadge(icon = Icons.Default.LocationOn, accent = InfoBlue, size = dimen_36)
                 Spacer(modifier = Modifier.width(dimen_10))
@@ -251,12 +256,10 @@ fun OwnerJobDetailsScreen(
             }
         }
 
-        // the customer still has to pay the advance: same countdown the customer sees
-        job.advance_due?.let { AdvanceCountdown(it) }
-
         // Operator: with Call, and a way to assign one before the journey starts
         val operator = job.assigned_operator
-        GlassCard(contentPadding = dimen_12) {
+        val unsettled = operator != null && job.operator_commission?.isSet == true && job.operator_commission.settlement_status != "settled"
+        GlassCard(contentPadding = dimen_12, borderColor = if (unsettled) AmberPrimary else androidx.compose.ui.graphics.Color.Unspecified) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconBadge(icon = Icons.Default.Person, accent = AmberPrimary, size = dimen_40)
                 Spacer(modifier = Modifier.width(dimen_10))
@@ -306,7 +309,7 @@ fun OwnerJobDetailsScreen(
                         Textview(stringResource(R.string.ow_operator_payment).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(
                             if (c?.isSet == true) listOfNotNull(rupees(c.amount), c.type_label).joinToString(" · ") else stringResource(R.string.ow_not_set),
-                            size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold
+                            size = font_13, color = if (unsettled) AmberPrimary else appColors.textPrimary, fontWeight = FontWeight.SemiBold
                         )
                     }
                     if (c?.isSet == true) {
@@ -368,6 +371,12 @@ fun OwnerJobDetailsScreen(
 private fun MonitoringBlock(job: OwnerJob, monitoring: Monitoring?) {
     // The real work time against the booked hours, the same card the customer and operator see
     FixedHoursCard(job.schedule?.start_at, job.schedule?.end_at, job.duration_label ?: job.duration?.label, timers = job.timers)
+    // the operator is on a break
+    if (job.timers?.is_waiting == true) {
+        GlassCard(contentPadding = dimen_12, borderColor = AmberPrimary) {
+            Textview(stringResource(R.string.cj_on_hold), size = font_13, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
+        }
+    }
     if ((monitoring?.extra_seconds ?: 0L) > 0) {
         GlassCard(contentPadding = dimen_12) {
             PriceLine(stringResource(R.string.op_extra_time), formatSeconds(monitoring?.extra_seconds))
@@ -471,6 +480,9 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
         track.operator?.let { operator ->
             GlassCard(contentPadding = dimen_14) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    // the operator's own photo (their first letter until they have one)
+                    com.cranezo.ui.components.Avatar(operator.profile_image, operator.full_name, size = dimen_48)
+                    Spacer(modifier = Modifier.width(dimen_12))
                     Column(modifier = Modifier.weight(1f)) {
                         Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(operator.full_name ?: stringResource(R.string.bk_operator), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)

@@ -103,9 +103,9 @@ val DarkAppColors = AppColors(
 
 val LightAppColors = AppColors(
     isDark = false,
-    bgBase = Color(0xFFFFFFFF),
-    bgCenter = Color(0xFFF6F7FB),
-    bgEdge = Color(0xFFF6F7FB),
+    bgBase = Color(0xFFEAF0F9),
+    bgCenter = Color(0xFFE6EDF7),
+    bgEdge = Color(0xFFE6EDF7),
     glowBlue = Color(0xFF2563EB),
     glowBlueAlpha = 0.10f,
     glowAmber = Color(0xFFF59E0B),
@@ -116,28 +116,29 @@ val LightAppColors = AppColors(
     primaryText = Color(0xFFC2410C),
     primaryTint = Color(0xFFF59E0B).copy(alpha = 0.14f),
     // card.fill: clean white cards with a soft blue-grey edge and a light shadow
-    glassTop = Color(0xFFFFFFFF).copy(alpha = 0.97f),
-    glassBottom = Color(0xFFFFFFFF).copy(alpha = 0.97f),
+    // white cards on a soft blue-grey page, with a clearer edge and a deeper shadow, so every card stands out
+    glassTop = Color(0xFFFFFFFF),
+    glassBottom = Color(0xFFFFFFFF),
     glassSheen = Color(0xFFFFFFFF),
-    glassBorderTop = Color(0xFFDCE4F0),
-    glassBorderBottom = Color(0xFFCBD6E6),
-    glassShadow = Color(0xFF1E3A8A).copy(alpha = 0.10f),
-    glassInset = Color(0xFF0F172A).copy(alpha = 0.04f),
-    subtleFill = Color(0xFFEDF1F8),
-    subtleBorder = Color(0xFFCBD6E6),
+    glassBorderTop = Color(0xFFC3D0E4),
+    glassBorderBottom = Color(0xFFB4C3DA),
+    glassShadow = Color(0xFF1E3A8A).copy(alpha = 0.18f),
+    glassInset = Color(0xFF0F172A).copy(alpha = 0.05f),
+    subtleFill = Color(0xFFE2E9F4),
+    subtleBorder = Color(0xFFB9C7DC),
     imageVeil = Color(0xFFFFFFFF),
-    screenTop = Color(0xFFEAF1FB),
-    screenBottom = Color(0xFFF9FBFE),
+    screenTop = Color(0xFFDCE7F7),
+    screenBottom = Color(0xFFEEF2F9),
     screenGlow = Color(0x33FFA000),
     heroTop = Color(0xFF0B1F3F),
     heroBottom = Color(0xFF050A15),
     heroGlow = Color(0xFFF59E0B),
     // A fresh light page: a faint sky-blue at the top fading into a cool near-white. White cards and amber buttons
     // stand out on it; nothing is yellow or grey-brown.
-    bodyTop = Color(0xFFE9F1FF),
-    bodyMid = Color(0xFFF3F7FD),
-    bodyBottom = Color(0xFFF7F9FD),
-    bodyShine = Color(0xFFFFFFFF)
+    bodyTop = Color(0xFFDCE7F7),
+    bodyMid = Color(0xFFE8EEF8),
+    bodyBottom = Color(0xFFEEF2F9),
+    bodyShine = Color(0xFFF5F8FD)
 )
 
 val LocalAppColors = staticCompositionLocalOf { DarkAppColors }

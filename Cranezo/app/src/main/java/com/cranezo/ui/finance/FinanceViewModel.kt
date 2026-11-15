@@ -54,6 +54,7 @@ data class FinanceUiState(
     val dueJobs: PendingJobs? = null,
     val platform: PendingJobs? = null,
     val platformBalance: PlatformBalance? = null,
+    val report: OwnerReport? = null,
     val settlements: List<SettlementItem> = emptyList(),
     val transactions: List<TransactionItem> = emptyList(),
     val requests: List<JobRequestItem> = emptyList(),
@@ -184,6 +185,10 @@ class FinanceViewModel @Inject constructor(
     }
 
     // ======================================================================== owner
+
+    fun loadReport(period: String) = call<OwnerReport>("owner/report", JSONObject().put("period", period), typeOf<OwnerReport>(), page = "report") { d ->
+        _ui.update { it.copy(report = d) }
+    }
 
     fun loadBilling() = call<BillingSettings>("owner/billing/settings", JSONObject(), typeOf<BillingSettings>(), page = "billing") { d ->
         _ui.update { it.copy(billing = d) }

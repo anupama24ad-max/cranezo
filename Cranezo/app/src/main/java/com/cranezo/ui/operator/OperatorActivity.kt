@@ -27,3 +27,8 @@ class OperatorActivity :
         )
     }
 }
+
+/** A tab the operator's home should open when it comes back to the front (set by the job screens) */
+object PendingTab {
+    @Volatile var route: String? = null
+}

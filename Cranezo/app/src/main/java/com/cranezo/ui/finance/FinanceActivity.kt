@@ -24,6 +24,8 @@ object FinanceRoutes {
     const val OPERATOR_DUES = "operator_dues"
     const val PAY_OPERATOR = "pay_operator"
     const val PLATFORM = "platform"
+    // owner: detailed report (operator payments, platform fees)
+    const val REPORT = "report"
     const val JOB_REQUESTS = "job_requests"
     // Rapido-style customer requests near the owner's cranes
     const val CRANE_REQUESTS = "crane_requests"
@@ -97,6 +99,7 @@ class FinanceActivity : BaseVMComposeActivity<FinanceViewModel>(FinanceViewModel
                 PayOperatorScreen(vm, operatorId, operatorName, leave, onPaid = { nav.popBackStack() })
             }
             composable(FinanceRoutes.PLATFORM) { OwnerPlatformScreen(vm, leave) }
+            composable(FinanceRoutes.REPORT) { OwnerReportScreen(vm, leave) }
             composable(FinanceRoutes.JOB_REQUESTS) { OwnerJobRequestsScreen(vm, leave, dial) }
             composable(FinanceRoutes.CRANE_REQUESTS) {
                 val requestVm = androidx.compose.runtime.remember {

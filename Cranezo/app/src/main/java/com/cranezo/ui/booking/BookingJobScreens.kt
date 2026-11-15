@@ -166,27 +166,14 @@ private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
     }
 }
 
-/** Green success mark (Job Completed, Payment Successful): green check in a green ring with a soft glow */
+/** Green success mark (Job Completed, Payment Successful): the supplied tick image */
 @Composable
 private fun SuccessMark() {
-    val green = androidx.compose.ui.graphics.Color(0xFF22C55E)
-    Box(
-        modifier = Modifier
-            .size(dimen_100)
-            .background(androidx.compose.ui.graphics.Brush.radialGradient(listOf(green.copy(alpha = 0.28f), androidx.compose.ui.graphics.Color.Transparent))),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .size(dimen_64)
-                .clip(CircleShape)
-                .background(green.copy(alpha = 0.16f))
-                .border(dimen_2, green.copy(alpha = 0.7f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(Icons.Default.Check, contentDescription = null, tint = green, modifier = Modifier.size(dimen_32))
-        }
-    }
+    androidx.compose.foundation.Image(
+        painter = androidx.compose.ui.res.painterResource(R.drawable.ic_payment_success),
+        contentDescription = null,
+        modifier = Modifier.size(dimen_100)
+    )
 }
 
 // ---------------------------------------------------------------------------------------------

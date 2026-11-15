@@ -62,7 +62,7 @@ fun OwnerHomeScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        CurvedHero {
+        CurvedHero(animated = true) {
             Column {
                 HomeHeader(
                     name = state.userName.ifBlank { stringResource(R.string.home_owner_default_name) },
@@ -154,6 +154,24 @@ fun OwnerHomeScreen(
                         contentDescription = null, tint = androidx.compose.ui.graphics.Color(0xFFEF4444)
                     )
                 }
+            }
+        }
+
+        // Detailed report: operator payments and platform fees
+        val reportContext = androidx.compose.ui.platform.LocalContext.current
+        GlassCard(
+            contentPadding = dimen_14,
+            onClick = { reportContext.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(reportContext, com.cranezo.ui.finance.FinanceRoutes.REPORT)) }
+        ) {
+            androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.rep_title), size = font_15, color = appColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Textview(stringResource(R.string.rep_sub), size = font_12, color = appColors.textSecondary)
+                }
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null, tint = AmberPrimary
+                )
             }
         }
 
@@ -321,6 +339,7 @@ private fun OwnerActionSection(state: MainHomeUiState, onNavigate: (String) -> U
     }
     val requests = state.owner.requests
     Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
+      if (requests.isNotEmpty() || state.owner.craneRequests > 0) {
         androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Textview(stringResource(R.string.rq_owner_title), size = font_16, color = appColors.textPrimary, fontWeight = bold)
@@ -335,11 +354,7 @@ private fun OwnerActionSection(state: MainHomeUiState, onNavigate: (String) -> U
                 modifier = Modifier.clickable { openRequests() }.padding(vertical = dimen_4)
             )
         }
-        if (requests.isEmpty()) {
-            GlassCard(contentPadding = dimen_14, onClick = openRequests) {
-                Textview(stringResource(R.string.rq_owner_none), size = font_13, color = appColors.textSecondary)
-            }
-        } else {
+        if (requests.isNotEmpty()) {
             // several requests: the cards scroll sideways
             androidx.compose.foundation.layout.Row(
                 modifier = Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()),
@@ -348,6 +363,7 @@ private fun OwnerActionSection(state: MainHomeUiState, onNavigate: (String) -> U
                 requests.forEach { OwnerRequestMiniCard(it, openRequests) }
             }
         }
+      }
         if (state.owner.jobsNeedingOperator > 0) {
             val red = androidx.compose.ui.graphics.Color(0xFFEF4444)
             GlassCard(contentPadding = dimen_14, borderColor = red, onClick = { onNavigate(Dest.Jobs.route) }) {

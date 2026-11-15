@@ -275,7 +275,11 @@ class BookingActivity :
                     vm.currentBookingId()?.let { requestVm.startOnlinePayment(it, "final") }
                 })
             }
-            composable(BookingRoutes.PAID) { PaymentSuccessfulScreen(vm, onBack = leave) }
+            composable(BookingRoutes.PAID) {
+                // after paying and rating, back leaves the booking screens at once (it does not walk back through them)
+                BackHandler { finish() }
+                PaymentSuccessfulScreen(vm, onBack = { finish() })
+            }
             composable(BookingRoutes.RECEIPT) { ReceiptScreen(vm, onBack = leave) }
             composable(BookingRoutes.ACTIVE_TRACKING) { TrackMyCranesScreen(vm, onBack = leave) }
         }

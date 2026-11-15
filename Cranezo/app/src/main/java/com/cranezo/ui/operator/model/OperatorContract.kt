@@ -17,6 +17,8 @@ data class OperatorTabsState(
     val jobsHasMore: Boolean = false,
     val jobsNextMin: Int = 0,
 
+    // "today", "6m", "1y" or "all"
+    val earningsPeriod: String = "all",
     val earnings: EarningsSummary? = null,
     val earningItems: List<EarningItem> = emptyList(),
     val earningsTotal: Int = 0,
@@ -34,6 +36,7 @@ sealed interface OperatorTabsIntent {
     data class LoadJobs(val tab: String) : OperatorTabsIntent
     data object LoadMoreJobs : OperatorTabsIntent
     data object LoadEarnings : OperatorTabsIntent
+    data class SetEarningsPeriod(val period: String) : OperatorTabsIntent
     data object LoadMoreEarnings : OperatorTabsIntent
     data object DismissIncoming : OperatorTabsIntent
 }

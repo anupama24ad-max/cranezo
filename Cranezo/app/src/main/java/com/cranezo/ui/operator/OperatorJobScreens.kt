@@ -229,7 +229,16 @@ private fun CameraBox(onClick: () -> Unit, uploading: Boolean, label: String) {
  * "Step 2 of 5", the step's name in large type and one short line saying what to do.
  */
 private const val OPERATOR_STEPS = 5
-private const val REACHED_DELAY_MS = 10 * 60 * 1000L
+private const val REACHED_RADIUS_M = 50.0
+
+private fun metersBetween(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+    val r = 6371000.0
+    val dLat = Math.toRadians(lat2 - lat1)
+    val dLng = Math.toRadians(lng2 - lng1)
+    val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
+    return 2 * r * Math.asin(Math.sqrt(a))
+}
 
 private fun stepOf(nextAction: String?): Int = when (nextAction) {
     NextAction.ACCEPT_JOB -> 1
@@ -364,6 +373,9 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
             InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
             InfoRow(Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address)
             InfoRow(Icons.Default.Schedule, stringResource(R.string.op_when), formatServerDateTime(job.schedule?.start_at), sub = job.duration?.label)
+            job.job_site?.distance_km?.let { km ->
+                InfoRow(Icons.Default.Navigation, stringResource(R.string.op_distance), "$km km", sub = job.job_site?.eta_minutes?.let { stringResource(R.string.op_eta_min, it) })
+            }
         }
         // The one number the operator cares about most, large
         GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
@@ -438,18 +450,10 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) { permission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
 
-    // "I have reached" stays hidden for the first 10 minutes of the drive (so a stray tap after Start Navigation cannot
-    // end the trip), unless the operator is already within 500 m of the site. The start time is kept on the phone.
-    val startedAt = remember(job.booking_id) {
-        val prefs = context.getSharedPreferences("operator_journey", Context.MODE_PRIVATE)
-        val key = "start_${job.booking_id}"
-        prefs.getLong(key, 0L).takeIf { it > 0L } ?: System.currentTimeMillis().also { prefs.edit().putLong(key, it).apply() }
-    }
-    var now by remember { mutableStateOf(System.currentTimeMillis()) }
-    LaunchedEffect(Unit) { while (true) { kotlinx.coroutines.delay(15_000); now = System.currentTimeMillis() } }
-    val waitMs = REACHED_DELAY_MS - (now - startedAt)
-    val nearSite = (state.liveDistanceKm ?: job.job_site?.distance_km)?.let { it <= 0.5 } == true
-    val reachedReady = waitMs <= 0 || nearSite
+    // "I have reached" works only when the operator's phone is within 50 m of the job site
+    val meters = if (state.myLatitude != null && state.myLongitude != null && siteLat != null && siteLng != null)
+        metersBetween(state.myLatitude, state.myLongitude, siteLat, siteLng) else null
+    val reachedReady = meters != null && meters <= REACHED_RADIUS_M
     var confirmReached by remember { mutableStateOf(false) }
     if (confirmReached) {
         androidx.compose.material3.AlertDialog(
@@ -477,7 +481,7 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
                 CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { confirmReached = true })
             } else {
                 Textview(
-                    stringResource(R.string.op_reached_wait, ((waitMs + 59_999) / 60_000).toInt()),
+                    if (meters == null) stringResource(R.string.op_reached_nogps) else stringResource(R.string.op_reached_wait, Math.round(meters - REACHED_RADIUS_M).coerceAtLeast(1).toInt()),
                     size = font_13, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -495,39 +499,8 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
                 follow = true
             )
         }
-        // turn-by-turn voice navigation in Google Maps, to the same site
-        if (siteLat != null && siteLng != null) {
-            CommonGradientButton(
-                text = stringResource(R.string.op_open_google_maps), leftIcon = Icons.Default.Navigation,
-                onClick = {
-                    val nav = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$siteLat,$siteLng&mode=d")).setPackage("com.google.android.apps.maps")
-                    runCatching { context.startActivity(nav) }.onFailure {
-                        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&destination=$siteLat,$siteLng&travelmode=driving"))) }
-                    }
-                },
-                height = dimen_48, textSize = font_14,
-                gradientColors = listOf(InfoBlue, InfoBlue), textColor = Color.White
-            )
-        }
         GlassCard(contentPadding = dimen_14) {
-            InfoRow(Icons.Default.Person, stringResource(R.string.op_customer), job.customer?.name.orEmpty())
             InfoRow(Icons.Default.LocationOn, stringResource(R.string.op_job_site), job.job_site?.name.orEmpty(), sub = job.job_site?.address)
-            // booking for someone else: tap to call the person at the site
-            job.site_contact?.let { c ->
-                InfoRow(
-                    Icons.Default.Call, stringResource(R.string.rq_site_contact), c.name.orEmpty(), sub = c.phone,
-                    trailing = {
-                        if (!c.phone.isNullOrBlank()) {
-                            Icon(
-                                Icons.Default.Call, contentDescription = null, tint = SuccessGreen,
-                                modifier = Modifier.size(dimen_32).clickable {
-                                    runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:${c.phone}"))) }
-                                }.padding(dimen_4)
-                            )
-                        }
-                    }
-                )
-            }
             // km and minutes left along the road, at crane speed (live from the server once moving)
             val km = state.liveDistanceKm ?: job.job_site?.distance_km
             val eta = state.liveEtaMinutes ?: job.job_site?.eta_minutes
@@ -539,12 +512,6 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
             }
         }
         Textview(stringResource(R.string.op_location_shared), size = font_12, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        if (job.customer?.mobile_number != null) {
-            CommonGradientButton(
-                text = stringResource(R.string.op_call_customer), leftIcon = Icons.Default.Call, onClick = { dial(context, job.customer) },
-                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
-            )
-        }
     }
 }
 
@@ -770,7 +737,7 @@ private fun MonitorScreen(
     BookingScaffold(
         onBack = onClose,
         title = stringResource(R.string.op_job_monitoring),
-        bottom = { CommonGradientButton(text = stringResource(R.string.op_finish_job), onClick = { finishing = true }) }
+        bottom = { CommonGradientButton(text = stringResource(R.string.op_finish_job), onClick = { onIntent(OperatorJobIntent.Finish("")) }) }
     ) {
         OperatorStepHeader(job.next_action)
         // The real work time (ticking), against the booked hours
@@ -1092,7 +1059,7 @@ private fun CompletedScreen(job: OperatorJob, onClose: () -> Unit) {
         onBack = onClose,
         success = true,
         title = stringResource(R.string.op_job_title),
-        bottom = { CommonGradientButton(text = stringResource(R.string.op_view_earnings), onClick = onClose) }
+        bottom = { CommonGradientButton(text = stringResource(R.string.op_view_earnings), onClick = { PendingTab.route = "earnings"; onClose() }) }
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_16), horizontalAlignment = Alignment.CenterHorizontally) {
             IconBadge(icon = Icons.Default.CheckCircle, accent = SuccessGreen, size = dimen_70, filled = true)

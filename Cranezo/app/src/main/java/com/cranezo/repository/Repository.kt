@@ -313,8 +313,8 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun opLocation(h: Map<String, String>, body: JSONObject) =
         safeApiCall(conflictAsError = true) { api.opLocationApi(O + "location", h, json(body)) }
 
-    suspend fun opEarningsSummary(h: Map<String, String>) =
-        safeApiCall(conflictAsError = true) { api.opEarningsSummaryApi(O + "earnings/summary", h, json(JSONObject())) }
+    suspend fun opEarningsSummary(h: Map<String, String>, body: JSONObject = JSONObject()) =
+        safeApiCall(conflictAsError = true) { api.opEarningsSummaryApi(O + "earnings/summary", h, json(body)) }
 
     suspend fun opEarningsList(h: Map<String, String>, body: JSONObject) =
         safeApiCall(conflictAsError = true) { api.opEarningsListApi(O + "earnings/list", h, json(body)) }

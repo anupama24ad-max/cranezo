@@ -156,6 +156,8 @@ class SupportViewModel @Inject constructor(
         viewModelScope.launch {
             repo.supMarkRead(headers(), body).isRequestCallSuspendSuccess(
                 success = { r ->
+                    // the bell on every home screen follows at once
+                    com.cranezo.push.UnreadBadge.count.value = r?.data?.unread ?: if (body.optBoolean("all", false)) 0 else com.cranezo.push.UnreadBadge.count.value
                     val all = body.optBoolean("all", false)
                     val ids = body.optJSONArray("ids")
                     val idSet = (0 until (ids?.length() ?: 0)).map { ids!!.getString(it) }.toSet()

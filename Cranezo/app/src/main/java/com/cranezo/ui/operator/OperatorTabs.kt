@@ -134,6 +134,26 @@ fun OperatorHomeTab(
             return@HomeScreenColumn
         }
 
+        // Owners give a job by this ID (one job at a time, then the operator is free for other work)
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val memberId = androidx.compose.runtime.remember {
+            com.cranezo.utils.SessionManager(context).getData(com.cranezo.utils.AppStrings.SessionValues.memberId, "")
+        }
+        if (memberId.isNotBlank()) {
+            GlassCard(contentPadding = dimen_12) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
+                    Spacer(modifier = Modifier.width(dimen_12))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Textview(stringResource(R.string.rq_your_operator_id), size = font_12, color = appColors.textSecondary)
+                        Textview(memberId, size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                        Textview(stringResource(R.string.rq_your_operator_id_sub), size = font_11, color = appColors.textSecondary)
+                    }
+                }
+            }
+        }
+
+
         // A job the owner just gave: shown here on the page (sound + vibration), not as a popup
         state.incomingJob?.let { id ->
             NewJobAlert(
@@ -292,8 +312,8 @@ fun OperatorHomeTab(
             }
         }
 
-        // Document status
-        GlassCard(contentPadding = dimen_14, onClick = onOpenDocuments) {
+        // Document status: only while something is still to do (nothing is shown once all documents are verified)
+        if (home?.document_status?.all_verified != true) GlassCard(contentPadding = dimen_14, onClick = onOpenDocuments) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconBadge(icon = Icons.Default.Description, accent = AmberPrimary, size = dimen_32)
                 Spacer(modifier = Modifier.width(dimen_10))
@@ -312,25 +332,6 @@ fun OperatorHomeTab(
                 Textview(stringResource(R.string.op_view_documents), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
         }
-        // Owners give a job by this ID (one job at a time, then the operator is free for other work)
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val memberId = androidx.compose.runtime.remember {
-            com.cranezo.utils.SessionManager(context).getData(com.cranezo.utils.AppStrings.SessionValues.memberId, "")
-        }
-        if (memberId.isNotBlank()) {
-            GlassCard(contentPadding = dimen_12) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconBadge(icon = Icons.Default.Work, accent = SuccessGreen, size = dimen_40)
-                    Spacer(modifier = Modifier.width(dimen_12))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Textview(stringResource(R.string.rq_your_operator_id), size = font_12, color = appColors.textSecondary)
-                        Textview(memberId, size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                        Textview(stringResource(R.string.rq_your_operator_id_sub), size = font_11, color = appColors.textSecondary)
-                    }
-                }
-            }
-        }
-
         Spacer(modifier = Modifier.height(dimen_8))
     }
 }
@@ -512,6 +513,30 @@ fun OperatorEarningsTab(
         verticalArrangement = Arrangement.spacedBy(dimen_12)
     ) {
         Textview(stringResource(R.string.op_earnings_title), size = font_24, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+        // period filter: today, 6 months, 1 year or overall
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+            listOf("today" to R.string.op_period_today, "6m" to R.string.op_period_6m, "1y" to R.string.op_period_1y, "all" to R.string.op_period_all).forEach { (key, label) ->
+                val selected = state.earningsPeriod == key
+                Box(
+                    modifier = Modifier.weight(1f).clip(RoundedCornerShape(50))
+                        .background(if (selected) com.cranezo.ui.theme.badgeFill(AmberPrimary) else appColors.subtleFill)
+                        .clickable { vm?.onIntent(OperatorTabsIntent.SetEarningsPeriod(key)) }
+                        .padding(vertical = dimen_8),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Textview(stringResource(label), size = font_12, color = if (selected) Color.White else appColors.textSecondary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                }
+            }
+        }
+        GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Textview(stringResource(R.string.op_period_earnings), size = font_12, color = appColors.textSecondary)
+                    Textview(stringResource(R.string.op_n_jobs, summary?.period_jobs ?: 0), size = font_11, color = appColors.textSecondary)
+                }
+                Textview(rupees(summary?.period_earnings ?: 0.0), size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+            }
+        }
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
             EarningTile(Icons.Default.Work, stringResource(R.string.op_todays_jobs), (summary?.today_jobs ?: 0).toString(), Modifier.weight(1f))
             EarningTile(Icons.Default.AccountBalanceWallet, stringResource(R.string.op_todays_earnings), rupees(summary?.today_earnings ?: 0.0), Modifier.weight(1f))
@@ -521,6 +546,7 @@ fun OperatorEarningsTab(
             EarningTile(Icons.Default.CheckCircle, stringResource(R.string.op_completed_settlement), rupees(summary?.completed_settlement ?: 0.0), Modifier.weight(1f), SuccessGreen)
         }
 
+        Textview(stringResource(R.string.op_settle_48h), size = font_12, color = appColors.textSecondary)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Textview(stringResource(R.string.op_jobs_earnings), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
             Textview(stringResource(R.string.op_n_jobs, state.earningsTotal), size = font_11, color = appColors.textSecondary)
@@ -530,7 +556,7 @@ fun OperatorEarningsTab(
             val settled = item.settlement_status == "settled"
             GlassCard(contentPadding = dimen_12, minHeight = dimen_88, onClick = { item.booking_id?.let(onOpenJob) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    CraneImage(path = null, modifier = Modifier.size(dimen_56))
+                    CraneImage(path = item.crane_photo, modifier = Modifier.size(dimen_56))
                     Spacer(modifier = Modifier.width(dimen_12))
                     Column(modifier = Modifier.weight(1f)) {
                         Textview(item.customer_name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)

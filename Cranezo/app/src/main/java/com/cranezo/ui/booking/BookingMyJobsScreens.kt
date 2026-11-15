@@ -256,25 +256,21 @@ fun JobDetailsScreen(
                     }
                     else -> {
                         if (actions?.can_track == true) CommonGradientButton(text = stringResource(R.string.cj_view_live_tracking), onClick = onTrack)
+                        // a confirmed booking is cancelled through Cranezo support (the admin), not from the app
                         if (actions?.can_cancel == true) {
-                            // asks once more right here (no popup)
-                            if (cancelOpen) {
-                                com.cranezo.ui.components.InlineConfirm(
-                                    message = stringResource(R.string.cj_cancel_booking_message),
-                                    confirmText = stringResource(R.string.cj_cancel_booking),
-                                    cancelText = stringResource(R.string.common_back),
-                                    onConfirm = {
-                                        cancelOpen = false
-                                        vm?.onIntent(BookingIntent.CancelBooking)
-                                    },
-                                    onCancel = { cancelOpen = false }
-                                )
-                            } else {
-                                CommonGradientButton(
-                                    text = stringResource(R.string.cj_cancel_booking), onClick = { cancelOpen = true },
-                                    gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
-                                )
+                            val supportContext = androidx.compose.ui.platform.LocalContext.current
+                            GlassCard(contentPadding = dimen_12) {
+                                Textview(stringResource(R.string.cj_cancel_via_admin), size = font_13, color = appColors.textPrimary)
                             }
+                            CommonGradientButton(
+                                text = stringResource(R.string.cj_call_support_cancel), leftIcon = Icons.Default.Call,
+                                onClick = {
+                                    supportContext.startActivity(
+                                        com.cranezo.ui.support.SupportActivity.intent(supportContext, com.cranezo.ui.support.SupportRoutes.HELP)
+                                    )
+                                },
+                                gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = Red
+                            )
                         }
                     }
                 }

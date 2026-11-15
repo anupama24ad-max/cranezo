@@ -245,7 +245,9 @@ data class EarningsSummary(
     val today_earnings: Double? = null,
     val pending_settlement: Double? = null,
     val completed_settlement: Double? = null,
-    val completed_jobs: Int? = null
+    val completed_jobs: Int? = null,
+    val period_earnings: Double? = null,
+    val period_jobs: Int? = null
 )
 
 data class EarningItem(
@@ -256,6 +258,7 @@ data class EarningItem(
     val completed_at: String? = null,
     val start_at: String? = null,
     val crane_label: String? = null,
+    val crane_photo: String? = null,
     val amount: Double? = null,
     val settlement_status: String? = null,
     val settlement_label: String? = null

@@ -285,3 +285,42 @@ data class PlatformBalance(
 )
 
 data class OwnerMoneySummary(val platform_balance: PlatformBalance? = null)
+
+// ---------------------------------------------------------------- owner detailed report (POST owner/report)
+
+data class ReportCommission(val total: Double? = null, val paid: Double? = null, val pending: Double? = null)
+
+data class ReportOperator(
+    val operator: PersonRef? = null,
+    val jobs: Int? = null,
+    val commission: Double? = null,
+    val paid: Double? = null,
+    val pending: Double? = null
+)
+
+data class ReportJob(
+    val booking_id: String? = null,
+    val booking_code: String? = null,
+    val completed_at: String? = null,
+    val site: String? = null,
+    val customer_paid: Double? = null,
+    val platform_fee: Double? = null,
+    val operator_commission: Double? = null,
+    val operator_name: String? = null,
+    val operator_paid: Boolean? = null,
+    val your_share: Double? = null
+)
+
+data class OwnerReport(
+    val period: String? = null,
+    val jobs: Int? = null,
+    val customer_paid: Double? = null,
+    val platform_fee_percent: Double? = null,
+    val platform_fee: Double? = null,
+    val other_deductions: Double? = null,
+    val gst: Double? = null,
+    val operator_commission: ReportCommission? = null,
+    val your_share: Double? = null,
+    val operators: List<ReportOperator>? = null,
+    val jobs_list: List<ReportJob>? = null
+)

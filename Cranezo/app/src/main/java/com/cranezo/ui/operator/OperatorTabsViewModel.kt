@@ -67,6 +67,10 @@ class OperatorTabsViewModel @Inject constructor(
             OperatorTabsIntent.LoadMoreJobs -> loadJobs(_uiState.value.jobsTab, reset = false)
             OperatorTabsIntent.LoadEarnings -> loadEarnings(reset = true)
             OperatorTabsIntent.LoadMoreEarnings -> loadEarnings(reset = false)
+            is OperatorTabsIntent.SetEarningsPeriod -> {
+                _uiState.update { it.copy(earningsPeriod = intent.period, earningItems = emptyList(), earningsLoaded = false, earningsHasMore = false, earningsNextMin = 0) }
+                loadEarnings(reset = true)
+            }
             OperatorTabsIntent.DismissIncoming -> _uiState.update { it.copy(incomingJob = null) }
         }
     }
@@ -143,12 +147,12 @@ class OperatorTabsViewModel @Inject constructor(
         val min = if (reset) 0 else s.earningsNextMin
         runWhenOnline {
             if (reset) {
-                repo.opEarningsSummary(headers()).isRequestCallSuspendSuccess(
+                repo.opEarningsSummary(headers(), JSONObject().put("period", s.earningsPeriod)).isRequestCallSuspendSuccess(
                     success = { r -> _uiState.update { it.copy(earnings = r?.data) } },
                     failure = { _, _, m -> fail(m) }
                 )
             }
-            val body = JSONObject().put("min", min).put("max", min + PAGE)
+            val body = JSONObject().put("min", min).put("max", min + PAGE).put("period", s.earningsPeriod)
             repo.opEarningsList(headers(), body).isRequestCallSuspendSuccess(
                 success = { r ->
                     val page = r?.data.orEmpty()

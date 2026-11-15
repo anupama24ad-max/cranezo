@@ -248,14 +248,13 @@ fun StatusBadge(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(dimen_12))
-            .background(color.copy(alpha = 0.14f))
-            .border(dimen_1, color.copy(alpha = 0.55f), RoundedCornerShape(dimen_12))
+            .background(com.cranezo.ui.theme.badgeFill(color))
             .padding(horizontal = dimen_8, vertical = dimen_3),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(dimen_12))
+        Icon(imageVector = icon, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size(dimen_12))
         Spacer(modifier = Modifier.width(dimen_4))
-        Textview(text = label, size = font_11, color = color, fontWeight = FontWeight.SemiBold, maxLines = 1)
+        Textview(text = label, size = font_11, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
 

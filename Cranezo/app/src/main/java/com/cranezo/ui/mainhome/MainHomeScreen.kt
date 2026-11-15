@@ -165,6 +165,23 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
         }
     }
 
+    // Operator: a job the owner just assigned opens its request screen at once (it rings there until answered)
+    val opIncoming = opVm?.uiState?.collectAsStateWithLifecycle()?.value?.incomingJob
+    androidx.compose.runtime.LaunchedEffect(opIncoming) {
+        if (opIncoming != null) {
+            opVm?.onIntent(com.cranezo.ui.operator.model.OperatorTabsIntent.DismissIncoming)
+            openJob(opIncoming)
+        }
+    }
+    // a finished job screen can ask for a tab (e.g. "View Earnings")
+    androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+        val route = com.cranezo.ui.operator.PendingTab.route
+        if (route != null && opVm != null) {
+            com.cranezo.ui.operator.PendingTab.route = null
+            navigateTo(route)
+        }
+    }
+
     // Owner: "New Crane Request" popup and "Booking Accepted"
     OwnerRequestHost(
         request = state.request,
