@@ -19,6 +19,7 @@ import com.cranezo.ui.finance.model.JobRequestItem
 import com.cranezo.ui.finance.model.OperatorDues
 import com.cranezo.ui.finance.model.OperatorEarnings
 import com.cranezo.ui.finance.model.OwnerJobMoney
+import com.cranezo.ui.finance.model.OwnerReport
 import com.cranezo.ui.finance.model.OwnerMoneySummary
 import com.cranezo.ui.finance.model.PendingJobs
 import com.cranezo.ui.finance.model.PlatformBalance
