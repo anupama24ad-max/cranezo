@@ -497,7 +497,7 @@ fun OperatorEarningsTab(
 ) {
     val state = vm?.uiState?.collectAsStateWithLifecycle()?.value ?: OperatorTabsState(
         earnings = EarningsSummary(1, 50000.0, 50000.0, 0.0, 3),
-        earningItems = listOf(EarningItem("1", "CRZ-1", "Sai Constructions", "OMR, Chennai", "2025-09-15T09:00:00.000Z", null, "50 Ton Mobile Crane", 50000.0, "pending", "Pending Settlement")),
+        earningItems = listOf(EarningItem("1", "CRZ-1", "Sai Constructions", "OMR, Chennai", "2025-09-15T09:00:00.000Z", null, "50 Ton Mobile Crane", null, 50000.0, "pending", "Pending Settlement")),
         earningsTotal = 1, earningsLoaded = true
     )
     androidx.lifecycle.compose.LifecycleEventEffect(androidx.lifecycle.Lifecycle.Event.ON_RESUME) { vm?.onIntent(OperatorTabsIntent.LoadEarnings) }
