@@ -804,6 +804,7 @@
     <string name="oe_last_settled">Last settled on %1$s</string>
     <string name="oe_settled_in_days">Will be settled in %1$d days</string>
     <string name="oe_settlement_due">Settlement due</string>
+    <string name="oe_pay_within_24h">Cranezo will pay your settlement within 24 hours of the job being completed.</string>
     <string name="oe_trend">Earnings Trend</string>
     <string name="oe_range_week">Week</string>
     <string name="oe_range_month">Month</string>
@@ -896,6 +897,7 @@
     <string name="cj_final_payment_sub">Settle the balance to close your booking.</string>
     <string name="cj_payment_breakdown">Payment Breakdown</string>
     <string name="cj_to_be_settled">To be settled now</string>
+    <string name="cj_confirm_5_10">Your order will be confirmed within 5 to 10 minutes.</string>
     <string name="cj_confirm_cash_payment">Confirm Cash Payment %1$s</string>
     <string name="cj_confirm_cash_title">Confirm payment</string>
     <string name="cj_confirm_cash_message">Have you paid %1$s in cash?</string>
@@ -1019,6 +1021,10 @@
     <string name="op_problem_at_site">Problem at the site?</string>
     <string name="op_open_google_maps">Open Google Maps</string>
     <string name="op_reached_button">I have reached the site</string>
+    <string name="op_reached_wait">The \"I have reached\" button appears in %1$d min, or when you are close to the site.</string>
+    <string name="op_reached_confirm_title">Have you reached the site?</string>
+    <string name="op_reached_confirm_msg">The customer will be told you have arrived. Only confirm if you are at the job site.</string>
+    <string name="op_reached_confirm_yes">Yes, I am here</string>
     <string name="op_code_sent">The customer has the code in their app.</string>
     <string name="cj_time_used">Time used</string>
     <string name="cj_of_booked">%1$s of %2$s booked</string>

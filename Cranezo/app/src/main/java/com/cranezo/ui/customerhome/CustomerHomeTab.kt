@@ -340,6 +340,9 @@ private fun BannerCarousel(banners: List<HomeBanner>, onAction: (BannerAction?) 
     Column(verticalArrangement = Arrangement.spacedBy(dimen_8), horizontalAlignment = Alignment.CenterHorizontally) {
         HorizontalPager(
             state = pager,
+            // a gap between one banner and the next, and a small peek of the next one so it is clear that it swipes
+            pageSpacing = dimen_12,
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(end = if (visible.size > 1) dimen_24 else dimen_0),
             modifier = Modifier.fillMaxWidth().height(200.dp)
                 .androidxPointerWatch { touching = it }
         ) { page ->

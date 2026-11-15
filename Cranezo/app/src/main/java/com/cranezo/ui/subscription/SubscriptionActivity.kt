@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -160,11 +162,11 @@ private fun SubscriptionContent(
     val yearly = offer?.plans?.firstOrNull { it.plan == "yearly" }
     // the plan running now stays locked until it is due soon (red), so nobody pays twice by mistake
     val running = info?.state == "active" && info.level != "red"
-    monthly?.let { PlanCard(it, stringResource(R.string.sub_per_month, formatPrice(it.price)), null, has, state.busy, onBuy, current = running && info?.plan == it.plan) }
+    monthly?.let { PlanCard(it, stringResource(R.string.sub_unit_month), null, has, state.busy, onBuy, current = running && info?.plan == it.plan) }
     yearly?.let {
         // what the owner saves compared with paying monthly for a year
         val save = if (monthly?.price != null && monthly.price > 0 && it.price != null) (((monthly.price * 12 - it.price) / (monthly.price * 12)) * 100).toInt() else 0
-        PlanCard(it, stringResource(R.string.sub_per_year, formatPrice(it.price)), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy, current = running && info?.plan == it.plan)
+        PlanCard(it, stringResource(R.string.sub_unit_year), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy, current = running && info?.plan == it.plan)
     }
     Textview(stringResource(R.string.sub_fee_note), size = font_11, color = appColors.textHint)
 }
@@ -172,29 +174,58 @@ private fun SubscriptionContent(
 private fun formatPrice(value: Double?): String = com.cranezo.utils.formatAmount(value ?: 0.0)
 
 @Composable
-private fun PlanCard(q: PlanQuote, title: String, badge: String?, renew: Boolean, busy: Boolean, onBuy: (String) -> Unit, current: Boolean = false) {
-    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary) {
+private fun PlanCard(q: PlanQuote, unit: String, badge: String?, renew: Boolean, busy: Boolean, onBuy: (String) -> Unit, current: Boolean = false) {
+    // the plan that saves money is highlighted, the other one is quiet
+    val highlight = badge != null || current
+    GlassCard(contentPadding = dimen_16, borderColor = if (highlight) AmberPrimary else Color.Unspecified) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Textview(q.label.orEmpty(), size = font_14, color = appColors.textSecondary)
-                Textview(title, size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            }
+            Textview(q.label.orEmpty(), size = font_15, color = appColors.textSecondary, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f), maxLines = 1)
             if (badge != null) com.cranezo.ui.booking.components.BookingTag(badge, SuccessGreen)
         }
         Spacer(modifier = Modifier.height(dimen_6))
-        // the bill: price, GST when there is any, the online payment fee, and the total
-        if ((q.gst_amount ?: 0.0) > 0) {
-            Textview(stringResource(R.string.sub_gst_line, formatPrice(q.gst_amount), formatPrice(q.gst_percent)), size = font_12, color = appColors.textSecondary)
-        }
-        if ((q.gateway_fee ?: 0.0) > 0) {
-            Textview(stringResource(R.string.sub_fee_line, formatPrice(q.gateway_fee), formatPrice(q.gateway_fee_percent)), size = font_12, color = appColors.textSecondary)
+        // the price, big, with its unit next to it on the same line
+        Row(verticalAlignment = Alignment.Bottom) {
+            Textview(rupees(q.price), size = font_32, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
+            Spacer(modifier = Modifier.width(dimen_6))
+            Textview(unit, size = font_14, color = appColors.textSecondary, modifier = Modifier.padding(bottom = dimen_6), maxLines = 1)
         }
         Spacer(modifier = Modifier.height(dimen_10))
+        androidx.compose.material3.HorizontalDivider(color = appColors.subtleFill)
+        Spacer(modifier = Modifier.height(dimen_10))
+        // the bill, one line per part, amounts lined up on the right
+        BillRow(stringResource(R.string.sub_row_plan), rupees(q.price))
+        if ((q.gst_amount ?: 0.0) > 0) {
+            BillRow(stringResource(R.string.sub_row_gst, formatPrice(q.gst_percent)), rupees(q.gst_amount))
+        }
+        if ((q.gateway_fee ?: 0.0) > 0) {
+            BillRow(stringResource(R.string.sub_row_fee, formatPrice(q.gateway_fee_percent)), rupees(q.gateway_fee))
+        }
+        Spacer(modifier = Modifier.height(dimen_6))
+        BillRow(stringResource(R.string.sub_row_total), rupees(q.total), strong = true)
+        Spacer(modifier = Modifier.height(dimen_14))
         CommonGradientButton(
+            // the string has its own rupee sign: pass the number only (it used to show "Pay ₹₹16,000")
             text = if (current) stringResource(R.string.sub_current_plan)
-            else stringResource(if (renew) R.string.sub_pay_extend else R.string.sub_pay, rupees(q.total)),
+            else stringResource(if (renew) R.string.sub_pay_extend else R.string.sub_pay, formatPrice(q.total)),
             enabled = !busy && !current,
             onClick = { q.plan?.let(onBuy) }
+        )
+    }
+}
+
+/** One line of the bill: the name on the left, the amount on the right */
+@Composable
+private fun BillRow(label: String, amount: String, strong: Boolean = false) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_2), verticalAlignment = Alignment.CenterVertically) {
+        Textview(
+            label, size = if (strong) font_15 else font_13, modifier = Modifier.weight(1f),
+            color = if (strong) appColors.textPrimary else appColors.textSecondary,
+            fontWeight = if (strong) FontWeight.Bold else FontWeight.Normal
+        )
+        Textview(
+            amount, size = if (strong) font_16 else font_13, maxLines = 1,
+            color = if (strong) appColors.primaryText else appColors.textPrimary,
+            fontWeight = if (strong) FontWeight.Bold else FontWeight.Medium
         )
     }
 }

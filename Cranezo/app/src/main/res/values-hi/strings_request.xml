@@ -326,4 +326,13 @@
     <string name="net_off_body">वाई-फ़ाई से जुड़ें या मोबाइल डेटा चालू करें। ऑनलाइन होते ही हम आपका डेटा लोड कर देंगे।</string>
     <string name="net_off_retry">फिर कोशिश करें</string>
     <string name="net_off_checking">कनेक्शन खोज रहे हैं…</string>
+    <string name="crane_pick_on_map">मैप पर चुनें</string>
+    <string name="crane_loc_hint">अपने आप मिल गया। दूसरी जगह के लिए उसे लिखें या खोजने/पिन हिलाने के लिए मैप आइकन टैप करें।</string>
+    <string name="crane_msg_place_not_found">यह जगह नहीं मिली। मैप आइकन से इसे चुनें।</string>
+    <string name="sub_unit_month">/ माह</string>
+    <string name="sub_unit_year">/ वर्ष</string>
+    <string name="sub_row_plan">प्लान की कीमत</string>
+    <string name="sub_row_gst">जीएसटी (%1$s%%)</string>
+    <string name="sub_row_fee">ऑनलाइन भुगतान शुल्क (%1$s%%)</string>
+    <string name="sub_row_total">कुल</string>
 </resources>

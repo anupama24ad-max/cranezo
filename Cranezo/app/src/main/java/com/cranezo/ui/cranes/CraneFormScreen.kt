@@ -50,6 +50,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.Map
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -129,6 +132,8 @@ fun CraneFormScreen(
     val form = state.form
     val options = state.options
     val isEdit = state.mode == FormMode.EDIT
+    // the screen's view model (place search for the map picker lives there)
+    val vm = remember { (context as? androidx.activity.ComponentActivity)?.let { androidx.lifecycle.ViewModelProvider(it)[CranesViewModel::class.java] } }
 
     LaunchedEffect(Unit) { onIntent(CranesIntent.LoadOptions) }
 
@@ -177,6 +182,36 @@ fun CraneFormScreen(
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
         if (granted.values.any { it }) findLocation()
         else com.cranezo.ui.components.AppMessages.show(context.getString(R.string.crane_msg_location_denied))
+    }
+
+    // A new crane starts with the owner's current position, found by itself (once): the place can then be changed by
+    // typing it or by choosing it on the map
+    var autoTried by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (autoTried || isEdit || form.location.isNotBlank() || form.latitude != null) return@LaunchedEffect
+        autoTried = true
+        val granted = androidx.core.content.ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (granted) findLocation()
+        else permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
+
+    // choose another place: search by name or move the map under the pin
+    var showMapPicker by rememberSaveable { mutableStateOf(false) }
+    if (showMapPicker) {
+        val suggestions by (vm?.suggestions ?: kotlinx.coroutines.flow.MutableStateFlow(emptyList<com.cranezo.ui.booking.BookingViewModel.AddressSuggestion>())).collectAsStateWithLifecycle()
+        com.cranezo.ui.booking.LocationPickerDialog(
+            initialLatitude = form.latitude, initialLongitude = form.longitude,
+            suggestions = suggestions,
+            onQuery = { vm?.suggestAddresses(it) },
+            onClearSuggestions = { vm?.clearSuggestions() },
+            resolveAddress = { la, lo -> vm?.addressAt(la, lo) },
+            onConfirm = { la, lo, address ->
+                onIntent(CranesIntent.GpsLocationFound(address, la, lo))
+                showMapPicker = false
+            },
+            onDismiss = { showMapPicker = false }
+        )
     }
 
     var showOperatorSheet by rememberSaveable { mutableStateOf(false) }
@@ -337,23 +372,37 @@ fun CraneFormScreen(
                                     modifier = Modifier.size(dimen_20)
                                 )
                             } else {
-                                Icon(
-                                    imageVector = Icons.Default.MyLocation,
-                                    contentDescription = stringResource(R.string.crane_use_gps),
-                                    tint = if (form.latitude != null) AmberPrimary else appColors.textSecondary,
-                                    modifier = Modifier
-                                        .size(dimen_24)
-                                        .clickable {
-                                            permissionLauncher.launch(
-                                                arrayOf(
-                                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                                    Manifest.permission.ACCESS_COARSE_LOCATION
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
+                                    // choose another place on the map (or by searching its name)
+                                    Icon(
+                                        imageVector = Icons.Default.Map,
+                                        contentDescription = stringResource(R.string.crane_pick_on_map),
+                                        tint = appColors.textSecondary,
+                                        modifier = Modifier.size(dimen_24).clickable { showMapPicker = true }
+                                    )
+                                    // the phone's current position
+                                    Icon(
+                                        imageVector = Icons.Default.MyLocation,
+                                        contentDescription = stringResource(R.string.crane_use_gps),
+                                        tint = if (form.latitude != null) AmberPrimary else appColors.textSecondary,
+                                        modifier = Modifier
+                                            .size(dimen_24)
+                                            .clickable {
+                                                permissionLauncher.launch(
+                                                    arrayOf(
+                                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                                    )
                                                 )
-                                            )
-                                        }
-                                )
+                                            }
+                                    )
+                                }
                             }
                         }
+                    )
+                    Spacer(modifier = Modifier.height(dimen_6))
+                    com.cranezo.ui.components.Textview(
+                        stringResource(R.string.crane_loc_hint), size = font_12, color = appColors.textSecondary
                     )
                 }
 

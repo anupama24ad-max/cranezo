@@ -326,4 +326,13 @@
     <string name="net_off_body">Wi-Fiకి కనెక్ట్ అవ్వండి లేదా మొబైల్ డేటా ఆన్ చేయండి. ఆన్‌లైన్‌లోకి రాగానే మీ డేటాను లోడ్ చేస్తాము.</string>
     <string name="net_off_retry">మళ్లీ ప్రయత్నించండి</string>
     <string name="net_off_checking">కనెక్షన్ కోసం చూస్తున్నాము…</string>
+    <string name="crane_pick_on_map">మ్యాప్‌లో ఎంచుకోండి</string>
+    <string name="crane_loc_hint">ఆటోమేటిక్‌గా దొరికింది. మరో ప్రదేశం కోసం దాన్ని టైప్ చేయండి లేదా వెతకడానికి/పిన్ కదిలించడానికి మ్యాప్ చిహ్నాన్ని నొక్కండి.</string>
+    <string name="crane_msg_place_not_found">ఈ ప్రదేశం దొరకలేదు. మ్యాప్ చిహ్నంతో దీన్ని ఎంచుకోండి.</string>
+    <string name="sub_unit_month">/ నెల</string>
+    <string name="sub_unit_year">/ సంవత్సరం</string>
+    <string name="sub_row_plan">ప్లాన్ ధర</string>
+    <string name="sub_row_gst">జిఎస్‌టి (%1$s%%)</string>
+    <string name="sub_row_fee">ఆన్‌లైన్ చెల్లింపు రుసుము (%1$s%%)</string>
+    <string name="sub_row_total">మొత్తం</string>
 </resources>

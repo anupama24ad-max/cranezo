@@ -327,4 +327,13 @@
     <string name="net_off_body">Connect to Wi-Fi or turn on mobile data. We will load your data as soon as you are back online.</string>
     <string name="net_off_retry">Try again</string>
     <string name="net_off_checking">Looking for a connection…</string>
+    <string name="crane_pick_on_map">Choose on map</string>
+    <string name="crane_loc_hint">Found automatically. To use another place, type it or tap the map icon to search or move the pin.</string>
+    <string name="crane_msg_place_not_found">We could not find this place. Choose it with the map icon.</string>
+    <string name="sub_unit_month">/ month</string>
+    <string name="sub_unit_year">/ year</string>
+    <string name="sub_row_plan">Plan price</string>
+    <string name="sub_row_gst">GST (%1$s%%)</string>
+    <string name="sub_row_fee">Online payment fee (%1$s%%)</string>
+    <string name="sub_row_total">Total</string>
 </resources>

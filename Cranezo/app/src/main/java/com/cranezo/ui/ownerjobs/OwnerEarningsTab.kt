@@ -280,6 +280,7 @@ fun OwnerEarningsTab(
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )
         }
+        Textview(stringResource(R.string.oe_pay_within_24h), size = font_12, color = appColors.textSecondary)
 
         TrendCard(state, onIntent)
 

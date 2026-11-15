@@ -167,7 +167,10 @@ fun MyJobsScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                             Textview(formatServerDate(job.start_at), size = font_11, color = appColors.textSecondary, modifier = Modifier.weight(1f))
                             Textview(rupees(job.amount), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                         }
-                        if (job.status_label == "Awaiting Owner" && job.tab == "upcoming") BookingTag(job.status_label.orEmpty(), InfoBlue)
+                        if (job.status_label == "Awaiting Owner" && job.tab == "upcoming") {
+                            BookingTag(job.status_label.orEmpty(), InfoBlue)
+                            Textview(stringResource(R.string.cj_confirm_5_10), size = font_11, color = appColors.textSecondary)
+                        }
                         if (job.can_rate == true) BookingTag(stringResource(R.string.cj_rate), AmberPrimary)
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = appColors.textSecondary)

@@ -651,6 +651,7 @@
     <string name="oe_last_settled">%1$s को आखिरी निपटान</string>
     <string name="oe_settled_in_days">%1$d दिनों में निपटान होगा</string>
     <string name="oe_settlement_due">निपटान देय</string>
+    <string name="oe_pay_within_24h">क्रेनज़ो काम पूरा होने के 24 घंटे के भीतर आपका भुगतान कर देगा।</string>
     <string name="oe_trend">कमाई का रुझान</string>
     <string name="oe_range_week">सप्ताह</string>
     <string name="oe_range_month">महीना</string>
@@ -743,6 +744,7 @@
     <string name="cj_final_payment_sub">अपनी बुकिंग बंद करने के लिए शेष राशि चुकाएँ।</string>
     <string name="cj_payment_breakdown">भुगतान का विवरण</string>
     <string name="cj_to_be_settled">अभी चुकाना है</string>
+    <string name="cj_confirm_5_10">आपका ऑर्डर 5 से 10 मिनट में कन्फर्म हो जाएगा।</string>
     <string name="cj_confirm_cash_payment">नकद भुगतान की पुष्टि करें %1$s</string>
     <string name="cj_confirm_cash_title">भुगतान की पुष्टि</string>
     <string name="cj_confirm_cash_message">क्या आपने %1$s नकद चुका दिए हैं?</string>
@@ -866,6 +868,10 @@
     <string name="op_problem_at_site">साइट पर कोई समस्या?</string>
     <string name="op_open_google_maps">Google Maps खोलें</string>
     <string name="op_reached_button">मैं साइट पर पहुँच गया</string>
+    <string name="op_reached_wait">\"मैं पहुँच गया\" बटन %1$d मिनट में दिखेगा, या जब आप साइट के पास होंगे।</string>
+    <string name="op_reached_confirm_title">क्या आप साइट पर पहुँच गए?</string>
+    <string name="op_reached_confirm_msg">ग्राहक को बताया जाएगा कि आप पहुँच गए हैं। केवल तभी पुष्टि करें जब आप काम की जगह पर हों।</string>
+    <string name="op_reached_confirm_yes">हाँ, मैं यहाँ हूँ</string>
     <string name="op_code_sent">ग्राहक के ऐप में कोड है।</string>
     <string name="cj_time_used">इस्तेमाल हुआ समय</string>
     <string name="cj_of_booked">बुक किए %2$s में से %1$s</string>

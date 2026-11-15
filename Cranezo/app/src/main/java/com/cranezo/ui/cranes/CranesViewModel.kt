@@ -316,7 +316,96 @@ class CranesViewModel @Inject constructor(
         }
     }
 
+    // ---------------------------------------------------------------------------------------
+    // Location: search while typing / on the map, and a typed place turned into coordinates
+    // ---------------------------------------------------------------------------------------
+
+    private val _suggestions = MutableStateFlow<List<com.cranezo.ui.booking.BookingViewModel.AddressSuggestion>>(emptyList())
+    val suggestions: StateFlow<List<com.cranezo.ui.booking.BookingViewModel.AddressSuggestion>> = _suggestions.asStateFlow()
+    private var suggestJob: kotlinx.coroutines.Job? = null
+
+    /** The server's place search first (it knows small towns), the phone's own search as the backup */
+    private suspend fun findPlaces(query: String): List<com.cranezo.ui.booking.BookingViewModel.AddressSuggestion> {
+        var list = emptyList<com.cranezo.ui.booking.BookingViewModel.AddressSuggestion>()
+        repo.placesSearchApi(AppMethods.getToken(sm), JSONObject().put("q", query)).isRequestCallSuspendSuccess(success = { r ->
+            list = r?.data.orEmpty().mapNotNull { p ->
+                val la = p.latitude ?: return@mapNotNull null
+                val lo = p.longitude ?: return@mapNotNull null
+                com.cranezo.ui.booking.BookingViewModel.AddressSuggestion(p.label ?: return@mapNotNull null, la, lo)
+            }
+        })
+        if (list.isEmpty()) {
+            val found = withContext(Dispatchers.IO) {
+                runCatching {
+                    @Suppress("DEPRECATION")
+                    android.location.Geocoder(app, java.util.Locale.getDefault()).getFromLocationName("$query, India", 5).orEmpty()
+                }.getOrDefault(emptyList())
+            }
+            list = found.mapNotNull { a ->
+                val line = a.getAddressLine(0) ?: return@mapNotNull null
+                com.cranezo.ui.booking.BookingViewModel.AddressSuggestion(line, a.latitude, a.longitude)
+            }.distinctBy { it.label }
+        }
+        return list
+    }
+
+    /** Called on every key press in the map's search box; waits a moment so it does not search on each letter */
+    fun suggestAddresses(query: String) {
+        suggestJob?.cancel()
+        if (query.trim().length < 3) {
+            _suggestions.value = emptyList()
+            return
+        }
+        suggestJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(400)
+            _suggestions.value = findPlaces(query)
+        }
+    }
+
+    fun clearSuggestions() {
+        _suggestions.value = emptyList()
+    }
+
+    /** The address of a point chosen on the map (the phone first, then the server) */
+    suspend fun addressAt(latitude: Double, longitude: Double): String? {
+        val phone = withContext(Dispatchers.IO) {
+            runCatching {
+                @Suppress("DEPRECATION")
+                android.location.Geocoder(app, java.util.Locale.getDefault()).getFromLocation(latitude, longitude, 1)?.firstOrNull()?.getAddressLine(0)
+            }.getOrNull()
+        }
+        if (!phone.isNullOrBlank()) return phone
+        var label: String? = null
+        repo.placesReverseApi(AppMethods.getToken(sm), JSONObject().put("latitude", latitude).put("longitude", longitude))
+            .isRequestCallSuspendSuccess(success = { r -> label = r?.data?.label })
+        return label
+    }
+
+    /**
+     * A place that was typed by hand has no coordinates yet (typing drops the old GPS point). Look it up now, so the crane
+     * is saved with a real position. False when the place cannot be found: the owner is asked to choose it on the map.
+     */
+    private suspend fun ensureCoordinates(): Boolean {
+        val f = _uiState.value.form
+        if (f.latitude != null && f.longitude != null) return true
+        if (f.location.isBlank()) return true // the missing text is reported by validate()
+        val hit = findPlaces(f.location.trim()).firstOrNull()
+        if (hit == null) {
+            showError(string(R.string.crane_msg_place_not_found))
+            return false
+        }
+        updateForm { it.copy(latitude = hit.latitude, longitude = hit.longitude) }
+        return true
+    }
+
     private fun submitCrane() {
+        viewModelScope.launch {
+            if (!ensureCoordinates()) return@launch
+            doSubmitCrane()
+        }
+    }
+
+    private fun doSubmitCrane() {
         val state = _uiState.value
         if (state.isSubmitting) return
         if (state.isUploading) {
@@ -470,6 +559,13 @@ class CranesViewModel @Inject constructor(
     }
 
     private fun saveEdit() {
+        viewModelScope.launch {
+            if (!ensureCoordinates()) return@launch
+            doSaveEdit()
+        }
+    }
+
+    private fun doSaveEdit() {
         val state = _uiState.value
         val craneId = state.original?.id ?: return
         if (state.isSubmitting) return

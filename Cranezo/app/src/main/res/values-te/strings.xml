@@ -651,6 +651,7 @@
     <string name="oe_last_settled">%1$s న చివరి సెటిల్‌మెంట్</string>
     <string name="oe_settled_in_days">%1$d రోజుల్లో సెటిల్ అవుతుంది</string>
     <string name="oe_settlement_due">సెటిల్‌మెంట్ గడువు వచ్చింది</string>
+    <string name="oe_pay_within_24h">పని పూర్తయిన 24 గంటల్లో క్రేన్‌జో మీ చెల్లింపు చేస్తుంది.</string>
     <string name="oe_trend">సంపాదన ధోరణి</string>
     <string name="oe_range_week">వారం</string>
     <string name="oe_range_month">నెల</string>
@@ -743,6 +744,7 @@
     <string name="cj_final_payment_sub">మీ బుకింగ్ ముగించడానికి బ్యాలెన్స్ చెల్లించండి.</string>
     <string name="cj_payment_breakdown">చెల్లింపు వివరాలు</string>
     <string name="cj_to_be_settled">ఇప్పుడు చెల్లించాలి</string>
+    <string name="cj_confirm_5_10">మీ ఆర్డర్ 5 నుండి 10 నిమిషాల్లో నిర్ధారించబడుతుంది.</string>
     <string name="cj_confirm_cash_payment">నగదు చెల్లింపు నిర్ధారించండి %1$s</string>
     <string name="cj_confirm_cash_title">చెల్లింపు నిర్ధారణ</string>
     <string name="cj_confirm_cash_message">మీరు %1$s నగదు చెల్లించారా?</string>
@@ -866,6 +868,10 @@
     <string name="op_problem_at_site">సైట్‌లో సమస్య ఉందా?</string>
     <string name="op_open_google_maps">Google Maps తెరవండి</string>
     <string name="op_reached_button">నేను సైట్‌కు చేరుకున్నాను</string>
+    <string name="op_reached_wait">\"నేను చేరుకున్నాను\" బటన్ %1$d నిమిషాల్లో కనిపిస్తుంది, లేదా మీరు సైట్ దగ్గరకు వచ్చినప్పుడు.</string>
+    <string name="op_reached_confirm_title">మీరు సైట్‌కు చేరుకున్నారా?</string>
+    <string name="op_reached_confirm_msg">మీరు చేరుకున్నారని కస్టమర్‌కు తెలియజేయబడుతుంది. మీరు పని స్థలంలో ఉన్నప్పుడే నిర్ధారించండి.</string>
+    <string name="op_reached_confirm_yes">అవును, నేను ఇక్కడ ఉన్నాను</string>
     <string name="op_code_sent">కోడ్ కస్టమర్ యాప్‌లో ఉంది.</string>
     <string name="cj_time_used">వాడిన సమయం</string>
     <string name="cj_of_booked">బుక్ చేసిన %2$s లో %1$s</string>

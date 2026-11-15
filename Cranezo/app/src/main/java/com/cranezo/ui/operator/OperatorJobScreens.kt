@@ -229,6 +229,7 @@ private fun CameraBox(onClick: () -> Unit, uploading: Boolean, label: String) {
  * "Step 2 of 5", the step's name in large type and one short line saying what to do.
  */
 private const val OPERATOR_STEPS = 5
+private const val REACHED_DELAY_MS = 10 * 60 * 1000L
 
 private fun stepOf(nextAction: String?): Int = when (nextAction) {
     NextAction.ACCEPT_JOB -> 1
@@ -437,11 +438,50 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
     LaunchedEffect(Unit) { permission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
 
+    // "I have reached" stays hidden for the first 10 minutes of the drive (so a stray tap after Start Navigation cannot
+    // end the trip), unless the operator is already within 500 m of the site. The start time is kept on the phone.
+    val startedAt = remember(job.booking_id) {
+        val prefs = context.getSharedPreferences("operator_journey", Context.MODE_PRIVATE)
+        val key = "start_${job.booking_id}"
+        prefs.getLong(key, 0L).takeIf { it > 0L } ?: System.currentTimeMillis().also { prefs.edit().putLong(key, it).apply() }
+    }
+    var now by remember { mutableStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) { while (true) { kotlinx.coroutines.delay(15_000); now = System.currentTimeMillis() } }
+    val waitMs = REACHED_DELAY_MS - (now - startedAt)
+    val nearSite = (state.liveDistanceKm ?: job.job_site?.distance_km)?.let { it <= 0.5 } == true
+    val reachedReady = waitMs <= 0 || nearSite
+    var confirmReached by remember { mutableStateOf(false) }
+    if (confirmReached) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmReached = false },
+            title = { Textview(stringResource(R.string.op_reached_confirm_title), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold) },
+            text = { Textview(stringResource(R.string.op_reached_confirm_msg), size = font_14, color = appColors.textSecondary) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = { confirmReached = false; onIntent(OperatorJobIntent.Arrived) }) {
+                    Textview(stringResource(R.string.op_reached_confirm_yes), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { confirmReached = false }) {
+                    Textview(stringResource(R.string.common_cancel), size = font_14, color = appColors.textSecondary)
+                }
+            }
+        )
+    }
+
     BookingScaffold(
         onBack = onClose,
         title = stringResource(R.string.op_on_the_way),
-        // no restriction: the operator continues with this button whenever they are ready
-        bottom = { CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { onIntent(OperatorJobIntent.Arrived) }) }
+        bottom = {
+            if (reachedReady) {
+                CommonGradientButton(text = stringResource(R.string.op_reached_button), onClick = { confirmReached = true })
+            } else {
+                Textview(
+                    stringResource(R.string.op_reached_wait, ((waitMs + 59_999) / 60_000).toInt()),
+                    size = font_13, color = appColors.textHint, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
     ) {
         OperatorStepHeader(job.next_action)
         // where the customer's site is, and where the operator is now (moves smoothly as they drive)

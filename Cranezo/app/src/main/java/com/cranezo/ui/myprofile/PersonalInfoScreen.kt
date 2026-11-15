@@ -211,7 +211,7 @@ private fun BasicDetails(
         keyboardType = KeyboardType.Email
     )
 
-    if (role == UserRole.CUSTOMER) UserTypeRadio(state, onIntent)
+    // The customer's user type is chosen once at sign-up and is not shown here
 }
 
 @Composable
