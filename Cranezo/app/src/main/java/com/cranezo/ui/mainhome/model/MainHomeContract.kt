@@ -92,6 +92,8 @@ data class OwnerHomeData(
     // the open requests near this owner, shown as cards on Home
     val requests: List<com.cranezo.ui.booking.request.OwnerRequestItem> = emptyList(),
     val jobsNeedingOperator: Int = 0,
+    // operators of this owner who were quiet for days or removed the app ("Name: reason")
+    val attention: List<String> = emptyList(),
     // commission still to pay to operators (shown as a highlighted card with a badge)
     val dueAmount: Double = 0.0,
     val dueOperators: Int = 0,

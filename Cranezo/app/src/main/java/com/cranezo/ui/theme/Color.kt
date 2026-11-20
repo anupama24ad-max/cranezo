@@ -52,5 +52,9 @@ val LightWhitish = Color(0xFFE2E8F0)
 val DarkBluish = Color(0xFF030814)
 val DarkGreen = Color(0xFF009C0A)
 
-/** Badges are filled with a darker shade of their colour and carry white text */
-fun badgeFill(color: Color): Color = androidx.compose.ui.graphics.lerp(color, Color.Black, 0.3f)
+/** Badges: a light tint of their colour inside, a border and text in the colour itself (the text is a little darker in light mode) */
+fun badgeFill(color: Color): Color = color.copy(alpha = 0.18f)
+
+@androidx.compose.runtime.Composable
+fun badgeText(color: Color): Color =
+    if (appColors.isDark) color else androidx.compose.ui.graphics.lerp(color, Color.Black, 0.35f)

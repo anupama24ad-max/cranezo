@@ -284,6 +284,9 @@ interface RestApi {
     suspend fun opOtpApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OtpSent>>
 
     @POST
+    suspend fun opSafetyAckApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OnlineStatus>>
+
+    @POST
     suspend fun opStatusApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.operator.model.OnlineStatus>>
 
     @POST

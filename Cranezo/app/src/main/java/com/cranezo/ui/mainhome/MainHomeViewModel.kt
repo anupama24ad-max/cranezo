@@ -130,6 +130,12 @@ class MainHomeViewModel @Inject constructor(
                                 todaysEarnings = com.cranezo.utils.rupees(earnings),
                                 craneRequests = int(d, "crane_requests"),
                                 jobsNeedingOperator = int(d, "jobs_needing_operator"),
+                                attention = d.getAsJsonArray("operators_attention")?.mapNotNull { e ->
+                                    val o = e.takeIf { x -> x.isJsonObject }?.asJsonObject
+                                    val name = o?.get("name")?.takeIf { v -> !v.isJsonNull }?.asString
+                                    val why = o?.get("reason_label")?.takeIf { v -> !v.isJsonNull }?.asString
+                                    if (name == null) null else listOfNotNull(name, why).joinToString(": ")
+                                }.orEmpty(),
                                 dueAmount = d.getAsJsonObject("operator_dues")?.get("amount")?.takeIf { v -> !v.isJsonNull }?.asDouble ?: 0.0,
                                 dueOperators = int(d.getAsJsonObject("operator_dues"), "operators"),
                                 dueJobs = int(d.getAsJsonObject("operator_dues"), "jobs"),

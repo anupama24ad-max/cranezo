@@ -804,11 +804,12 @@ private fun TipCard(tipped: Double, onTip: (Double) -> Unit) {
                     Box(
                         modifier = Modifier.weight(1f).clip(RoundedCornerShape(50))
                             .background(if (selected) com.cranezo.ui.theme.badgeFill(AmberPrimary) else appColors.subtleFill)
+                            .border(androidx.compose.ui.unit.Dp(1.5f), if (selected) AmberPrimary else Color.Transparent, RoundedCornerShape(50))
                             .clickable { amount = v }
                             .padding(vertical = dimen_8),
                         contentAlignment = Alignment.Center
                     ) {
-                        Textview("₹" + v.toInt(), size = font_13, color = if (selected) Color.White else appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                        Textview("₹" + v.toInt(), size = font_13, color = if (selected) com.cranezo.ui.theme.badgeText(AmberPrimary) else appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }

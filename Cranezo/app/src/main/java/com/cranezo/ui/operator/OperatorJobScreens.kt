@@ -683,6 +683,7 @@ private fun StartJobScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Un
         }
     ) {
         OperatorStepHeader(job.next_action)
+        SafetyReminderCard()
         job.start_checks.orEmpty().forEach { check ->
             GlassCard(contentPadding = dimen_12) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

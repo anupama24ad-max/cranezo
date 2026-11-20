@@ -1,6 +1,7 @@
 package com.cranezo.ui.finance
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,11 +50,12 @@ fun OwnerReportScreen(vm: FinanceViewModel, onBack: () -> Unit) {
                 Box(
                     modifier = Modifier.weight(1f).clip(RoundedCornerShape(50))
                         .background(if (selected) badgeFill(AmberPrimary) else appColors.subtleFill)
+                        .border(androidx.compose.ui.unit.Dp(1.5f), if (selected) AmberPrimary else Color.Transparent, RoundedCornerShape(50))
                         .clickable { period = key }
                         .padding(vertical = dimen_8),
                     contentAlignment = Alignment.Center
                 ) {
-                    Textview(stringResource(label), size = font_12, color = if (selected) Color.White else appColors.textSecondary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                    Textview(stringResource(label), size = font_12, color = if (selected) badgeText(AmberPrimary) else appColors.textSecondary, fontWeight = FontWeight.SemiBold, maxLines = 1)
                 }
             }
         }

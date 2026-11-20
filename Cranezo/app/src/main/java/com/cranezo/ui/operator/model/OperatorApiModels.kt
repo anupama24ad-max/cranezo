@@ -21,6 +21,7 @@ data class OperatorHome(
     val today_earnings: Double? = null,
     val overall_earnings: Double? = null,
     val total_tips: Double? = null,
+    val conduct: ConductInfo? = null,
     val document_status: DocumentStatus? = null,
     val active_job: ActiveJob? = null,
     val jobs_waiting_for_response: Int? = null,
@@ -266,4 +267,13 @@ data class EarningItem(
     val settlement_status: String? = null,
     val settlement_label: String? = null,
     val tip: Double? = null
+)
+
+/** The operator's own conduct status: red-card restriction, penalty, card counts and whether the safety rules were read */
+data class ConductInfo(
+    val restricted: Boolean? = null,
+    val penalty_due: Double? = null,
+    val yellow_cards: Int? = null,
+    val red_cards: Int? = null,
+    val safety_read: Boolean? = null
 )

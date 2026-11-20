@@ -33,6 +33,7 @@ data class OperatorTabsState(
 sealed interface OperatorTabsIntent {
     data object LoadHome : OperatorTabsIntent
     data object ToggleOnline : OperatorTabsIntent
+    data object AckSafety : OperatorTabsIntent
     data class LoadJobs(val tab: String) : OperatorTabsIntent
     data object LoadMoreJobs : OperatorTabsIntent
     data object LoadEarnings : OperatorTabsIntent

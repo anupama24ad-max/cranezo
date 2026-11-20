@@ -160,6 +160,14 @@ fun OwnerHomeScreen(
             }
         }
 
+        // operators who were quiet for days or removed the app
+        if (state.owner.attention.isNotEmpty()) {
+            GlassCard(contentPadding = dimen_14, borderColor = androidx.compose.ui.graphics.Color(0xFFEF4444)) {
+                Textview(stringResource(R.string.owner_attention_title), size = font_15, color = appColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                state.owner.attention.take(5).forEach { Textview("• $it", size = font_12, color = appColors.textSecondary) }
+            }
+        }
+
         // Detailed report: operator payments and platform fees
         val reportContext = androidx.compose.ui.platform.LocalContext.current
         GlassCard(

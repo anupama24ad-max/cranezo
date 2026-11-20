@@ -3,6 +3,7 @@ package com.cranezo.ui.operator
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.filled.PlayArrow
@@ -132,6 +133,29 @@ fun OperatorHomeTab(
         if (home == null && state.homeLoaded) {
             com.cranezo.ui.components.NoInternetState(onRetry = { vm?.onIntent(OperatorTabsIntent.LoadHome) })
             return@HomeScreenColumn
+        }
+
+        // red card: the account is restricted until Cranezo clears it
+        val conduct = home?.conduct
+        if (conduct?.restricted == true) {
+            GlassCard(contentPadding = dimen_14, borderColor = Red) {
+                Textview(stringResource(R.string.conduct_restricted_title), size = font_15, color = Red, fontWeight = FontWeight.Bold)
+                Textview(stringResource(R.string.conduct_restricted_sub, rupees(conduct.penalty_due ?: 0.0)), size = font_12, color = appColors.textSecondary)
+            }
+        } else if ((conduct?.yellow_cards ?: 0) > 0 || (conduct?.red_cards ?: 0) > 0) {
+            Textview(stringResource(R.string.conduct_cards, conduct?.yellow_cards ?: 0, conduct?.red_cards ?: 0), size = font_12, color = appColors.textSecondary)
+        }
+        // the safety rules: read once (the card stays until they are read)
+        var showSafety by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+        if (showSafety) {
+            SafetyRulesPage(onDone = { showSafety = false; vm?.onIntent(OperatorTabsIntent.AckSafety) }, onBack = { showSafety = false })
+            return@HomeScreenColumn
+        }
+        if (home != null && conduct != null && conduct.safety_read != true) {
+            GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = { showSafety = true }) {
+                Textview(stringResource(R.string.safety_card_title), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                Textview(stringResource(R.string.safety_card_sub), size = font_12, color = appColors.textSecondary)
+            }
         }
 
         // banners the admin made for operators
@@ -526,11 +550,12 @@ fun OperatorEarningsTab(
                 Box(
                     modifier = Modifier.weight(1f).clip(RoundedCornerShape(50))
                         .background(if (selected) com.cranezo.ui.theme.badgeFill(AmberPrimary) else appColors.subtleFill)
+                        .border(androidx.compose.ui.unit.Dp(1.5f), if (selected) AmberPrimary else Color.Transparent, RoundedCornerShape(50))
                         .clickable { vm?.onIntent(OperatorTabsIntent.SetEarningsPeriod(key)) }
                         .padding(vertical = dimen_8),
                     contentAlignment = Alignment.Center
                 ) {
-                    Textview(stringResource(label), size = font_12, color = if (selected) Color.White else appColors.textSecondary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                    Textview(stringResource(label), size = font_12, color = if (selected) com.cranezo.ui.theme.badgeText(AmberPrimary) else appColors.textSecondary, fontWeight = FontWeight.SemiBold, maxLines = 1)
                 }
             }
         }

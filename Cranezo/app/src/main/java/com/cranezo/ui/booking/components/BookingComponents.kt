@@ -241,10 +241,11 @@ fun BookingTag(text: String, color: Color, modifier: Modifier = Modifier) {
         modifier = modifier
             .clip(pill)
             .background(com.cranezo.ui.theme.badgeFill(color))
+            .border(androidx.compose.ui.unit.Dp(1.5f), color, pill)
             .padding(horizontal = dimen_10, vertical = dimen_4),
         contentAlignment = Alignment.Center
     ) {
-        Textview(text = text, size = font_11, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.SemiBold, maxLines = 1)
+        Textview(text = text, size = font_11, color = com.cranezo.ui.theme.badgeText(color), fontWeight = FontWeight.SemiBold, maxLines = 1)
     }
 }
 

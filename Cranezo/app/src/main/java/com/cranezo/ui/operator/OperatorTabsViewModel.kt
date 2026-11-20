@@ -1,5 +1,6 @@
 package com.cranezo.ui.operator
 
+import com.cranezo.ui.operator.model.ConductInfo
 import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
@@ -63,6 +64,7 @@ class OperatorTabsViewModel @Inject constructor(
         when (intent) {
             OperatorTabsIntent.LoadHome -> loadHome()
             OperatorTabsIntent.ToggleOnline -> toggleOnline()
+            OperatorTabsIntent.AckSafety -> ackSafety()
             is OperatorTabsIntent.LoadJobs -> loadJobs(intent.tab, reset = true)
             OperatorTabsIntent.LoadMoreJobs -> loadJobs(_uiState.value.jobsTab, reset = false)
             OperatorTabsIntent.LoadEarnings -> loadEarnings(reset = true)
@@ -85,6 +87,12 @@ class OperatorTabsViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    private fun ackSafety() {
+        // the page closes at once; the server only records that it was read
+        _uiState.update { it.copy(home = it.home?.copy(conduct = (it.home.conduct ?: ConductInfo()).copy(safety_read = true))) }
+        viewModelScope.launch { repo.opSafetyAck(headers()).isRequestCallSuspendSuccess(success = {}, failure = { _, _, _ -> }) }
     }
 
     private fun toggleOnline() {

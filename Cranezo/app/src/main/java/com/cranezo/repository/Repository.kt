@@ -307,6 +307,9 @@ class Repository @Inject constructor(val api: RestApi) {
     suspend fun opDecline(h: Map<String, String>, body: JSONObject) =
         safeApiCall(conflictAsError = true) { api.plainPostApi(O + "jobs/decline", h, json(body)) }
 
+    suspend fun opSafetyAck(h: Map<String, String>) =
+        safeApiCall(conflictAsError = true) { api.opSafetyAckApi(O + "safety/ack", h, json(JSONObject())) }
+
     suspend fun opStatus(h: Map<String, String>, body: JSONObject) =
         safeApiCall(conflictAsError = true) { api.opStatusApi(O + "status", h, json(body)) }
 
