@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -128,39 +129,68 @@ private fun PollWhileOpen(vm: BookingViewModel?, bookingId: String?, periodMs: L
     }
 }
 
+/** The green outlined "VERIFIED" pill with a check */
+@Composable
+private fun VerifiedPill() {
+    val shape = RoundedCornerShape(50)
+    Row(
+        modifier = Modifier.clip(shape)
+            .background(SuccessGreen.copy(alpha = 0.16f))
+            .border(androidx.compose.ui.unit.Dp(1.5f), SuccessGreen, shape)
+            .padding(horizontal = dimen_14, vertical = dimen_6),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Default.Check, contentDescription = null, tint = com.cranezo.ui.theme.badgeText(SuccessGreen), modifier = Modifier.size(dimen_14))
+        Spacer(modifier = Modifier.width(dimen_6))
+        Textview(stringResource(R.string.common_verified).uppercase(), size = font_13, color = com.cranezo.ui.theme.badgeText(SuccessGreen), fontWeight = FontWeight.SemiBold, maxLines = 1)
+    }
+}
+
+/** "Crane & Operator": the crane on the left, the operator on the right, each with name, detail and a Verified pill */
 @Composable
 private fun CraneOperatorCard(booking: Booking, showOperator: Boolean = true) {
-    GlassCard(contentPadding = dimen_12) {
-        Row {
-            CraneImage(path = booking.crane?.primary_photo, modifier = Modifier.size(dimen_80))
+    GlassCard(contentPadding = dimen_14) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            com.cranezo.ui.mainhome.components.IconBadge(
+                icon = androidx.compose.material.icons.Icons.Default.LocalShipping, accent = AmberPrimary, size = dimen_44
+            )
             Spacer(modifier = Modifier.width(dimen_12))
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(dimen_4)) {
-                // title on the left, "Verified" in the top-right corner
-                Row(verticalAlignment = Alignment.Top) {
-                    Textview(
-                        booking.crane?.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold,
-                        maxLines = 2, modifier = Modifier.weight(1f).padding(end = dimen_8)
-                    )
-                    if (booking.crane?.verified == true) BookingTag(stringResource(R.string.common_verified), SuccessGreen)
-                }
-                com.cranezo.ui.components.RatingChip(booking.crane?.rating, booking.crane?.reviews_count ?: 0, textSize = font_12)
-                Textview(
-                    listOfNotNull(booking.crane?.capacity_name, booking.crane?.fuel_type_name, booking.duration?.label).joinToString("  •  "),
-                    size = font_12, color = appColors.textSecondary
-                )
-            }
+            Textview(stringResource(R.string.cj_crane_operator), size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
         }
-        if (showOperator && booking.operator != null) {
-            Spacer(modifier = Modifier.height(dimen_10))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                // the operator's own photo (their first letter until they have one), name and rating on one level
-                com.cranezo.ui.components.Avatar(booking.operator.profile_image, booking.operator.full_name, size = dimen_40)
-                Spacer(modifier = Modifier.width(dimen_10))
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
-                    Textview(booking.operator.full_name ?: stringResource(R.string.bk_operator), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
+        Spacer(modifier = Modifier.height(dimen_14))
+        val operator = if (showOperator) booking.operator else null
+        Row(modifier = Modifier.fillMaxWidth().height(androidx.compose.foundation.layout.IntrinsicSize.Min)) {
+            // the crane
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                CraneImage(path = booking.crane?.primary_photo, modifier = Modifier.size(dimen_100), shape = RoundedCornerShape(dimen_20))
+                Spacer(modifier = Modifier.height(dimen_10))
+                Textview(booking.crane?.title.orEmpty(), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 2, textAlign = TextAlign.Center)
+                (booking.crane?.capacity_label ?: booking.crane?.capacity_name?.let { stringResource(R.string.cj_capacity_x, it) })?.let {
+                    Textview(it, size = font_13, color = appColors.textSecondary, maxLines = 1, textAlign = TextAlign.Center)
                 }
-                com.cranezo.ui.components.RatingChip(booking.operator.rating, booking.operator.reviews_count ?: 0, textSize = font_12)
+                if (booking.crane?.verified == true) {
+                    Spacer(modifier = Modifier.height(dimen_10))
+                    VerifiedPill()
+                }
+            }
+            if (operator != null) {
+                Box(modifier = Modifier.padding(horizontal = dimen_4).fillMaxHeight().width(dimen_1).background(appColors.subtleBorder))
+                // the operator: round photo with a green dot, name, rating
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box {
+                        com.cranezo.ui.components.Avatar(operator.profile_image, operator.full_name, size = dimen_100)
+                        Box(
+                            modifier = Modifier.align(Alignment.BottomEnd).padding(dimen_6).size(dimen_16).clip(CircleShape)
+                                .background(SuccessGreen).border(dimen_2, appColors.glassTop, CircleShape)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(dimen_10))
+                    Textview(operator.full_name ?: stringResource(R.string.bk_operator), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 2, textAlign = TextAlign.Center)
+                    com.cranezo.ui.components.RatingChip(operator.rating, operator.reviews_count ?: 0, textSize = font_13)
+                    // operators are checked by Cranezo before they can take jobs
+                    Spacer(modifier = Modifier.height(dimen_10))
+                    VerifiedPill()
+                }
             }
         }
     }

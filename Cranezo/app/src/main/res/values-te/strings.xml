@@ -933,6 +933,7 @@
     <string name="crane_operator_salary_hint">ఉదా. 20000. పని ప్రకారం చెల్లిస్తే ఖాళీగా ఉంచండి</string>
     <string name="fin_commission_salary">నెలవారీ జీతం</string>
     <string name="as_on_salary">ఈ పని %1$s నెలవారీ జీతంలో కలిసి ఉంది. ఈ పనికి అదనంగా ఏమీ చెల్లించరు.</string>
+    <string name="cj_capacity_x">%1$s సామర్థ్యం</string>
     <string name="op_distance">దూరం</string>
     <string name="op_reached_confirm_title">మీరు సైట్‌కు చేరుకున్నారా?</string>
     <string name="op_reached_confirm_msg">మీరు చేరుకున్నారని కస్టమర్‌కు తెలియజేయబడుతుంది. మీరు పని స్థలంలో ఉన్నప్పుడే నిర్ధారించండి.</string>

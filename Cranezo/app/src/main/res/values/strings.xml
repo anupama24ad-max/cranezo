@@ -1086,6 +1086,7 @@
     <string name="crane_operator_salary_hint">e.g. 20000. Leave empty if paid per job</string>
     <string name="fin_commission_salary">Monthly salary</string>
     <string name="as_on_salary">This job is covered by the monthly salary of %1$s. Nothing extra is paid for this job.</string>
+    <string name="cj_capacity_x">%1$s Capacity</string>
     <string name="op_distance">Distance</string>
     <string name="op_reached_confirm_title">Have you reached the site?</string>
     <string name="op_reached_confirm_msg">The customer will be told you have arrived. Only confirm if you are at the job site.</string>
