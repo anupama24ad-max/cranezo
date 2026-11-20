@@ -113,5 +113,7 @@ data class Operator(
     val source: String? = null,
     val is_mobile_verified: Boolean? = null,
     // the operator's Online / Offline button
-    val is_online: Boolean? = null
+    val is_online: Boolean? = null,
+    // the monthly wage the owner pays (0 = paid per job)
+    val monthly_salary: Double? = null
 )

@@ -20,6 +20,8 @@ data class OperatorHome(
     val today_jobs: TodayJobs? = null,
     val today_earnings: Double? = null,
     val overall_earnings: Double? = null,
+    val monthly_salary: Double? = null,
+    val salary_received: Double? = null,
     val total_tips: Double? = null,
     val conduct: ConductInfo? = null,
     val document_status: DocumentStatus? = null,

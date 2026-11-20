@@ -103,7 +103,8 @@ private val previewOptions = BookingOptions(
     duration_types = listOf(
         DurationTypeOption("hours", "Hours", "Select the number of hours (Minimum 4 hours)", min = 4, max = 12, default = 8),
         DurationTypeOption("full_day", "Full day", "Typically 8 hours per day", hours = 8),
-        DurationTypeOption("days", "Multiple Days", "Select the number of days", min = 1, max = 30, default = 1)
+        DurationTypeOption("days", "Multiple Days", "Select the number of days", min = 1, max = 30, default = 1),
+        DurationTypeOption("months", "Monthly", "Select the number of months (30 days each)", min = 1, max = 6, default = 1)
     )
 )
 
@@ -640,6 +641,7 @@ private fun DurationChoices(state: BookingUiState, vm: BookingViewModel?) {
                 when (type.id) {
                     "hours" -> Stepper(state.hours, type.min ?: 4, type.max ?: 12) { vm?.onIntent(BookingIntent.HoursChanged(it)) }
                     "days" -> Stepper(state.days, type.min ?: 1, type.max ?: 30) { vm?.onIntent(BookingIntent.DaysChanged(it)) }
+                    "months" -> Stepper(state.months, type.min ?: 1, type.max ?: 6) { vm?.onIntent(BookingIntent.MonthsChanged(it)) }
                     else -> RadioDot(selected)
                 }
             }
@@ -684,7 +686,7 @@ fun DurationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
     val state = rememberState(vm)
 
     // The estimate follows the choice: a silent search shows the price of the cheapest crane
-    LaunchedEffect(state.durationType, state.hours, state.days) {
+    LaunchedEffect(state.durationType, state.hours, state.days, state.months) {
         vm?.onIntent(BookingIntent.EstimatePrice)
     }
 
@@ -723,6 +725,7 @@ fun DurationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
                     when (type.id) {
                         "hours" -> Stepper(state.hours, type.min ?: 4, type.max ?: 12) { vm?.onIntent(BookingIntent.HoursChanged(it)) }
                         "days" -> Stepper(state.days, type.min ?: 1, type.max ?: 30) { vm?.onIntent(BookingIntent.DaysChanged(it)) }
+                    "months" -> Stepper(state.months, type.min ?: 1, type.max ?: 6) { vm?.onIntent(BookingIntent.MonthsChanged(it)) }
                         else -> RadioDot(selected)
                     }
                 }
@@ -778,7 +781,7 @@ private fun StepEstimateCard(vm: BookingViewModel?, state: BookingUiState) {
         androidx.lifecycle.ViewModelProvider(activity)[com.cranezo.ui.booking.request.RequestViewModel::class.java]
     }
     val rs by rvm.ui.collectAsStateWithLifecycle()
-    androidx.compose.runtime.LaunchedEffect(state.startType, state.date, state.time, state.durationType, state.hours, state.days) {
+    androidx.compose.runtime.LaunchedEffect(state.startType, state.date, state.time, state.durationType, state.hours, state.days, state.months) {
         kotlinx.coroutines.delay(400) // wait for the stepper to settle
         vm.requestBody()?.let { rvm.estimate(it) }
     }

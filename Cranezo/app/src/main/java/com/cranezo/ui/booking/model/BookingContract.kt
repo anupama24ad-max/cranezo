@@ -19,6 +19,7 @@ data class BookingUiState(
     val durationType: String = "hours",
     val hours: Int = 8,
     val days: Int = 1,
+    val months: Int = 1,
     val paymentMethod: String = "COD",
 
     // Search
@@ -77,6 +78,7 @@ sealed interface BookingIntent {
     data class DurationTypeChanged(val value: String) : BookingIntent
     data class HoursChanged(val value: Int) : BookingIntent
     data class DaysChanged(val value: Int) : BookingIntent
+    data class MonthsChanged(val value: Int) : BookingIntent
     data object EstimatePrice : BookingIntent
 
     data object Search : BookingIntent

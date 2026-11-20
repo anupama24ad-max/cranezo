@@ -68,7 +68,7 @@ fun OperatorPickerSheet(
     isAdding: Boolean,
     onSearch: (String) -> Unit,
     onSelect: (Operator?) -> Unit,
-    onAdd: (name: String, mobile: String, email: String) -> Unit,
+    onAdd: (name: String, mobile: String, email: String, salary: String) -> Unit,
     onAddById: (operatorId: String) -> Unit = {},
     onDismiss: () -> Unit,
     // Set to true by the screen when the operator was added, which closes the add form
@@ -253,13 +253,14 @@ private fun OperatorRow(
 private fun AddOperatorForm(
     isAdding: Boolean,
     onBack: () -> Unit,
-    onAdd: (name: String, mobile: String, email: String) -> Unit,
+    onAdd: (name: String, mobile: String, email: String, salary: String) -> Unit,
     onAddById: (operatorId: String) -> Unit
 ) {
     var operatorId by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var mobile by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
+    var salary by rememberSaveable { mutableStateOf("") }
 
     Textview(
         text = stringResource(R.string.crane_operator_add_title),
@@ -318,6 +319,13 @@ private fun AddOperatorForm(
             placeholder = stringResource(R.string.crane_operator_email_hint),
             keyboardType = KeyboardType.Email
         )
+        GlassInputField(
+            label = stringResource(R.string.crane_operator_salary),
+            value = salary,
+            onValueChange = { salary = it.filter { c -> c.isDigit() || c == '.' }.take(9) },
+            placeholder = stringResource(R.string.crane_operator_salary_hint),
+            keyboardType = KeyboardType.Decimal
+        )
     }
 
     Spacer(modifier = Modifier.height(dimen_16))
@@ -326,7 +334,7 @@ private fun AddOperatorForm(
         gradientColors = listOf(AmberPrimary, AmberSecondary, AmberDark),
         textColor = Color.Black,
         enabled = !isAdding,
-        onClick = { onAdd(name, mobile, email) }
+        onClick = { onAdd(name, mobile, email, salary) }
     )
     Spacer(modifier = Modifier.height(dimen_8))
     CommonGradientButton(

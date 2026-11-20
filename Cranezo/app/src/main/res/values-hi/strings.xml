@@ -929,6 +929,10 @@
     <string name="conduct_cards">पीले कार्ड: %1$d · लाल कार्ड: %2$d</string>
     <string name="safety_before_job">शुरू करने से पहले सुरक्षा</string>
     <string name="owner_attention_title">ध्यान चाहने वाले ऑपरेटर</string>
+    <string name="crane_operator_salary">मासिक वेतन (वैकल्पिक)</string>
+    <string name="crane_operator_salary_hint">जैसे 20000। काम के हिसाब से भुगतान हो तो खाली छोड़ें</string>
+    <string name="fin_commission_salary">मासिक वेतन</string>
+    <string name="as_on_salary">यह काम %1$s के मासिक वेतन में शामिल है। इस काम के लिए अलग से कुछ नहीं दिया जाएगा।</string>
     <string name="op_distance">दूरी</string>
     <string name="op_reached_confirm_title">क्या आप साइट पर पहुँच गए?</string>
     <string name="op_reached_confirm_msg">ग्राहक को बताया जाएगा कि आप पहुँच गए हैं। केवल तभी पुष्टि करें जब आप काम की जगह पर हों।</string>

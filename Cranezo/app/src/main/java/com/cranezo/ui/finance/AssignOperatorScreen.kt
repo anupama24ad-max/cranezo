@@ -94,7 +94,10 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
     }
     val byCode = selected.isEmpty()
     val operatorPicked = selected.isNotEmpty() || otherCode.length >= 4
-    val valueOk = entered != null && entered > 0 && (type != "percent" || entered <= 100)
+    // an operator with a monthly salary can be given the job on that salary (nothing extra per job)
+    val salaryOf = state.operators.firstOrNull { it.id == selected }?.monthly_salary ?: 0.0
+    if (type == "salary" && salaryOf <= 0.0) type = "percent"
+    val valueOk = type == "salary" || (entered != null && entered > 0 && (type != "percent" || entered <= 100))
     val canAssign = operatorPicked && valueOk && !state.saving
 
     if (done) {
@@ -185,9 +188,11 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
 
         // 2. what the operator earns for this job
         FinSection(stringResource(R.string.as_earn)) {
-            ChoiceChips(commissionOptions(commission?.types), type) { type = it }
+            ChoiceChips(commissionOptions(commission?.types, withSalary = salaryOf > 0.0), type) { type = it }
             Spacer(modifier = Modifier.height(dimen_8))
-            GlassInputField(
+            if (type == "salary") {
+                Textview(stringResource(R.string.as_on_salary, rupees(salaryOf)), size = font_13, color = appColors.textSecondary)
+            } else GlassInputField(
                 label = commissionValueLabel(type), value = value,
                 onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } },
                 placeholder = "0", keyboardType = KeyboardType.Decimal
@@ -212,7 +217,7 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
                 }
             }
             // updates while typing
-            MoneyRow(stringResource(R.string.cm_operator_will_get), earns, bold = true, color = FinGreen)
+            if (type != "salary") MoneyRow(stringResource(R.string.cm_operator_will_get), earns, bold = true, color = FinGreen)
             Textview(stringResource(R.string.as_change_later), size = font_11, color = appColors.textHint, modifier = Modifier.padding(top = dimen_4))
         }
 
@@ -225,7 +230,7 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
             onClick = {
                 val id = if (byCode) otherCode else selected
                 val name = if (byCode) otherCode else selectedName
-                vm.assignOperator(bookingId, id, byCode, type, value) {
+                vm.assignOperator(bookingId, id, byCode, type, if (type == "salary") "0" else value) {
                     doneName = name
                     doneAmount = earns ?: 0.0
                     done = true

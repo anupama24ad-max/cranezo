@@ -333,7 +333,7 @@ fun OperatorHomeTab(
                 Spacer(modifier = Modifier.width(dimen_10))
                 Column(modifier = Modifier.weight(1f)) {
                     Textview(stringResource(R.string.op_overall_earnings), size = font_12, color = appColors.textSecondary)
-                    Textview(rupees((home?.overall_earnings ?: 0.0) + (home?.total_tips ?: 0.0)), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(rupees((home?.overall_earnings ?: 0.0) + (home?.total_tips ?: 0.0) + (home?.salary_received ?: 0.0)), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     if ((home?.total_tips ?: 0.0) > 0) {
                         Textview(stringResource(R.string.op_incl_tips, rupees(home?.total_tips ?: 0.0)), size = font_11, color = SuccessGreen, fontWeight = FontWeight.SemiBold)
                     }

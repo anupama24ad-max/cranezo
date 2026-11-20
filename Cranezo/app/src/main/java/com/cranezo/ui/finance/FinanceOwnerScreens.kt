@@ -356,10 +356,10 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
 }
 
 @Composable
-fun commissionOptions(@Suppress("UNUSED_PARAMETER") server: List<IdName>?): List<IdName> = listOf(
+fun commissionOptions(@Suppress("UNUSED_PARAMETER") server: List<IdName>?, withSalary: Boolean = false): List<IdName> = listOf(
     IdName("percent", stringResource(R.string.fin_commission_percent)),
     IdName("fixed", stringResource(R.string.fin_commission_fixed))
-)
+) + (if (withSalary) listOf(IdName("salary", stringResource(R.string.fin_commission_salary))) else emptyList())
 
 @Composable
 fun commissionValueLabel(type: String): String = when (type) {

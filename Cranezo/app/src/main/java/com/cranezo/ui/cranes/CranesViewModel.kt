@@ -715,6 +715,7 @@ class CranesViewModel @Inject constructor(
             .put("mobile_number", mobile)
             .put("country_code", sm.getData(AppStrings.SessionValues.countryCode, AppStrings.Constants.defaultCountryCode))
         body.putIfPresent("user_email", email)
+        intent.salary.trim().toDoubleOrNull()?.takeIf { it > 0 }?.let { body.put("monthly_salary", it) }
         postAddOperator(body)
     }
 

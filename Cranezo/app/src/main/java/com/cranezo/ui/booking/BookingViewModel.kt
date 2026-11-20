@@ -76,6 +76,7 @@ class BookingViewModel @Inject constructor(
             is BookingIntent.DurationTypeChanged -> _uiState.update { it.copy(durationType = intent.value) }
             is BookingIntent.HoursChanged -> _uiState.update { it.copy(hours = intent.value) }
             is BookingIntent.DaysChanged -> _uiState.update { it.copy(days = intent.value) }
+            is BookingIntent.MonthsChanged -> _uiState.update { it.copy(months = intent.value) }
             BookingIntent.EstimatePrice -> estimatePrice()
 
             BookingIntent.Search -> search(reset = true)
@@ -320,6 +321,7 @@ class BookingViewModel @Inject constructor(
         when (s.durationType) {
             "hours" -> it.put("hours", s.hours)
             "days" -> it.put("days", s.days)
+            "months" -> it.put("months", s.months)
         }
     }
 

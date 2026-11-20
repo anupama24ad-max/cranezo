@@ -155,8 +155,6 @@ fun OperatorJobFlow(
         NextAction.ACCEPT_JOB, NextAction.START_JOURNEY -> JobRequestScreen(job, onIntent, onClose)
         NextAction.WAIT_OWNER -> MessageScreen(stringResource(R.string.op_waiting_owner), onClose)
         NextAction.MARK_ARRIVED -> JourneyScreen(job, state, onIntent, onClose)
-        NextAction.SITE_PHOTOS -> SitePhotoScreen(job, state, onIntent, onClose)
-        NextAction.CHECKLIST -> ChecklistScreen(job, state, onIntent, onClose)
         NextAction.WAIT_CUSTOMER -> ArrivalWaitScreen(job, onIntent, onClose)
         NextAction.START_JOB -> StartJobScreen(job, onIntent, onClose)
         NextAction.MONITOR -> MonitorScreen(job, state, onIntent, onClose) { report = it }
@@ -516,119 +514,6 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
 }
 
 // ---------------------------------------------------------------------------------------------
-// Site photo
-// ---------------------------------------------------------------------------------------------
-
-@Composable
-private fun SitePhotoScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
-    val picker = rememberImagePickerController()
-    LaunchedEffect(picker.imageUrl) {
-        val uri = picker.imageUrl ?: return@LaunchedEffect
-        onIntent(OperatorJobIntent.AddSitePhoto(uri))
-        picker.clear()
-    }
-    ImageSourceBottomSheet(picker)
-    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
-    LaunchedEffect(Unit) { permission.launch(Manifest.permission.ACCESS_FINE_LOCATION) }
-    val photo = state.sitePhotos.firstOrNull()
-
-    BookingScaffold(
-        onBack = onClose,
-        title = stringResource(R.string.op_site_photo),
-        bottom = {
-            CommonGradientButton(
-                text = stringResource(R.string.common_continue),
-                onClick = { onIntent(OperatorJobIntent.SaveSitePhotos) },
-                enabled = photo != null && !state.isUploading
-            )
-        }
-    ) {
-        OperatorStepHeader(job.next_action)
-        CameraBox(onClick = picker::openChooser, uploading = state.isUploading, label = stringResource(R.string.op_take_site_photo))
-        GlassCard(contentPadding = dimen_12) {
-            listOf(R.string.op_photo_req_1, R.string.op_photo_req_2, R.string.op_photo_req_3).forEach {
-                Textview("• ${stringResource(it)}", size = font_12, color = appColors.textSecondary)
-            }
-        }
-        if (photo != null) {
-            Textview(stringResource(R.string.op_captured_photo), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_12)) {
-                Box(modifier = Modifier.size(dimen_100).clip(RoundedCornerShape(dimen_12))) {
-                    ShimmerImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
-                }
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(formatServerDateTime(photo.captured_at), size = font_12, color = appColors.textPrimary)
-                    if (photo.latitude != null) {
-                        Textview("%.4f, %.4f".format(photo.latitude, photo.longitude ?: 0.0), size = font_11, color = appColors.textSecondary)
-                    }
-                    Spacer(modifier = Modifier.height(dimen_8))
-                    CommonGradientButton(
-                        text = stringResource(R.string.op_retake), onClick = picker::openChooser, height = dimen_40, textSize = font_11,
-                        gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
-                    )
-                }
-            }
-        }
-    }
-}
-
-// ---------------------------------------------------------------------------------------------
-// Safety checklist
-// ---------------------------------------------------------------------------------------------
-
-@Preview(showBackground = true, heightDp = 800)
-@Composable
-private fun ChecklistPreview() {
-    ChecklistScreen(
-        previewJob,
-        OperatorJobState(checklist = Checklist(listOf(ChecklistItem("a", "Crane positioned safely", "Ensure crane is on stable ground.", true), ChecklistItem("b", "Ground checked", "Check for underground utilities.", false)), 1, 2, false)),
-        {}, {}
-    )
-}
-
-@Composable
-private fun ChecklistScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onClose: () -> Unit) {
-    LaunchedEffect(Unit) { onIntent(OperatorJobIntent.LoadChecklist) }
-    val checklist = state.checklist
-
-    BookingScaffold(onBack = onClose, title = stringResource(R.string.op_safety_checklist)) {
-        OperatorStepHeader(job.next_action)
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Textview(stringResource(R.string.op_checklist), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            Textview(
-                stringResource(R.string.op_n_of_m_completed, checklist?.completed_count ?: 0, checklist?.total ?: 0),
-                size = font_13, color = appColors.primaryText, fontWeight = FontWeight.SemiBold
-            )
-        }
-        // Rendered as the server sent it. The whole row is the tap target; a ticked row turns green.
-        checklist?.items.orEmpty().forEach { item ->
-            val done = item.done == true
-            GlassCard(
-                contentPadding = dimen_14, borderColor = if (done) SuccessGreen else Color.Unspecified,
-                onClick = { item.key?.let { onIntent(OperatorJobIntent.TickChecklist(it, !done)) } }
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        if (done) Icons.Default.CheckCircle else Icons.Default.CheckBoxOutlineBlank,
-                        contentDescription = null, tint = if (done) SuccessGreen else appColors.textSecondary, modifier = Modifier.size(dimen_30)
-                    )
-                    Spacer(modifier = Modifier.width(dimen_14))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Textview(item.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
-                        Textview(item.description.orEmpty(), size = font_12, color = appColors.textSecondary)
-                    }
-                }
-            }
-        }
-        if (checklist?.completed == true) {
-            // The job moves on by itself; this is only for the moment before it does
-            CommonGradientButton(text = stringResource(R.string.common_continue), onClick = { onIntent(OperatorJobIntent.Poll) })
-        }
-        Spacer(modifier = Modifier.height(dimen_8))
-    }
-}
-
-// ---------------------------------------------------------------------------------------------
 // Waiting for the customer to confirm the arrival
 // ---------------------------------------------------------------------------------------------
 
@@ -703,7 +588,7 @@ private fun StartJobScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Un
 }
 
 // ---------------------------------------------------------------------------------------------
-// Job Monitoring and Photos & Notes
+// Job Monitoring
 // ---------------------------------------------------------------------------------------------
 
 @Composable
@@ -714,7 +599,6 @@ private fun MonitorScreen(
     onClose: () -> Unit,
     onReport: (String) -> Unit
 ) {
-    var finishing by rememberSaveable { mutableStateOf(false) }
     var extraOpen by rememberSaveable { mutableStateOf(false) }
     val pendingExtra = job.extension?.pending
     LaunchedEffect(pendingExtra?.id) { if (pendingExtra != null) extraOpen = true }
@@ -728,11 +612,6 @@ private fun MonitorScreen(
             delay(5_000)
             onIntent(OperatorJobIntent.Poll)
         }
-    }
-
-    if (finishing) {
-        PhotosNotesScreen(job, state, onIntent, onBack = { finishing = false })
-        return
     }
 
     BookingScaffold(
@@ -791,69 +670,6 @@ private fun MonitorScreen(
             height = dimen_48, textSize = font_14, gradientColors = listOf(Red, DarkRed), textColor = Color.White
         )
         Spacer(modifier = Modifier.height(dimen_8))
-    }
-}
-
-@Composable
-private fun PhotosNotesScreen(job: OperatorJob, state: OperatorJobState, onIntent: (OperatorJobIntent) -> Unit, onBack: () -> Unit) {
-    val picker = rememberImagePickerController()
-    LaunchedEffect(picker.imageUrl) {
-        val uri = picker.imageUrl ?: return@LaunchedEffect
-        onIntent(OperatorJobIntent.AddFinalPhoto(uri))
-        picker.clear()
-    }
-    ImageSourceBottomSheet(picker)
-    var notes by rememberSaveable { mutableStateOf("") }
-
-    // No popup: the button says exactly what it does, with one line of explanation above it
-    BookingScaffold(
-        onBack = onBack,
-        title = stringResource(R.string.op_photos_notes),
-        bottom = {
-            Column {
-                Textview(stringResource(R.string.fin_finish_note), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(bottom = dimen_8))
-                CommonGradientButton(
-                    text = stringResource(R.string.op_finish_job),
-                    onClick = { onIntent(OperatorJobIntent.Finish(notes)) },
-                    enabled = !state.isUploading
-                )
-            }
-        }
-    ) {
-        CraneHeaderCard(job.assigned_crane)
-        GlassCard(contentPadding = dimen_12) {
-            Row {
-                Textview(stringResource(R.string.op_final_photos), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                Textview("${state.finalPhotos.size}/10", size = font_11, color = appColors.textSecondary)
-            }
-            Spacer(modifier = Modifier.height(dimen_8))
-            Row(horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
-                state.finalPhotos.forEachIndexed { index, photo ->
-                    Box(modifier = Modifier.size(dimen_56).clip(RoundedCornerShape(dimen_10))) {
-                        ShimmerImage(model = fileUrl(photo.photo_url), contentDescription = null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
-                        Icon(
-                            Icons.Default.Close, contentDescription = null, tint = Color.White,
-                            modifier = Modifier.align(Alignment.TopEnd).size(dimen_16).background(Color.Black.copy(alpha = 0.5f), CircleShape)
-                                .clickable { onIntent(OperatorJobIntent.RemoveFinalPhoto(index)) }
-                        )
-                    }
-                }
-                if (state.finalPhotos.size < 10) {
-                    Box(
-                        modifier = Modifier.size(dimen_56).clip(RoundedCornerShape(dimen_10)).background(appColors.subtleFill).clickable { picker.openChooser() },
-                        contentAlignment = Alignment.Center
-                    ) { Icon(Icons.Default.AddAPhoto, contentDescription = null, tint = appColors.textSecondary) }
-                }
-            }
-        }
-        GlassInputField(
-            label = stringResource(R.string.op_job_notes),
-            value = notes,
-            onValueChange = { notes = it.take(500) },
-            placeholder = stringResource(R.string.op_job_notes_hint),
-            singleLine = false,
-            minHeight = dimen_80
-        )
     }
 }
 
