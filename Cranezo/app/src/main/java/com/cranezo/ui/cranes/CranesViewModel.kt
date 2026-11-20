@@ -162,6 +162,7 @@ class CranesViewModel @Inject constructor(
 
             is CranesIntent.SearchOperators -> searchOperators(intent.query)
             is CranesIntent.AddOperator -> addOperator(intent)
+            is CranesIntent.AddOperatorById -> addOperatorById(intent.operatorId)
         }
     }
 
@@ -714,7 +715,17 @@ class CranesViewModel @Inject constructor(
             .put("mobile_number", mobile)
             .put("country_code", sm.getData(AppStrings.SessionValues.countryCode, AppStrings.Constants.defaultCountryCode))
         body.putIfPresent("user_email", email)
+        postAddOperator(body)
+    }
 
+    private fun addOperatorById(operatorId: String) {
+        if (_uiState.value.isAddingOperator) return
+        val id = operatorId.trim().uppercase()
+        if (id.length < 4) return showError(string(R.string.crane_msg_operator_id))
+        postAddOperator(JSONObject().put("operator_id", id))
+    }
+
+    private fun postAddOperator(body: JSONObject) {
         _uiState.update { it.copy(isAddingOperator = true) }
         runWhenOnline {
             repo.addOperatorApi(AppMethods.getToken(sm), body).isRequestCallSuspendSuccess(

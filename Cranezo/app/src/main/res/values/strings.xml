@@ -1050,6 +1050,17 @@
     <string name="rep_no_jobs">No completed jobs in this period</string>
     <string name="rep_job_split">Platform fee %1$s · Operator %2$s</string>
     <string name="rep_your_share_x">You get %1$s</string>
+    <string name="crane_operator_by_id">Operator ID</string>
+    <string name="crane_operator_add_by_id">Find and add operator</string>
+    <string name="crane_operator_or_new">Or add a new operator with their mobile number</string>
+    <string name="crane_msg_operator_id">Enter the operator ID, for example OP754197</string>
+    <string name="tip_title">Tip your operator</string>
+    <string name="tip_sub">A thank-you for great work. All of it goes to the operator.</string>
+    <string name="tip_pay">Pay ₹%1$d tip</string>
+    <string name="tip_thanks">You tipped the operator %1$s. Thank you!</string>
+    <string name="op_overall_earnings">Overall earnings</string>
+    <string name="op_incl_tips">including %1$s in tips</string>
+    <string name="op_tips_received">Tips received</string>
     <string name="op_distance">Distance</string>
     <string name="op_reached_confirm_title">Have you reached the site?</string>
     <string name="op_reached_confirm_msg">The customer will be told you have arrived. Only confirm if you are at the job site.</string>

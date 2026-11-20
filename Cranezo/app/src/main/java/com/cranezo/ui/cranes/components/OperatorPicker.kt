@@ -69,6 +69,7 @@ fun OperatorPickerSheet(
     onSearch: (String) -> Unit,
     onSelect: (Operator?) -> Unit,
     onAdd: (name: String, mobile: String, email: String) -> Unit,
+    onAddById: (operatorId: String) -> Unit = {},
     onDismiss: () -> Unit,
     // Set to true by the screen when the operator was added, which closes the add form
     modifier: Modifier = Modifier
@@ -97,7 +98,8 @@ fun OperatorPickerSheet(
                 AddOperatorForm(
                     isAdding = isAdding,
                     onBack = { adding = false },
-                    onAdd = onAdd
+                    onAdd = onAdd,
+                    onAddById = onAddById
                 )
             } else {
                 Textview(
@@ -251,8 +253,10 @@ private fun OperatorRow(
 private fun AddOperatorForm(
     isAdding: Boolean,
     onBack: () -> Unit,
-    onAdd: (name: String, mobile: String, email: String) -> Unit
+    onAdd: (name: String, mobile: String, email: String) -> Unit,
+    onAddById: (operatorId: String) -> Unit
 ) {
+    var operatorId by rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     var mobile by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
@@ -269,6 +273,24 @@ private fun AddOperatorForm(
         color = appColors.textSecondary
     )
     Spacer(modifier = Modifier.height(dimen_14))
+
+    // an operator who is already on Cranezo: type their operator ID, the record is fetched and added to your team
+    GlassInputField(
+        label = stringResource(R.string.crane_operator_by_id),
+        value = operatorId,
+        onValueChange = { operatorId = it.uppercase().filter { c -> c.isLetterOrDigit() }.take(20) },
+        placeholder = "OP754197",
+        leftIcon = Icons.Default.Search
+    )
+    Spacer(modifier = Modifier.height(dimen_8))
+    CommonGradientButton(
+        text = stringResource(R.string.crane_operator_add_by_id),
+        enabled = !isAdding && operatorId.length >= 4,
+        onClick = { onAddById(operatorId) }
+    )
+    Spacer(modifier = Modifier.height(dimen_12))
+    Textview(text = stringResource(R.string.crane_operator_or_new), size = font_12, color = appColors.textSecondary)
+    Spacer(modifier = Modifier.height(dimen_8))
 
     Column(verticalArrangement = Arrangement.spacedBy(dimen_12)) {
         GlassInputField(

@@ -99,7 +99,7 @@ private fun openScreen(context: Context, key: String?, onProfile: () -> Unit) {
     }
 }
 
-private fun runBannerAction(context: Context, action: BannerAction?, onProfile: () -> Unit) {
+fun runBannerAction(context: Context, action: BannerAction?, onProfile: () -> Unit) {
     when (action?.type) {
         "book_crane" -> context.startActivity(BookingActivity.intent(context))
         "screen" -> openScreen(context, action.value, onProfile)
@@ -319,7 +319,7 @@ private fun CurrentOrderCard(order: com.cranezo.ui.customerhome.model.CurrentOrd
 // ---------------------------------------------------------------------------------------------
 
 @Composable
-private fun BannerCarousel(banners: List<HomeBanner>, onAction: (BannerAction?) -> Unit) {
+fun BannerCarousel(banners: List<HomeBanner>, onAction: (BannerAction?) -> Unit) {
     // A banner whose picture fails to load is skipped, not shown broken
     var failed by remember { mutableStateOf(setOf<Int?>()) }
     val visible = banners.filter { it.id !in failed && !it.image.isNullOrBlank() }

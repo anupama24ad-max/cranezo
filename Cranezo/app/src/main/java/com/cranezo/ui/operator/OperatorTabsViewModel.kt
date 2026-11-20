@@ -88,27 +88,29 @@ class OperatorTabsViewModel @Inject constructor(
     }
 
     private fun toggleOnline() {
-        val goOnline = _uiState.value.home?.online != true
+        val before = _uiState.value.home
+        val goOnline = before?.online != true
+        // the switch moves at once; the server answer only confirms it (or puts it back if it fails)
+        _uiState.update {
+            it.copy(home = it.home?.copy(online = goOnline, online_label = if (goOnline) "Online" else "Offline", online_message = null))
+        }
         viewModelScope.launch {
             val body = JSONObject().put("online", goOnline)
-            // Coordinates are optional: only when the permission is already there
-            if (ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                fetchCurrentLocation(app)?.let { body.put("latitude", it.latitude).put("longitude", it.longitude) }
+            // the location is optional and must never slow the switch: only a quick fix is used
+            if (goOnline && ContextCompat.checkSelfPermission(app, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                kotlinx.coroutines.withTimeoutOrNull(1200) { fetchCurrentLocation(app) }?.let { body.put("latitude", it.latitude).put("longitude", it.longitude) }
             }
             repo.opStatus(headers(), body).isRequestCallSuspendSuccess(
                 success = { r ->
                     _uiState.update {
-                        it.copy(
-                            home = it.home?.copy(
-                                online = r?.data?.online ?: goOnline,
-                                online_label = r?.data?.online_label ?: it.home.online_label,
-                                online_message = null
-                            )
-                        )
+                        it.copy(home = it.home?.copy(online = r?.data?.online ?: goOnline, online_message = null))
                     }
-                    loadHome()
                 },
-                failure = { _, _, m -> fail(m) }
+                failure = { _, _, m ->
+                    // not saved: the switch goes back
+                    _uiState.update { it.copy(home = it.home?.copy(online = before?.online, online_label = before?.online_label, online_message = before?.online_message)) }
+                    fail(m)
+                }
             )
         }
     }

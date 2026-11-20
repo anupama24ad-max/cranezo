@@ -19,6 +19,8 @@ data class OperatorHome(
     val assigned_crane: HomeCrane? = null,
     val today_jobs: TodayJobs? = null,
     val today_earnings: Double? = null,
+    val overall_earnings: Double? = null,
+    val total_tips: Double? = null,
     val document_status: DocumentStatus? = null,
     val active_job: ActiveJob? = null,
     val jobs_waiting_for_response: Int? = null,
@@ -247,7 +249,8 @@ data class EarningsSummary(
     val completed_settlement: Double? = null,
     val completed_jobs: Int? = null,
     val period_earnings: Double? = null,
-    val period_jobs: Int? = null
+    val period_jobs: Int? = null,
+    val total_tips: Double? = null
 )
 
 data class EarningItem(
@@ -261,5 +264,6 @@ data class EarningItem(
     val crane_photo: String? = null,
     val amount: Double? = null,
     val settlement_status: String? = null,
-    val settlement_label: String? = null
+    val settlement_label: String? = null,
+    val tip: Double? = null
 )

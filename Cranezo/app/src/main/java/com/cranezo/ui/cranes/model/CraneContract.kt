@@ -137,6 +137,8 @@ sealed interface CranesIntent {
     // Operators
     data class SearchOperators(val query: String) : CranesIntent
     data class AddOperator(val fullName: String, val mobile: String, val email: String) : CranesIntent
+    // an operator who registered on their own: the owner types the operator ID and the record is fetched
+    data class AddOperatorById(val operatorId: String) : CranesIntent
 }
 
 sealed interface CranesEffect {

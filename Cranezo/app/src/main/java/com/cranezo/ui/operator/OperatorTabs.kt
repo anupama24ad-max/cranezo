@@ -134,6 +134,9 @@ fun OperatorHomeTab(
             return@HomeScreenColumn
         }
 
+        // banners the admin made for operators
+        com.cranezo.ui.customerhome.RoleBanners()
+
         // Owners give a job by this ID (one job at a time, then the operator is free for other work)
         val context = androidx.compose.ui.platform.LocalContext.current
         val memberId = androidx.compose.runtime.remember {
@@ -305,8 +308,11 @@ fun OperatorHomeTab(
                 IconBadge(icon = Icons.Default.Payments, accent = AmberPrimary, size = dimen_32)
                 Spacer(modifier = Modifier.width(dimen_10))
                 Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.op_todays_earnings), size = font_12, color = appColors.textSecondary)
-                    Textview(rupees(home?.today_earnings ?: 0.0), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(stringResource(R.string.op_overall_earnings), size = font_12, color = appColors.textSecondary)
+                    Textview(rupees((home?.overall_earnings ?: 0.0) + (home?.total_tips ?: 0.0)), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    if ((home?.total_tips ?: 0.0) > 0) {
+                        Textview(stringResource(R.string.op_incl_tips, rupees(home?.total_tips ?: 0.0)), size = font_11, color = SuccessGreen, fontWeight = FontWeight.SemiBold)
+                    }
                 }
                 Textview(stringResource(R.string.op_view_earnings), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
             }
@@ -535,6 +541,14 @@ fun OperatorEarningsTab(
                     Textview(stringResource(R.string.op_n_jobs, summary?.period_jobs ?: 0), size = font_11, color = appColors.textSecondary)
                 }
                 Textview(rupees(summary?.period_earnings ?: 0.0), size = font_22, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+            }
+        }
+        if ((summary?.total_tips ?: 0.0) > 0) {
+            GlassCard(contentPadding = dimen_14, borderColor = SuccessGreen) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Textview(stringResource(R.string.op_tips_received), size = font_13, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+                    Textview(rupees(summary?.total_tips ?: 0.0), size = font_18, color = SuccessGreen, fontWeight = FontWeight.Bold)
+                }
             }
         }
         Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(dimen_12)) {

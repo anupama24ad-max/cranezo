@@ -232,6 +232,7 @@ fun CraneFormScreen(
                 showOperatorSheet = false
             },
             onAdd = { name, mobile, email -> onIntent(CranesIntent.AddOperator(name, mobile, email)) },
+            onAddById = { id -> onIntent(CranesIntent.AddOperatorById(id)) },
             onDismiss = { showOperatorSheet = false }
         )
     }

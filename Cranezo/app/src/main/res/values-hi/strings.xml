@@ -897,6 +897,17 @@
     <string name="rep_no_jobs">इस अवधि में कोई पूरा काम नहीं</string>
     <string name="rep_job_split">प्लेटफ़ॉर्म शुल्क %1$s · ऑपरेटर %2$s</string>
     <string name="rep_your_share_x">आपको %1$s मिलेगा</string>
+    <string name="crane_operator_by_id">ऑपरेटर आईडी</string>
+    <string name="crane_operator_add_by_id">ऑपरेटर खोजें और जोड़ें</string>
+    <string name="crane_operator_or_new">या मोबाइल नंबर से नया ऑपरेटर जोड़ें</string>
+    <string name="crane_msg_operator_id">ऑपरेटर आईडी डालें, जैसे OP754197</string>
+    <string name="tip_title">ऑपरेटर को टिप दें</string>
+    <string name="tip_sub">अच्छे काम के लिए धन्यवाद। पूरी राशि ऑपरेटर को मिलती है।</string>
+    <string name="tip_pay">₹%1$d टिप दें</string>
+    <string name="tip_thanks">आपने ऑपरेटर को %1$s टिप दी। धन्यवाद!</string>
+    <string name="op_overall_earnings">कुल कमाई</string>
+    <string name="op_incl_tips">टिप %1$s सहित</string>
+    <string name="op_tips_received">मिली टिप</string>
     <string name="op_distance">दूरी</string>
     <string name="op_reached_confirm_title">क्या आप साइट पर पहुँच गए?</string>
     <string name="op_reached_confirm_msg">ग्राहक को बताया जाएगा कि आप पहुँच गए हैं। केवल तभी पुष्टि करें जब आप काम की जगह पर हों।</string>

@@ -32,6 +32,8 @@ data class RequestUiState(
     val payingBookingId: String? = null,
     // the final payment went through: the booking screens show "Payment Successful"
     val finalPaidBookingId: String? = null,
+    // a tip for the operator was paid: the paid screen reloads and says thank you
+    val tipPaidBookingId: String? = null,
     // owner side
     val ownerList: OwnerRequestList? = null,
     val ownerLoaded: Boolean = false,
@@ -146,6 +148,8 @@ class RequestViewModel @Inject constructor(
     private fun applyPaid(bookingId: String, result: PayResult?) {
         if (result?.kind == "final") {
             _ui.update { it.copy(finalPaidBookingId = bookingId, payingBookingId = null) }
+        } else if (result?.kind == "tip") {
+            _ui.update { it.copy(tipPaidBookingId = bookingId, payingBookingId = null) }
         } else {
             result?.request?.let { r -> _ui.update { it.copy(request = r, payingBookingId = null) } }
         }
@@ -189,8 +193,10 @@ class RequestViewModel @Inject constructor(
     }
 
     /** 1. ask the server for a Razorpay order; the activity then opens Checkout with it */
-    fun startOnlinePayment(bookingId: String, kind: String) {
-        post("customer/payments/order", JSONObject().put("booking_id", bookingId).put("kind", kind)) { d ->
+    fun startOnlinePayment(bookingId: String, kind: String, tipAmount: Double? = null) {
+        val body = JSONObject().put("booking_id", bookingId).put("kind", kind)
+        if (tipAmount != null) body.put("tip_amount", tipAmount)
+        post("customer/payments/order", body) { d ->
             parse(d, PayOrder::class.java)?.let { order -> _ui.update { it.copy(pendingOrder = order, payingBookingId = bookingId) } }
         }
     }
@@ -226,6 +232,12 @@ class RequestViewModel @Inject constructor(
             val r = parse(d, PayResult::class.java)
             if (r?.paid == true) applyPaid(bookingId, r) else fail(string(R.string.rq_payment_not_done))
         }
+    }
+
+    fun consumeTipPaid(): String? {
+        val id = _ui.value.tipPaidBookingId
+        _ui.update { it.copy(tipPaidBookingId = null) }
+        return id
     }
 
     fun consumeFinalPaid(): String? {

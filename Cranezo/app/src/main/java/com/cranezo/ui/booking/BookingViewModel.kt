@@ -651,6 +651,9 @@ class BookingViewModel @Inject constructor(
         viewModelScope.launch { _effect.send(BookingEffect.Go(BookingRoutes.PAID, popUpTo = BookingRoutes.PAY)) }
     }
 
+    /** Reloads the booking on screen (after a tip, so the thank-you shows) */
+    fun reloadBooking() { currentId()?.let { pollBooking(it) } }
+
     /** Booking shown on the final payment screen */
     fun currentBookingId(): String? = currentId()
 

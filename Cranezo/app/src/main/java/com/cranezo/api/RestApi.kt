@@ -377,6 +377,9 @@ interface RestApi {
     suspend fun supEmergencyApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.support.model.EmergencyResult>>
 
     @POST
+    suspend fun homeBannersApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<List<com.cranezo.ui.customerhome.model.HomeBanner>>>
+
+    @POST
     suspend fun customerHomeApi(@Url url: String, @HeaderMap headers: Map<String, String>, @Body body: RequestBody): Response<ApiResult<com.cranezo.ui.customerhome.model.CustomerHome>>
 
     // ---- Payments, commission, settlements, job requests, complaints: raw JSON, parsed per screen ----

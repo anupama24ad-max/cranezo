@@ -734,7 +734,7 @@ private fun RatingSheet(visible: Boolean, onDismiss: () -> Unit, onSubmit: (Int,
 
 @Preview(showBackground = true, heightDp = 1000)
 @Composable
-fun PaymentSuccessfulScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
+fun PaymentSuccessfulScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onTip: (Double) -> Unit = {}) {
     val state = rememberBooking(vm)
     val booking = state.booking ?: return
     val receipt = booking.receipt
@@ -765,6 +765,8 @@ fun PaymentSuccessfulScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {
             Textview(stringResource(R.string.cj_payment_successful_sub), size = font_12, color = appColors.textSecondary, textAlign = TextAlign.Center)
         }
         CraneOperatorCard(booking)
+        // a tip for the operator: one tip per job, paid online, all of it goes to the operator
+        if (booking.operator != null) TipCard(tipped = booking.payment?.tip_amount ?: 0.0, onTip = onTip)
         if (receipt != null) {
             GlassCard(contentPadding = dimen_14) {
                 Textview(stringResource(R.string.bk_payment_summary), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
@@ -782,5 +784,36 @@ fun PaymentSuccessfulScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))
+    }
+}
+
+/** "Tip your operator": quick amounts, then Razorpay. After a tip it only says thank you. */
+@Composable
+private fun TipCard(tipped: Double, onTip: (Double) -> Unit) {
+    var amount by remember { mutableStateOf(50.0) }
+    GlassCard(contentPadding = dimen_14, borderColor = if (tipped > 0) SuccessGreen else AmberPrimary) {
+        if (tipped > 0) {
+            Textview(stringResource(R.string.tip_thanks, rupees(tipped)), size = font_14, color = SuccessGreen, fontWeight = FontWeight.Bold)
+        } else {
+            Textview(stringResource(R.string.tip_title), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Textview(stringResource(R.string.tip_sub), size = font_12, color = appColors.textSecondary)
+            Spacer(modifier = Modifier.height(dimen_10))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+                listOf(20.0, 50.0, 100.0, 200.0).forEach { v ->
+                    val selected = amount == v
+                    Box(
+                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(50))
+                            .background(if (selected) com.cranezo.ui.theme.badgeFill(AmberPrimary) else appColors.subtleFill)
+                            .clickable { amount = v }
+                            .padding(vertical = dimen_8),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Textview("₹" + v.toInt(), size = font_13, color = if (selected) Color.White else appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(dimen_10))
+            CommonGradientButton(text = stringResource(R.string.tip_pay, amount.toInt()), onClick = { onTip(amount) }, height = dimen_44, textSize = font_14)
+        }
     }
 }

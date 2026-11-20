@@ -164,6 +164,8 @@ data class BookingPayment(
     val advance_amount: Double? = null,
     val remaining_amount: Double? = null,
     val paid_amount: Double? = null,
+    // the tip this booking already gave the operator
+    val tip_amount: Double? = null,
     val status_label: String? = null,
     val booking_amount: Double? = null,
     val booking_hours: Double? = null,

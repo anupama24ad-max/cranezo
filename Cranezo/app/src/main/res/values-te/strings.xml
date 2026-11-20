@@ -897,6 +897,17 @@
     <string name="rep_no_jobs">ఈ కాలంలో పూర్తయిన పనులు లేవు</string>
     <string name="rep_job_split">ప్లాట్‌ఫామ్ ఫీజు %1$s · ఆపరేటర్ %2$s</string>
     <string name="rep_your_share_x">మీకు %1$s వస్తుంది</string>
+    <string name="crane_operator_by_id">ఆపరేటర్ ఐడి</string>
+    <string name="crane_operator_add_by_id">ఆపరేటర్‌ను వెతికి జోడించండి</string>
+    <string name="crane_operator_or_new">లేదా మొబైల్ నంబర్‌తో కొత్త ఆపరేటర్‌ను జోడించండి</string>
+    <string name="crane_msg_operator_id">ఆపరేటర్ ఐడి నమోదు చేయండి, ఉదా. OP754197</string>
+    <string name="tip_title">ఆపరేటర్‌కు టిప్ ఇవ్వండి</string>
+    <string name="tip_sub">మంచి పనికి కృతజ్ఞత. మొత్తం ఆపరేటర్‌కే వెళ్తుంది.</string>
+    <string name="tip_pay">₹%1$d టిప్ ఇవ్వండి</string>
+    <string name="tip_thanks">మీరు ఆపరేటర్‌కు %1$s టిప్ ఇచ్చారు. ధన్యవాదాలు!</string>
+    <string name="op_overall_earnings">మొత్తం సంపాదన</string>
+    <string name="op_incl_tips">టిప్‌లు %1$s సహా</string>
+    <string name="op_tips_received">వచ్చిన టిప్‌లు</string>
     <string name="op_distance">దూరం</string>
     <string name="op_reached_confirm_title">మీరు సైట్‌కు చేరుకున్నారా?</string>
     <string name="op_reached_confirm_msg">మీరు చేరుకున్నారని కస్టమర్‌కు తెలియజేయబడుతుంది. మీరు పని స్థలంలో ఉన్నప్పుడే నిర్ధారించండి.</string>

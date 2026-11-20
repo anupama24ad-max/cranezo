@@ -148,6 +148,13 @@ class BookingActivity :
                 vm.showPaidOnline()
             }
         }
+        // a tip was paid: reload the paid screen, which then says thank you
+        LaunchedEffect(payState.tipPaidBookingId) {
+            if (payState.tipPaidBookingId != null) {
+                requestVm.consumeTipPaid()
+                vm.reloadBooking()
+            }
+        }
         // "Book a crane" while a request is still running reopens it (resume)
         LaunchedEffect(Unit) {
             if (start == BookingRoutes.TYPE) {
@@ -278,7 +285,7 @@ class BookingActivity :
             composable(BookingRoutes.PAID) {
                 // after paying and rating, back leaves the booking screens at once (it does not walk back through them)
                 BackHandler { finish() }
-                PaymentSuccessfulScreen(vm, onBack = { finish() })
+                PaymentSuccessfulScreen(vm, onBack = { finish() }, onTip = { amount -> vm.currentBookingId()?.let { requestVm.startOnlinePayment(it, "tip", amount) } })
             }
             composable(BookingRoutes.RECEIPT) { ReceiptScreen(vm, onBack = leave) }
             composable(BookingRoutes.ACTIVE_TRACKING) { TrackMyCranesScreen(vm, onBack = leave) }

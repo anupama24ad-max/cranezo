@@ -90,6 +90,9 @@ fun OwnerHomeScreen(
         verticalArrangement = Arrangement.spacedBy(dimen_16)
     ) {
 
+        // banners the admin made for owners
+        com.cranezo.ui.customerhome.RoleBanners()
+
         // Subscription: the free trial, a due date that is near (red), overdue or expired. Nothing when all is well.
         val subContext = androidx.compose.ui.platform.LocalContext.current
         val subRed = state.owner.subLevel == "red"
