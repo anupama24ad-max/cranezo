@@ -62,7 +62,7 @@ fun OwnerHomeScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        CurvedHero(animated = true) {
+        CurvedHero {
             Column {
                 HomeHeader(
                     name = state.userName.ifBlank { stringResource(R.string.home_owner_default_name) },
