@@ -229,6 +229,11 @@
     <string name="sub_from">शुरू</string>
     <string name="sub_due">देय तिथि</string>
     <string name="sub_due_on">देय %1$s</string>
+    <string name="sub_pay_renew">₹%1$s में नवीनीकरण करें</string>
+    <string name="sub_available_after">%1$s के बाद उपलब्ध</string>
+    <string name="sub_locked_title">सदस्यता समाप्त</string>
+    <string name="sub_locked_msg">आपका प्लान समाप्त हो गया है। क्रेन, जॉब और अनुरोध संभालने के लिए नवीनीकरण करें। नवीनीकरण तक आपकी क्रेन ग्राहकों को नहीं दिखेंगी।</string>
+    <string name="sub_locked_button">अभी नवीनीकरण करें</string>
     <string name="sub_pay_success_title">भुगतान सफल</string>
     <string name="sub_pay_success_msg">आपकी सदस्यता %1$s तक सक्रिय है।</string>
     <string name="sub_pay_failed_title">भुगतान विफल</string>

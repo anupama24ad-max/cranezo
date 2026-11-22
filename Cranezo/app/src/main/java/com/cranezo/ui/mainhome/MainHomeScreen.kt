@@ -241,6 +241,11 @@ fun MainHomeScreen(vm: MainHomeViewModel? = null) {
                                 else -> Unit
                             }
                         }
+                        // An owner whose plan has expired can only renew: every tab but Profile is replaced by the renew screen
+                        if (state.role == UserRole.CRANE_OWNER && state.owner.subState == "expired" && tab.dest != Dest.Profile) {
+                            com.cranezo.ui.mainhome.components.SubscriptionLockedScreen(onRefresh = { onIntent(MainHomeIntent.RefreshOwnerHome) })
+                            return@composable
+                        }
                         when (tab.dest) {
                             Dest.Home -> if (opVm != null) OperatorHomeTab(
                                 vm = opVm,
