@@ -230,6 +230,11 @@
     <string name="sub_from">From</string>
     <string name="sub_due">Due date</string>
     <string name="sub_due_on">Due %1$s</string>
+    <string name="sub_pay_renew">Renew for ₹%1$s</string>
+    <string name="sub_available_after">Available after %1$s</string>
+    <string name="sub_locked_title">Subscription expired</string>
+    <string name="sub_locked_msg">Your plan has ended. Renew to manage your cranes, jobs and requests. Your cranes stay hidden from customers until you renew.</string>
+    <string name="sub_locked_button">Renew now</string>
     <string name="sub_pay_success_title">Payment successful</string>
     <string name="sub_pay_success_msg">Your subscription is active until %1$s.</string>
     <string name="sub_pay_failed_title">Payment failed</string>

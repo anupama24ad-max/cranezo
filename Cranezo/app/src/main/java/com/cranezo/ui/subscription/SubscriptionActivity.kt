@@ -222,20 +222,22 @@ private fun SubscriptionContent(
 
     val monthly = offer?.plans?.firstOrNull { it.plan == "monthly" }
     val yearly = offer?.plans?.firstOrNull { it.plan == "yearly" }
-    // the plan running now stays locked until it is due soon (red), so nobody pays twice by mistake
-    val running = info?.state == "active" && info.level != "red"
-    monthly?.let { PlanCard(it, stringResource(R.string.sub_unit_month), null, has, state.busy, onBuy, current = running && info?.plan == it.plan) }
+    // One subscription at a time: while a plan (or the free trial) is running nothing can be bought or changed.
+    // A plan can be bought again only after its due date; until then the other plan says when it becomes available.
+    val locked = has && info?.can_buy == false
+    val lockedUntil = if (locked) formatServerDate(info?.due_at) else null
+    monthly?.let { PlanCard(it, stringResource(R.string.sub_unit_month), null, has, state.busy, onBuy, current = locked && info?.plan == it.plan, lockedUntil = lockedUntil) }
     yearly?.let {
         // what the owner saves compared with paying monthly for a year
         val save = if (monthly?.price != null && monthly.price > 0 && it.price != null) (((monthly.price * 12 - it.price) / (monthly.price * 12)) * 100).toInt() else 0
-        PlanCard(it, stringResource(R.string.sub_unit_year), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy, current = running && info?.plan == it.plan)
+        PlanCard(it, stringResource(R.string.sub_unit_year), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy, current = locked && info?.plan == it.plan, lockedUntil = lockedUntil)
     }
 }
 
 private fun formatPrice(value: Double?): String = com.cranezo.utils.formatAmount(value ?: 0.0)
 
 @Composable
-private fun PlanCard(q: PlanQuote, unit: String, badge: String?, renew: Boolean, busy: Boolean, onBuy: (String) -> Unit, current: Boolean = false) {
+private fun PlanCard(q: PlanQuote, unit: String, badge: String?, renew: Boolean, busy: Boolean, onBuy: (String) -> Unit, current: Boolean = false, lockedUntil: String? = null) {
     // the plan that saves money is highlighted, the other one is quiet
     val highlight = badge != null || current
     GlassCard(contentPadding = dimen_16, borderColor = if (highlight) AmberPrimary else Color.Unspecified) {
@@ -267,8 +269,9 @@ private fun PlanCard(q: PlanQuote, unit: String, badge: String?, renew: Boolean,
         CommonGradientButton(
             // the string has its own rupee sign: pass the number only (it used to show "Pay ₹₹16,000")
             text = if (current) stringResource(R.string.sub_current_plan)
-            else stringResource(if (renew) R.string.sub_pay_extend else R.string.sub_pay, formatPrice(q.total)),
-            enabled = !busy && !current,
+            else if (lockedUntil != null) stringResource(R.string.sub_available_after, lockedUntil)
+            else stringResource(if (renew) R.string.sub_pay_renew else R.string.sub_pay, formatPrice(q.total)),
+            enabled = !busy && !current && lockedUntil == null,
             onClick = { q.plan?.let(onBuy) }
         )
     }

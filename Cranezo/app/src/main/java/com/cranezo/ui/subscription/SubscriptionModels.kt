@@ -38,6 +38,9 @@ data class SubscriptionInfo(
     val last_paid_at: String? = null,
     // only on the payment check (sync): did THIS payment go through
     val paid: Boolean? = null,
+    // a plan can be bought only when none is running; the free trial only when the owner never had a plan
+    val can_buy: Boolean? = null,
+    val can_start_trial: Boolean? = null,
     val offer: SubscriptionOffer? = null
 )
 

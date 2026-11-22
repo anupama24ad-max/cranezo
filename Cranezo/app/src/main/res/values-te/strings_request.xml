@@ -229,6 +229,11 @@
     <string name="sub_from">ప్రారంభం</string>
     <string name="sub_due">గడువు తేదీ</string>
     <string name="sub_due_on">గడువు %1$s</string>
+    <string name="sub_pay_renew">₹%1$sతో రెన్యూ చేయండి</string>
+    <string name="sub_available_after">%1$s తర్వాత అందుబాటులో</string>
+    <string name="sub_locked_title">సబ్‌స్క్రిప్షన్ ముగిసింది</string>
+    <string name="sub_locked_msg">మీ ప్లాన్ ముగిసింది. క్రేన్లు, జాబ్‌లు, అభ్యర్థనలు నిర్వహించడానికి రెన్యూ చేయండి. రెన్యూ చేసే వరకు మీ క్రేన్లు కస్టమర్లకు కనిపించవు.</string>
+    <string name="sub_locked_button">ఇప్పుడే రెన్యూ చేయండి</string>
     <string name="sub_pay_success_title">చెల్లింపు విజయవంతమైంది</string>
     <string name="sub_pay_success_msg">మీ సబ్‌స్క్రిప్షన్ %1$s వరకు సక్రియంగా ఉంటుంది.</string>
     <string name="sub_pay_failed_title">చెల్లింపు విఫలమైంది</string>
