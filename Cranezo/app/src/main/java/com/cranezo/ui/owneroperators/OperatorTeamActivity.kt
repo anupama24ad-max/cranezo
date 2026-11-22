@@ -67,7 +67,8 @@ class OperatorTeamActivity : BaseVMComposeActivity<OperatorTeamViewModel>(Operat
                 editing = null
             }
         }
-        BackHandler(enabled = screen != "list") {
+        BackHandler(enabled = state.verifying != null || screen != "list") {
+            if (state.verifying != null) { vm.clearVerify(); screen = "list"; return@BackHandler }
             screen = "list"
             editing = null
             vm.clearFound()
@@ -80,6 +81,13 @@ class OperatorTeamActivity : BaseVMComposeActivity<OperatorTeamViewModel>(Operat
             } else finish()
         }
         when {
+            // an OTP was sent to the operator's mobile: the owner types it to verify them
+            state.verifying != null -> OtpScreen(
+                op = state.verifying!!, testOtp = state.testOtp, busy = state.busy,
+                onBack = { vm.clearVerify(); screen = "list" },
+                onVerify = { code -> vm.verifyOtp(state.verifying!!.id.orEmpty(), code) },
+                onResend = { vm.resendOtp(state.verifying!!.id.orEmpty()) }
+            )
             screen == "new" -> NewOperatorScreen(state.busy, back) { n, m, e, t -> vm.addNew(n, m, e, t) }
             screen == "find" -> FindOperatorScreen(state, back, onSearch = { vm.search(it) }) { id, t, msg -> vm.sendRequest(id, t, msg) }
             screen == "edit" && editing != null -> EditTermsScreen(editing!!, state.busy, back) { t -> vm.saveTerms(editing!!.id.orEmpty(), t) }
@@ -87,6 +95,7 @@ class OperatorTeamActivity : BaseVMComposeActivity<OperatorTeamViewModel>(Operat
                 state = state, onBack = back,
                 onNew = { screen = "new" }, onFind = { screen = "find" },
                 onEdit = { editing = it; screen = "edit" },
+                onVerify = { vm.startVerify(it) },
                 onCancel = { vm.cancelRequest(it) }
             )
         }
@@ -171,7 +180,7 @@ private fun formatPlain(v: Double): String = if (v % 1.0 == 0.0) v.toLong().toSt
 @Composable
 private fun TeamListScreen(
     state: OperatorTeamState, onBack: () -> Unit, onNew: () -> Unit, onFind: () -> Unit,
-    onEdit: (TeamOperator) -> Unit, onCancel: (String) -> Unit
+    onEdit: (TeamOperator) -> Unit, onVerify: (TeamOperator) -> Unit, onCancel: (String) -> Unit
 ) {
     MyProfileScaffold(
         title = stringResource(R.string.ot_title), subtitle = stringResource(R.string.ot_subtitle), onBack = onBack,
@@ -219,7 +228,9 @@ private fun TeamListScreen(
             Textview(stringResource(R.string.ot_empty), size = font_13, color = appColors.textSecondary)
         }
         state.team.forEach { op ->
-            GlassCard(contentPadding = dimen_12, onClick = { onEdit(op) }) {
+            // an operator whose mobile number is not verified yet: tapping asks for the OTP first
+            val verified = op.is_mobile_verified == true
+            GlassCard(contentPadding = dimen_12, onClick = { if (verified) onEdit(op) else onVerify(op) }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier.size(dimen_40).clip(CircleShape).background(AmberPrimary.copy(alpha = 0.18f)),
@@ -230,12 +241,13 @@ private fun TeamListScreen(
                         Textview(op.full_name.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, maxLines = 1)
                         Textview("${op.member_id.orEmpty()} · ${op.country_code.orEmpty()} ${op.mobile_number.orEmpty()}".trim(), size = font_11, color = appColors.textSecondary, maxLines = 1)
                     }
-                    Box(modifier = Modifier.size(dimen_10).clip(CircleShape).background(if (op.is_online == true) SuccessGreen else appColors.textHint))
+                    if (!verified) BookingTag(stringResource(R.string.ot_not_verified), Red)
+                    else Box(modifier = Modifier.size(dimen_10).clip(CircleShape).background(if (op.is_online == true) SuccessGreen else appColors.textHint))
                 }
                 Spacer(modifier = Modifier.height(dimen_8))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Textview(termsText(op.salary_type, op.monthly_salary, op.daily_wage, op.batta), size = font_12, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                    Textview(stringResource(R.string.ot_edit_pay), size = font_12, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
+                    Textview(stringResource(if (verified) R.string.ot_edit_pay else R.string.ot_verify_now), size = font_12, color = AmberPrimary, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -357,5 +369,39 @@ private fun EditTermsScreen(op: TeamOperator, busy: Boolean, onBack: () -> Unit,
         GlassCard(contentPadding = dimen_14) {
             PayTermsForm(PayTerms(op.salary_type ?: "monthly", op.monthly_salary, op.daily_wage, op.batta), onChange = { terms = it })
         }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Verify the operator's mobile number with the OTP sent to it
+// ---------------------------------------------------------------------------------------------
+
+@Composable
+private fun OtpScreen(op: TeamOperator, testOtp: String?, busy: Boolean, onBack: () -> Unit, onVerify: (String) -> Unit, onResend: () -> Unit) {
+    var code by rememberSaveable { mutableStateOf(testOtp.orEmpty()) }
+    MyProfileScaffold(
+        title = stringResource(R.string.ot_otp_title), subtitle = op.full_name, onBack = onBack,
+        bottom = {
+            CommonGradientButton(text = stringResource(R.string.ot_verify), enabled = !busy && code.length >= 4, onClick = { onVerify(code) })
+        }
+    ) {
+        GlassCard(contentPadding = dimen_14) {
+            Textview(
+                stringResource(R.string.ot_otp_msg, "${op.country_code.orEmpty()} ${op.mobile_number.orEmpty()}".trim()),
+                size = font_13, color = appColors.textSecondary
+            )
+            Spacer(modifier = Modifier.height(dimen_12))
+            GlassInputField(
+                label = stringResource(R.string.ot_otp_label), value = code,
+                onValueChange = { code = it.filter { c -> c.isDigit() }.take(8) }, placeholder = "123456",
+                keyboardType = KeyboardType.Number, isRequired = true
+            )
+            Spacer(modifier = Modifier.height(dimen_8))
+            Textview(
+                stringResource(R.string.ot_resend), size = font_13, color = AmberPrimary, fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable(enabled = !busy) { onResend() }.padding(vertical = dimen_6)
+            )
+        }
+        Textview(stringResource(R.string.ot_otp_note), size = font_12, color = appColors.textSecondary)
     }
 }

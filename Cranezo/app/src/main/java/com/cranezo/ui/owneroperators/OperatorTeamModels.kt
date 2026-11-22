@@ -22,7 +22,10 @@ data class TeamOperator(
     val salary_type: String? = null,
     val monthly_salary: Double? = null,
     val daily_wage: Double? = null,
-    val batta: Double? = null
+    val batta: Double? = null,
+    // only in the reply to "add a new operator": an OTP was sent to their mobile (otp is the fixed test code, never a real one)
+    val needs_otp: Boolean? = null,
+    val otp: String? = null
 )
 
 data class OperatorBrief(

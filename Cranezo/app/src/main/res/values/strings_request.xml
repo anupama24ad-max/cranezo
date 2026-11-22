@@ -411,4 +411,14 @@
     <string name="ot_decline">Decline</string>
     <string name="ot_no_invites">No requests yet.</string>
     <string name="ot_owner">Owner</string>
+    <string name="ot_not_verified">Not verified</string>
+    <string name="ot_verify_now">Verify now</string>
+    <string name="ot_otp_title">Verify mobile number</string>
+    <string name="ot_otp_msg">We sent an OTP to %1$s. Ask the operator for the code and type it here.</string>
+    <string name="ot_otp_label">OTP</string>
+    <string name="ot_resend">Send the OTP again</string>
+    <string name="ot_verify">Verify</string>
+    <string name="ot_otp_note">Until the number is verified, the operator cannot be given jobs or cranes.</string>
+    <string name="ot_otp_sent">OTP sent</string>
+    <string name="ot_verified">Operator verified</string>
 </resources>

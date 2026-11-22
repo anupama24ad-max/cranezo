@@ -731,7 +731,8 @@ class CranesViewModel @Inject constructor(
         runWhenOnline {
             repo.addOperatorApi(AppMethods.getToken(sm), body).isRequestCallSuspendSuccess(
                 success = { response ->
-                    val operator = response?.data
+                    // an operator found by ID gets a request, not an entry: only a real operator record (it has a member ID) is added
+                    val operator = response?.data?.takeIf { !it.member_id.isNullOrBlank() }
                     _uiState.update { s ->
                         s.copy(
                             isAddingOperator = false,

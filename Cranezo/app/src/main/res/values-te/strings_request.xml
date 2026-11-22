@@ -410,4 +410,14 @@
     <string name="ot_decline">తిరస్కరించు</string>
     <string name="ot_no_invites">ఇంకా అభ్యర్థనలు లేవు.</string>
     <string name="ot_owner">యజమాని</string>
+    <string name="ot_not_verified">ధృవీకరించలేదు</string>
+    <string name="ot_verify_now">ఇప్పుడే ధృవీకరించండి</string>
+    <string name="ot_otp_title">మొబైల్ నంబర్ ధృవీకరణ</string>
+    <string name="ot_otp_msg">మేము %1$s కు OTP పంపాము. ఆపరేటర్‌ను కోడ్ అడిగి ఇక్కడ నమోదు చేయండి.</string>
+    <string name="ot_otp_label">OTP</string>
+    <string name="ot_resend">OTP మళ్లీ పంపండి</string>
+    <string name="ot_verify">ధృవీకరించండి</string>
+    <string name="ot_otp_note">నంబర్ ధృవీకరించే వరకు ఆపరేటర్‌కు జాబ్‌లు లేదా క్రేన్లు ఇవ్వలేరు.</string>
+    <string name="ot_otp_sent">OTP పంపబడింది</string>
+    <string name="ot_verified">ఆపరేటర్ ధృవీకరించబడ్డారు</string>
 </resources>

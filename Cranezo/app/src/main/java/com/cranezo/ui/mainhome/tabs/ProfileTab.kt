@@ -383,8 +383,9 @@ fun HomeProfileScreen(
                 )
             }
 
-            // one phone number can be an owner, an operator and a customer: switch between them without signing in again
-            MenuGroup {
+            // Operator and owner extras (owner requests, ratings). A customer has none of them, and Switch role is commented out,
+            // so for a customer this group would be an empty box: it is only drawn when it has a row.
+            if (role == UserRole.OPERATOR || role == UserRole.CRANE_OWNER) MenuGroup {
                 // an operator sees the owners who asked them to join a team, and accepts or declines
                 if (role == UserRole.OPERATOR) {
                     MenuRow(

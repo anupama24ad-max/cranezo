@@ -410,4 +410,14 @@
     <string name="ot_decline">अस्वीकार करें</string>
     <string name="ot_no_invites">अभी कोई अनुरोध नहीं।</string>
     <string name="ot_owner">मालिक</string>
+    <string name="ot_not_verified">सत्यापित नहीं</string>
+    <string name="ot_verify_now">अभी सत्यापित करें</string>
+    <string name="ot_otp_title">मोबाइल नंबर सत्यापित करें</string>
+    <string name="ot_otp_msg">हमने %1$s पर OTP भेजा है। ऑपरेटर से कोड पूछकर यहाँ डालें।</string>
+    <string name="ot_otp_label">OTP</string>
+    <string name="ot_resend">OTP फिर भेजें</string>
+    <string name="ot_verify">सत्यापित करें</string>
+    <string name="ot_otp_note">नंबर सत्यापित होने तक ऑपरेटर को जॉब या क्रेन नहीं दी जा सकती।</string>
+    <string name="ot_otp_sent">OTP भेजा गया</string>
+    <string name="ot_verified">ऑपरेटर सत्यापित हुआ</string>
 </resources>
