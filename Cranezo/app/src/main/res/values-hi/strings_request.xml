@@ -229,6 +229,11 @@
     <string name="sub_from">शुरू</string>
     <string name="sub_due">देय तिथि</string>
     <string name="sub_due_on">देय %1$s</string>
+    <string name="sub_pay_success_title">भुगतान सफल</string>
+    <string name="sub_pay_success_msg">आपकी सदस्यता %1$s तक सक्रिय है।</string>
+    <string name="sub_pay_failed_title">भुगतान विफल</string>
+    <string name="sub_pay_failed_msg">भुगतान पूरा नहीं हुआ। अगर कोई पैसा कटा है, तो आपका बैंक उसे अपने आप लौटा देगा।</string>
+    <string name="sub_try_again">फिर कोशिश करें</string>
     <string name="pm_title">भुगतान का तरीका चुनें</string>
     <string name="pm_upi">UPI</string>
     <string name="pm_upi_sub">किसी भी UPI ऐप से भुगतान करें</string>

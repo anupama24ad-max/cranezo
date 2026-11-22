@@ -229,6 +229,11 @@
     <string name="sub_from">ప్రారంభం</string>
     <string name="sub_due">గడువు తేదీ</string>
     <string name="sub_due_on">గడువు %1$s</string>
+    <string name="sub_pay_success_title">చెల్లింపు విజయవంతమైంది</string>
+    <string name="sub_pay_success_msg">మీ సబ్‌స్క్రిప్షన్ %1$s వరకు సక్రియంగా ఉంటుంది.</string>
+    <string name="sub_pay_failed_title">చెల్లింపు విఫలమైంది</string>
+    <string name="sub_pay_failed_msg">చెల్లింపు పూర్తి కాలేదు. ఏదైనా డబ్బు కట్ అయితే, మీ బ్యాంక్ దాన్ని ఆటోమేటిక్‌గా తిరిగి ఇస్తుంది.</string>
+    <string name="sub_try_again">మళ్లీ ప్రయత్నించండి</string>
     <string name="pm_title">చెల్లింపు పద్ధతిని ఎంచుకోండి</string>
     <string name="pm_upi">UPI</string>
     <string name="pm_upi_sub">ఏదైనా UPI యాప్‌తో చెల్లించండి</string>

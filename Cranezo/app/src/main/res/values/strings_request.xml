@@ -230,6 +230,11 @@
     <string name="sub_from">From</string>
     <string name="sub_due">Due date</string>
     <string name="sub_due_on">Due %1$s</string>
+    <string name="sub_pay_success_title">Payment successful</string>
+    <string name="sub_pay_success_msg">Your subscription is active until %1$s.</string>
+    <string name="sub_pay_failed_title">Payment failed</string>
+    <string name="sub_pay_failed_msg">The payment was not completed. If any money was deducted, your bank will return it automatically.</string>
+    <string name="sub_try_again">Try again</string>
     <string name="pm_title">Select Payment Method</string>
     <string name="pm_upi">UPI</string>
     <string name="pm_upi_sub">Pay using any UPI app</string>

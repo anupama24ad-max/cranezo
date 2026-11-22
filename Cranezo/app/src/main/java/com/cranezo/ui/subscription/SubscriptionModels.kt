@@ -36,6 +36,8 @@ data class SubscriptionInfo(
     val days_left: Int? = null,
     val grace_days_left: Int? = null,
     val last_paid_at: String? = null,
+    // only on the payment check (sync): did THIS payment go through
+    val paid: Boolean? = null,
     val offer: SubscriptionOffer? = null
 )
 

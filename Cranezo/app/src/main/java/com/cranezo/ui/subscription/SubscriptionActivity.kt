@@ -2,7 +2,10 @@ package com.cranezo.ui.subscription
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -98,6 +101,55 @@ class SubscriptionActivity :
             )
         }
         LaunchedEffect(state.done) { if (state.done) continueSignup() }
+
+        // one alert for the result of a payment: Payment successful (then the screen moves on) or Payment failed (stay and try again)
+        state.result?.let { result ->
+            val ok = result == "success"
+            androidx.compose.ui.window.Dialog(onDismissRequest = {
+                vm.clearResult()
+                if (ok) continueSignup()
+            }) {
+                androidx.compose.foundation.layout.Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(dimen_24))
+                        .background(com.cranezo.ui.theme.appColors.screenBottom)
+                        .padding(dimen_24),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (ok) com.cranezo.ui.components.SuccessTick(size = dimen_80)
+                    else androidx.compose.foundation.layout.Box(
+                        modifier = Modifier.size(dimen_80).clip(androidx.compose.foundation.shape.CircleShape).background(Red.copy(alpha = 0.16f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.material3.Icon(
+                            androidx.compose.material.icons.Icons.Default.Close, contentDescription = null,
+                            tint = Red, modifier = Modifier.size(dimen_44)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(dimen_14))
+                    Textview(
+                        stringResource(if (ok) R.string.sub_pay_success_title else R.string.sub_pay_failed_title),
+                        size = font_20, color = if (ok) SuccessGreen else Red, fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(dimen_6))
+                    Textview(
+                        if (ok) stringResource(R.string.sub_pay_success_msg, formatServerDate(state.info?.due_at))
+                        else stringResource(R.string.sub_pay_failed_msg),
+                        size = font_13, color = appColors.textSecondary,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(dimen_20))
+                    CommonGradientButton(
+                        text = stringResource(if (ok) R.string.common_continue else R.string.sub_try_again),
+                        onClick = {
+                            vm.clearResult()
+                            if (ok) continueSignup()
+                        }
+                    )
+                }
+            }
+        }
 
         MyProfileScaffold(title = stringResource(R.string.sub_title), onBack = { finish() }) {
             SubscriptionContent(

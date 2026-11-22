@@ -22,8 +22,10 @@ data class SubscriptionState(
     val busy: Boolean = false,
     /** A Razorpay order is ready: the screen opens Checkout once and clears it */
     val order: SubOrder? = null,
-    /** The free trial started or the payment went through */
-    val done: Boolean = false
+    /** The free trial started: the screen moves on at once */
+    val done: Boolean = false,
+    /** The result of a payment, shown as one alert: "success" or "failed" (null = nothing to show) */
+    val result: String? = null
 )
 
 @HiltViewModel
@@ -77,21 +79,35 @@ class SubscriptionViewModel @Inject constructor(
         return order
     }
 
+    /** The alert was closed */
+    fun clearResult() = _state.update { it.copy(result = null) }
+
     /** Razorpay says it was paid: the server checks the signature before the plan changes */
     fun onPaymentSuccess(orderId: String?, paymentId: String?, signature: String?) {
         val body = JSONObject()
             .put("razorpay_order_id", orderId.orEmpty())
             .put("razorpay_payment_id", paymentId.orEmpty())
             .put("razorpay_signature", signature.orEmpty())
-        call("owner/subscription/verify", body, SubscriptionInfo::class.java) { info ->
-            _state.update { it.copy(info = info, done = true) }
+        _state.update { it.copy(busy = true) }
+        runWhenOnline {
+            repo.financePost("owner/subscription/verify", headers(), body).isRequestCallSuspendSuccess(
+                success = { r ->
+                    val info = r?.data?.takeIf { !it.isJsonNull }?.let { gson.fromJson(it, SubscriptionInfo::class.java) }
+                    _state.update { it.copy(busy = false, loaded = true, info = info ?: it.info, result = "success") }
+                },
+                // Razorpay said paid but the check failed: ask Razorpay itself before telling the owner anything
+                failure = { _, _, _ ->
+                    _state.update { it.copy(busy = false) }
+                    onPaymentError(orderId)
+                }
+            )
         }
     }
 
-    /** The payment screen was closed or failed: ask Razorpay in case the money was taken anyway */
+    /** The payment screen was closed or failed: ask Razorpay in case the money was taken anyway, then show one alert */
     fun onPaymentError(orderId: String?) {
         if (orderId.isNullOrBlank()) {
-            showError(string(R.string.sub_payment_failed))
+            _state.update { it.copy(result = "failed") }
             return
         }
         _state.update { it.copy(busy = true) }
@@ -99,14 +115,13 @@ class SubscriptionViewModel @Inject constructor(
             repo.financePost("owner/subscription/sync", headers(), JSONObject().put("order_id", orderId)).isRequestCallSuspendSuccess(
                 success = { r ->
                     val info = r?.data?.takeIf { !it.isJsonNull }?.let { gson.fromJson(it, SubscriptionInfo::class.java) }
-                    val paid = info?.state == "active"
-                    _state.update { it.copy(busy = false, loaded = true, info = info ?: it.info, done = paid) }
-                    if (!paid) showError(string(R.string.sub_payment_failed))
+                    // this payment only: an owner who already has an active plan is not "paid" after a failed attempt
+                    val paid = info?.paid == true
+                    _state.update { it.copy(busy = false, loaded = true, info = info ?: it.info, result = if (paid) "success" else "failed") }
                 },
-                // the check itself failed (e.g. "forbidden"): the owner only cancelled, so show the plain message, not the server's
+                // the check itself failed (e.g. "forbidden"): the owner only cancelled, so it is a plain failure, not the server's message
                 failure = { _, _, _ ->
-                    _state.update { it.copy(busy = false, loaded = true) }
-                    showError(string(R.string.sub_payment_failed))
+                    _state.update { it.copy(busy = false, loaded = true, result = "failed") }
                 }
             )
         }

@@ -53,7 +53,7 @@ object CheckoutStyle {
     fun open(activity: Activity, keyId: String?, options: JSONObject, method: PayMethod? = null) {
         val checkout = Checkout().apply {
             setKeyID(keyId)
-            setImage(R.drawable.cranezo_logo)
+            setImage(R.drawable.ic_checkout_logo)
         }
         checkout.open(activity, apply(options, method))
     }
