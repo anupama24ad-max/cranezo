@@ -175,10 +175,11 @@ fun SelectedCheck(modifier: Modifier = Modifier) {
         modifier = modifier
             .size(dimen_24)
             .clip(CircleShape)
-            .background(AmberPrimary),
+            // a light tint with an amber tick (a solid yellow disc looked too heavy)
+            .background(AmberPrimary.copy(alpha = 0.16f)),
         contentAlignment = Alignment.Center
     ) {
-        Icon(Icons.Default.Check, contentDescription = null, tint = Color.Black, modifier = Modifier.size(dimen_14))
+        Icon(Icons.Default.Check, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_14))
     }
 }
 
@@ -193,11 +194,11 @@ fun SelectableCard(
 ) {
     Box(
         modifier = modifier
-            .background(if (selected) appColors.primaryTint else Color.Transparent, RoundedCornerShape(dimen_16))
+            .background(if (selected) AmberPrimary.copy(alpha = 0.07f) else Color.Transparent, RoundedCornerShape(dimen_16))
             .glassEffect(
                 shape = RoundedCornerShape(dimen_16),
-                borderColor = if (selected) AmberPrimary else Color.Unspecified,
-                borderWidth = 1.5.dp
+                borderColor = if (selected) AmberPrimary.copy(alpha = 0.55f) else Color.Unspecified,
+                borderWidth = 1.dp
             )
             .clip(RoundedCornerShape(dimen_16))
             .clickable { onClick() },

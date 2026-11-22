@@ -214,7 +214,7 @@ fun OfferScreen(bookingVm: BookingViewModel, vm: RequestViewModel, onBack: () ->
                 Spacer(modifier = Modifier.height(dimen_8))
                 GlassInputField(
                     label = stringResource(R.string.rq_auto_raise_max), value = autoMax,
-                    onValueChange = { autoMax = it.filter { c -> c.isDigit() } }, placeholder = "0", keyboardType = KeyboardType.Number
+                    onValueChange = { autoMax = it.filter { c -> c.isDigit() } }, placeholder = "0", keyboardType = KeyboardType.Number, groupDigits = true
                 )
             }
         }

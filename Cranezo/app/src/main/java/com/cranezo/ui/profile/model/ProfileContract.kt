@@ -141,7 +141,7 @@ object ProfileFormSchema {
     }
 
     fun defaultUserType(role: UserRole): String = when (role) {
-        UserRole.CUSTOMER -> UserTypes.BUSINESS_USER
+        UserRole.CUSTOMER -> UserTypes.INDIVIDUAL_USER // every customer is an individual user now
         UserRole.OPERATOR -> UserTypes.INDIVIDUAL_OPERATOR
         UserRole.CRANE_OWNER -> ""
     }
@@ -159,10 +159,8 @@ object ProfileFormSchema {
             OptionSource.PARTNERS, OptionSource.OWNERSHIP_TYPE
         )
 
-        UserRole.CUSTOMER -> listOf(
-            OptionSource.CUSTOMER_TYPE, OptionSource.CONSTITUTION,
-            OptionSource.NATURE_OF_BUSINESS, OptionSource.STATE
-        )
+        // the customer type is still loaded: the id of "Individual User" is sent with the profile
+        UserRole.CUSTOMER -> listOf(OptionSource.CUSTOMER_TYPE, OptionSource.STATE)
 
         UserRole.OPERATOR -> listOf(OptionSource.OPERATOR_TYPE, OptionSource.EXPERIENCE)
     }
@@ -234,13 +232,16 @@ object ProfileFormSchema {
         )
     )
 
-    private fun customerItems(userType: String): List<ProfileFormItem> {
+    /** Customers are all individual users: no user-type choice and no company details, just the city and state */
+    private fun customerItems(@Suppress("UNUSED_PARAMETER") userType: String): List<ProfileFormItem> {
         val userTypeChoice = ProfileFormItem.Choice(
             label = R.string.field_user_type,
             source = OptionSource.CUSTOMER_TYPE,
             fallback = fallbackUserTypes(UserRole.CUSTOMER)
         )
-        return if (userType == UserTypes.BUSINESS_USER) {
+        // the business form is switched off: nobody can choose "Business User" any more
+        val businessEnabled = false
+        return if (businessEnabled) {
             listOf(
                 userTypeChoice,
                 ProfileFormItem.Input(
@@ -288,7 +289,6 @@ object ProfileFormSchema {
             )
         } else {
             listOf(
-                userTypeChoice,
                 // Aadhaar and PAN are not asked from individual customers any more
                 ProfileFormItem.Input(
                     ProfileField.CITY, R.string.field_city, R.string.field_city_hint,
@@ -429,7 +429,8 @@ data class ProfileUiState(
         get() {
             if (isUploading) return false
             if (value(ProfileField.FULL_NAME).isBlank()) return false
-            if (ProfileFormSchema.userTypeSource(role) != OptionSource.NONE && userTypeId == null) return false
+            // a customer has no user-type choice any more (the server makes them an individual user), so nothing to wait for
+            if (role != UserRole.CUSTOMER && ProfileFormSchema.userTypeSource(role) != OptionSource.NONE && userTypeId == null) return false
 
             val inputsFilled = formItems.filterIsInstance<ProfileFormItem.Input>()
                 .filter { it.required }

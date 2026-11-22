@@ -84,7 +84,9 @@ class FilePreviewActivity : ComponentActivity() {
     }
 
     private fun openOutside(url: String) {
-        runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+        // Files are private: another app or a browser has no login token and would only get a security error,
+        // so a file is never handed out by its link. It is shown here, inside the app.
+        android.widget.Toast.makeText(this, getString(R.string.pv_private_note), android.widget.Toast.LENGTH_LONG).show()
     }
 }
 
@@ -157,6 +159,12 @@ private fun PdfPages(url: String, onOpenOutside: () -> Unit) {
                 val file = File(context.cacheDir, "preview_${url.hashCode()}.pdf")
                 if (!file.exists() || file.length() == 0L) {
                     val conn = URL(url).openConnection() as HttpURLConnection
+                    // uploaded files are private: the server opens them only for a request with the login token
+                    val token = com.cranezo.app.Cranezo.instance.sm
+                        .getData<String>(com.cranezo.utils.AppStrings.SessionValues.accessToken, "").toString()
+                    if (token.isNotBlank()) {
+                        conn.setRequestProperty("Authorization", if (token.startsWith("Bearer ", ignoreCase = true)) token else "Bearer $token")
+                    }
                     conn.connectTimeout = 15_000
                     conn.readTimeout = 30_000
                     conn.inputStream.use { input -> file.outputStream().use { input.copyTo(it) } }

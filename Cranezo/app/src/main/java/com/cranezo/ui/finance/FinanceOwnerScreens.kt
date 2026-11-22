@@ -279,7 +279,8 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(dimen_10))
             GlassInputField(
                 label = stringResource(R.string.rq_per_km_label), value = perKm,
-                onValueChange = { perKm = it.filter { c -> c.isDigit() || c == '.' } }, placeholder = "50", keyboardType = KeyboardType.Decimal
+                onValueChange = { perKm = it.filter { c -> c.isDigit() || c == '.' } }, placeholder = "50", keyboardType = KeyboardType.Decimal,
+                groupDigits = true
             )
             Textview(stringResource(R.string.rq_advance_hint), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_6))
         }
@@ -419,7 +420,8 @@ fun OwnerCommissionScreen(vm: FinanceViewModel, bookingId: String, onBack: () ->
                 Spacer(modifier = Modifier.height(dimen_8))
                 GlassInputField(
                     label = commissionValueLabel(type), value = value,
-                    onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } }, placeholder = "0", keyboardType = KeyboardType.Decimal
+                    onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } }, placeholder = "0", keyboardType = KeyboardType.Decimal,
+                    groupDigits = type != "percent"
                 )
                 // updates while typing: what the operator will get for this job
                 val entered = value.toDoubleOrNull()

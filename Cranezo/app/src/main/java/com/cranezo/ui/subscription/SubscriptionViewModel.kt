@@ -19,7 +19,10 @@ import javax.inject.Inject
 data class SubscriptionState(
     val info: SubscriptionInfo? = null,
     val loaded: Boolean = false,
+    /** A button was tapped and its request is running (a plain page load is not "busy": the buttons stay normal) */
     val busy: Boolean = false,
+    /** Which button it was: "trial", "monthly" or "yearly": only that button shows "Please wait" */
+    val busyKey: String? = null,
     /** A Razorpay order is ready: the screen opens Checkout once and clears it */
     val order: SubOrder? = null,
     /** The free trial started: the screen moves on at once */
@@ -44,17 +47,18 @@ class SubscriptionViewModel @Inject constructor(
     private fun fail(message: String?) =
         showError(message?.takeIf { it.isNotBlank() } ?: string(R.string.crane_msg_generic_error), autoHideMs = 2500L)
 
-    private fun <T> call(path: String, body: JSONObject, type: Class<T>, onOk: (T?) -> Unit) {
-        _state.update { it.copy(busy = true) }
+    /** [key] names the button that started the call; without a key (loading the page) nothing looks busy */
+    private fun <T> call(path: String, body: JSONObject, type: Class<T>, key: String? = null, onOk: (T?) -> Unit) {
+        _state.update { it.copy(busy = key != null, busyKey = key) }
         runWhenOnline {
             repo.financePost(path, headers(), body).isRequestCallSuspendSuccess(
                 success = { r ->
                     val data = r?.data?.takeIf { !it.isJsonNull }?.let { gson.fromJson(it, type) }
-                    _state.update { it.copy(busy = false, loaded = true) }
+                    _state.update { it.copy(busy = false, busyKey = null, loaded = true) }
                     onOk(data)
                 },
                 failure = { _, _, m ->
-                    _state.update { it.copy(busy = false, loaded = true) }
+                    _state.update { it.copy(busy = false, busyKey = null, loaded = true) }
                     fail(m)
                 }
             )
@@ -65,12 +69,19 @@ class SubscriptionViewModel @Inject constructor(
         _state.update { it.copy(info = info) }
     }
 
-    fun startTrial() = call("owner/subscription/start-trial", JSONObject(), SubscriptionInfo::class.java) { info ->
-        _state.update { it.copy(info = info, done = true) }
+    fun startTrial() {
+        if (_state.value.busy) return
+        call("owner/subscription/start-trial", JSONObject(), SubscriptionInfo::class.java, key = "trial") { info ->
+            _state.update { it.copy(info = info, done = true) }
+        }
     }
 
-    fun buy(plan: String) = call("owner/subscription/order", JSONObject().put("plan", plan), SubOrder::class.java) { order ->
-        _state.update { it.copy(order = order) }
+    fun buy(plan: String) {
+        // one tap at a time: a second tap while a request runs does nothing
+        if (_state.value.busy) return
+        call("owner/subscription/order", JSONObject().put("plan", plan), SubOrder::class.java, key = plan) { order ->
+            _state.update { it.copy(order = order) }
+        }
     }
 
     fun consumeOrder(): SubOrder? {

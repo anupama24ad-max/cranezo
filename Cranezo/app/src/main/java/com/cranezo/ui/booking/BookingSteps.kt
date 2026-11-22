@@ -519,8 +519,8 @@ private fun RadioDot(selected: Boolean) {
         modifier = Modifier
             .size(dimen_20)
             .clip(CircleShape)
-            .background(if (selected) AmberPrimary.copy(alpha = 0.25f) else Color.Transparent)
-            .glassEffect(CircleShape, borderColor = if (selected) AmberPrimary else Color.Unspecified),
+            .background(if (selected) AmberPrimary.copy(alpha = 0.10f) else Color.Transparent)
+            .glassEffect(CircleShape, borderColor = if (selected) AmberPrimary.copy(alpha = 0.7f) else Color.Unspecified),
         contentAlignment = Alignment.Center
     ) {
         if (selected) Box(modifier = Modifier.size(dimen_10).clip(CircleShape).background(AmberPrimary))
@@ -619,7 +619,7 @@ fun DateTimeStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
 /** Hours (stepper), Full day, or Multiple days (stepper) */
 @Composable
 private fun DurationChoices(state: BookingUiState, vm: BookingViewModel?) {
-    state.options?.duration_types.orEmpty().forEach { type ->
+    state.options?.duration_types.orEmpty().filter { it.id != "full_day" /* Full day is switched off: use Hours or Days */ }.forEach { type ->
         val selected = type.id == state.durationType
         SelectableCard(
             selected = selected,
@@ -703,7 +703,7 @@ fun DurationStep(vm: BookingViewModel? = null, onBack: () -> Unit = {}, onNext: 
     ) {
         StepTitle(R.string.bk_duration_title, R.string.bk_duration_subtitle)
 
-        state.options?.duration_types.orEmpty().forEach { type ->
+        state.options?.duration_types.orEmpty().filter { it.id != "full_day" /* Full day is switched off: use Hours or Days */ }.forEach { type ->
             val selected = type.id == state.durationType
             SelectableCard(
                 selected = selected,
