@@ -1098,6 +1098,7 @@
     <string name="op_distance">Distance</string>
     <string name="op_reached_confirm_title">Have you reached the site?</string>
     <string name="op_reached_confirm_msg">The customer will be told you have arrived. Only confirm if you are at the job site.</string>
+    <string name="op_reached_test_msg">Test mode: you will be treated as within 50 m of the site. The customer will be told you have arrived.</string>
     <string name="op_reached_confirm_yes">Yes, I am here</string>
     <string name="op_code_sent">The customer has the code in their app.</string>
     <string name="cj_time_used">Time used</string>

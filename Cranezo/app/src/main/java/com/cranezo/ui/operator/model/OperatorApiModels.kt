@@ -193,6 +193,8 @@ data class OperatorJob(
     val stage: String? = null,
     val stage_label: String? = null,
     val next_action: String? = null,
+    // the server has TESTING_RIDE_STATUS=true: the On the way screen shows the "I have reached" test button at any distance
+    val testing_ride: Boolean? = null,
     val operator_status: Int? = null,
     val requested_crane: JobCrane? = null,
     val assigned_crane: JobCrane? = null,

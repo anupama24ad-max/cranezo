@@ -945,6 +945,7 @@
     <string name="op_distance">దూరం</string>
     <string name="op_reached_confirm_title">మీరు సైట్‌కు చేరుకున్నారా?</string>
     <string name="op_reached_confirm_msg">మీరు చేరుకున్నారని కస్టమర్‌కు తెలియజేయబడుతుంది. మీరు పని స్థలంలో ఉన్నప్పుడే నిర్ధారించండి.</string>
+    <string name="op_reached_test_msg">టెస్ట్ మోడ్: మిమ్మల్ని సైట్‌కు 50 మీటర్ల లోపల ఉన్నట్లు పరిగణిస్తారు. మీరు చేరుకున్నారని కస్టమర్‌కు తెలియజేస్తారు.</string>
     <string name="op_reached_confirm_yes">అవును, నేను ఇక్కడ ఉన్నాను</string>
     <string name="op_code_sent">కోడ్ కస్టమర్ యాప్‌లో ఉంది.</string>
     <string name="cj_time_used">వాడిన సమయం</string>

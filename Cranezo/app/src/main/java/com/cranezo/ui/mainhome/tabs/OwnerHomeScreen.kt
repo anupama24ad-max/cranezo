@@ -44,6 +44,7 @@ import com.cranezo.ui.components.Textview
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.LocationOn
@@ -365,12 +366,15 @@ private fun OwnerActionSection(state: MainHomeUiState, onNavigate: (String) -> U
             )
         }
         if (requests.isNotEmpty()) {
-            // several requests: the cards scroll sideways
-            androidx.compose.foundation.layout.Row(
-                modifier = Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(dimen_12)
-            ) {
-                requests.forEach { OwnerRequestMiniCard(it, openRequests) }
+            // One request: the card is as wide as the screen. Several: each card is nearly as wide, so the next one peeks in and the row scrolls sideways.
+            androidx.compose.foundation.layout.BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val cardWidth = if (requests.size == 1) maxWidth else maxWidth - dimen_32
+                androidx.compose.foundation.layout.Row(
+                    modifier = Modifier.horizontalScroll(androidx.compose.foundation.rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(dimen_12)
+                ) {
+                    requests.forEach { OwnerRequestMiniCard(it, openRequests, cardWidth) }
+                }
             }
         }
       }
@@ -392,9 +396,9 @@ private fun OwnerActionSection(state: MainHomeUiState, onNavigate: (String) -> U
 
 /** One request as a card: code and time left, the crane asked for, where and when, the offer, and the button */
 @Composable
-private fun OwnerRequestMiniCard(item: com.cranezo.ui.booking.request.OwnerRequestItem, onOpen: () -> Unit) {
+private fun OwnerRequestMiniCard(item: com.cranezo.ui.booking.request.OwnerRequestItem, onOpen: () -> Unit, width: androidx.compose.ui.unit.Dp) {
     val bold = androidx.compose.ui.text.font.FontWeight.Bold
-    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = onOpen, modifier = Modifier.width(dimen_280)) {
+    GlassCard(contentPadding = dimen_14, borderColor = AmberPrimary, onClick = onOpen, modifier = Modifier.width(width)) {
         androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             com.cranezo.ui.booking.components.BookingTag(item.request_code.orEmpty(), InfoBlue)
             Spacer(modifier = Modifier.weight(1f))

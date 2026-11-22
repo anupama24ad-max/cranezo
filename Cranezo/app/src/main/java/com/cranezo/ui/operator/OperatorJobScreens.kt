@@ -451,13 +451,16 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     // "I have reached" works only when the operator's phone is within 50 m of the job site
     val meters = if (state.myLatitude != null && state.myLongitude != null && siteLat != null && siteLng != null)
         metersBetween(state.myLatitude, state.myLongitude, siteLat, siteLng) else null
-    val reachedReady = meters != null && meters <= REACHED_RADIUS_M
+    // testing: with TESTING_RIDE_STATUS=true on the server the button is always there; otherwise only within 50 m (the regular flow)
+    val testing = job.testing_ride == true
+    val reachedReady = testing || (meters != null && meters <= REACHED_RADIUS_M)
     var confirmReached by remember { mutableStateOf(false) }
     if (confirmReached) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { confirmReached = false },
             title = { Textview(stringResource(R.string.op_reached_confirm_title), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold) },
-            text = { Textview(stringResource(R.string.op_reached_confirm_msg), size = font_14, color = appColors.textSecondary) },
+            // in test mode the alert says the operator is treated as within 50 m of the site
+            text = { Textview(stringResource(if (testing) R.string.op_reached_test_msg else R.string.op_reached_confirm_msg), size = font_14, color = appColors.textSecondary) },
             confirmButton = {
                 androidx.compose.material3.TextButton(onClick = { confirmReached = false; onIntent(OperatorJobIntent.Arrived) }) {
                     Textview(stringResource(R.string.op_reached_confirm_yes), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
