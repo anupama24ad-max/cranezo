@@ -419,7 +419,8 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
                 }
             }
         }
-        if (accepted && job.customer?.mobile_number != null) {
+        // calling the customer directly is switched off (see Privacy.kt)
+        if (com.cranezo.utils.Privacy.PARTY_CALLS && accepted && job.customer?.mobile_number != null) {
             CommonGradientButton(
                 text = stringResource(R.string.op_call_customer), leftIcon = Icons.Default.Call, onClick = { dial(context, job.customer) },
                 gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
@@ -572,7 +573,9 @@ private fun StartJobScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Un
     ) {
         OperatorStepHeader(job.next_action)
         SafetyReminderCard()
-        job.start_checks.orEmpty().forEach { check ->
+        // The green checks (Crane Verified, Operator Verified, Documents Valid, Arrival Completed) are not shown any more.
+        // A check that is NOT ok still is: it is the reason the Start Job button is off. Remove the filter to show all again.
+        job.start_checks.orEmpty().filter { it.ok != true }.forEach { check ->
             GlassCard(contentPadding = dimen_12) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {

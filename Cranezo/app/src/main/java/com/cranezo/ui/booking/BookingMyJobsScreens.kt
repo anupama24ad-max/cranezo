@@ -274,7 +274,8 @@ fun JobDetailsScreen(
                         }
                     }
                 }
-                if (booking.operator?.mobile_number != null) {
+                // calling the operator directly is switched off (see Privacy.kt)
+                if (com.cranezo.utils.Privacy.PARTY_CALLS && booking.operator?.mobile_number != null) {
                     CommonGradientButton(
                         text = stringResource(R.string.cj_contact_operator), leftIcon = Icons.Default.Call,
                         onClick = {
@@ -290,9 +291,14 @@ fun JobDetailsScreen(
             Row {
                 CraneImage(path = booking.crane?.primary_photo, modifier = Modifier.size(dimen_80))
                 Spacer(modifier = Modifier.width(dimen_12))
-                Column {
-                    Textview(booking.booking_code.orEmpty(), size = font_10, color = appColors.textSecondary)
-                    BookingTag(booking.tab_label ?: booking.status_label.orEmpty(), if (closed) Red else if (completed || booking.tab == "active") SuccessGreen else AmberPrimary)
+                Column(modifier = Modifier.weight(1f)) {
+                    // the code on the left and the status tag at the right corner (the same place as "Fully paid")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Textview(booking.booking_code.orEmpty(), size = font_10, color = appColors.textSecondary, modifier = Modifier.weight(1f), maxLines = 1)
+                        Spacer(modifier = Modifier.width(dimen_8))
+                        BookingTag(booking.tab_label ?: booking.status_label.orEmpty(), if (closed) Red else if (completed || booking.tab == "active") SuccessGreen else AmberPrimary)
+                    }
+                    Spacer(modifier = Modifier.height(dimen_4))
                     Textview(booking.crane?.title.orEmpty(), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     Textview(booking.crane?.capacity_label ?: booking.crane?.capacity_name.orEmpty(), size = font_11, color = appColors.textSecondary)
                 }
@@ -315,22 +321,31 @@ fun JobDetailsScreen(
         GlassCard(contentPadding = dimen_12) {
             Textview(stringResource(R.string.cj_crane_operator), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(dimen_8))
-            Row {
+            // both columns have the same rows (picture, name, a line for the rating, the tag), so the two VERIFIED tags sit on one line
+            Row(verticalAlignment = Alignment.Top) {
                 Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                     CraneImage(path = booking.crane?.primary_photo, modifier = Modifier.size(dimen_56), shape = CircleShape)
+                    Spacer(modifier = Modifier.height(dimen_4))
                     Textview(booking.crane?.title.orEmpty(), size = font_11, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                    Spacer(modifier = Modifier.height(dimen_16))
+                    Spacer(modifier = Modifier.height(dimen_4))
                     if (booking.crane?.verified == true) BookingTag(stringResource(R.string.common_verified).uppercase(), SuccessGreen)
                 }
                 booking.operator?.let { operator ->
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         CraneImage(path = operator.profile_image, modifier = Modifier.size(dimen_56), shape = CircleShape)
+                        Spacer(modifier = Modifier.height(dimen_4))
                         Textview(operator.full_name.orEmpty(), size = font_11, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                        operator.rating?.let {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Star, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_12))
-                                Textview(" ${String.format(Locale.US, "%.1f", it)}", size = font_10, color = appColors.textSecondary)
+                        // the rating line has a fixed height (the crane column keeps the same empty line)
+                        androidx.compose.foundation.layout.Box(modifier = Modifier.height(dimen_16), contentAlignment = Alignment.Center) {
+                            operator.rating?.let {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_12))
+                                    Textview(" ${String.format(Locale.US, "%.1f", it)}", size = font_10, color = appColors.textSecondary)
+                                }
                             }
                         }
+                        Spacer(modifier = Modifier.height(dimen_4))
                         BookingTag(stringResource(R.string.common_verified).uppercase(), SuccessGreen)
                     }
                 }

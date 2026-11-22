@@ -80,6 +80,9 @@ data class OperatorDue(
     val operator: PersonRef? = null,
     val jobs: Int? = null,
     val amount_due: Double? = null,
+    // the amount due is the commission plus the tips customers paid online for this operator
+    val commission_due: Double? = null,
+    val tips_due: Double? = null,
     val jobs_without_commission: Int? = null
 )
 
@@ -99,6 +102,11 @@ data class JobLine(
     val payment_status: String? = null,
     val collected_by: String? = null,
     val platform_balance: Double? = null,
+    // the tip the customer paid online for the operator, and what of it the owner still has to pay
+    val tip: Double? = null,
+    val operator_tip_due: Double? = null,
+    // false when the commission of this job was already paid and only a tip is left
+    val commission_pending: Boolean? = null,
     val settlement_status: String? = null,
     val operator_settlement_status: String? = null
 )

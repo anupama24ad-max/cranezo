@@ -227,7 +227,7 @@ fun HomeProfileScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+        verticalArrangement = Arrangement.spacedBy(CardGap)
     ) {
         Textview(
             text = stringResource(if (role == UserRole.OPERATOR) R.string.tab_profile else R.string.mp_my_profile),

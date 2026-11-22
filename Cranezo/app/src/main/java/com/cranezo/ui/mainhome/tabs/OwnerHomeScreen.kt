@@ -88,7 +88,7 @@ fun OwnerHomeScreen(
         modifier = Modifier
             .padding(horizontal = dimen_20)
             .padding(top = dimen_16, bottom = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_16)
+        verticalArrangement = Arrangement.spacedBy(CardGap)
     ) {
 
         // banners the admin made for owners

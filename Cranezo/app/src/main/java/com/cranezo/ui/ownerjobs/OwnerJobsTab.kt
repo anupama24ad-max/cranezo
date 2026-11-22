@@ -135,7 +135,7 @@ fun OwnerJobsTab(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+        verticalArrangement = Arrangement.spacedBy(CardGap)
     ) {
         Column {
             Textview(stringResource(R.string.op_jobs_title), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
@@ -258,7 +258,8 @@ private fun OperatorRow(job: OwnerJob, onCall: (() -> Unit)?) {
         if (label != null && job.tab == "upcoming") {
             BookingTag(label, when (label) { "Assigned" -> SuccessGreen; "Not assigned" -> Red; else -> AmberPrimary })
         }
-        if (onCall != null && operator?.mobile_number != null) {
+        // calling the operator directly is switched off (see Privacy.kt)
+        if (com.cranezo.utils.Privacy.PARTY_CALLS && onCall != null && operator?.mobile_number != null) {
             Spacer(modifier = Modifier.width(dimen_8))
             Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_20).clickable { onCall() })
         }

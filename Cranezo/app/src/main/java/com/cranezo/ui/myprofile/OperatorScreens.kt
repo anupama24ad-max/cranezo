@@ -270,7 +270,8 @@ fun AssignedCraneScreen(
                 Spacer(modifier = Modifier.height(dimen_8))
                 InfoLine(stringResource(R.string.field_full_name), owner.full_name)
                 InfoLine(stringResource(R.string.field_company_name), owner.company_name)
-                InfoLine(stringResource(R.string.mp_mobile_number), owner.mobile_number)
+                // the owner's phone number is not shown to the operator (see Privacy.kt)
+                if (com.cranezo.utils.Privacy.PARTY_PHONES) InfoLine(stringResource(R.string.mp_mobile_number), owner.mobile_number)
             }
         }
         Spacer(modifier = Modifier.height(dimen_8))

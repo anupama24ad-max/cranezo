@@ -233,7 +233,8 @@ fun CraneArrivedScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {}) {
                         vm?.onIntent(BookingIntent.ConfirmArrival)
                     })
                 }
-                CommonGradientButton(
+                // calling the operator directly is switched off (see Privacy.kt): only the toll-free support number is shown
+                if (com.cranezo.utils.Privacy.PARTY_CALLS) CommonGradientButton(
                     text = stringResource(R.string.cj_contact_operator), leftIcon = Icons.Default.Call, onClick = { dial(context, booking.operator) },
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
                 )
@@ -320,7 +321,8 @@ fun JobInProgressScreen(
                 if (booking.actions?.can_request_extra_time == true && pending == null) {
                     CommonGradientButton(text = stringResource(R.string.cj_request_extra_time), onClick = onExtra)
                 }
-                CommonGradientButton(
+                // calling the operator directly is switched off (see Privacy.kt): only the toll-free support number is shown
+                if (com.cranezo.utils.Privacy.PARTY_CALLS) CommonGradientButton(
                     text = stringResource(R.string.cj_contact_operator), leftIcon = Icons.Default.Call, onClick = { dial(context, booking.operator) },
                     gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
                 )
@@ -488,7 +490,7 @@ fun ExtraTimeStatusScreen(vm: BookingViewModel? = null, onBack: () -> Unit = {})
         bottom = {
             Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
                 if (pending != null) {
-                    CommonGradientButton(text = stringResource(R.string.cj_contact_operator), onClick = { dial(context, booking.operator) })
+                    if (com.cranezo.utils.Privacy.PARTY_CALLS) CommonGradientButton(text = stringResource(R.string.cj_contact_operator), onClick = { dial(context, booking.operator) })
                     CommonGradientButton(
                         text = stringResource(R.string.cj_cancel_request), onClick = { vm?.onIntent(BookingIntent.CancelExtra) },
                         gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary

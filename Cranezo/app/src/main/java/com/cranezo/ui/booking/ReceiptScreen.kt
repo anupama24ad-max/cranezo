@@ -134,7 +134,8 @@ private fun Party(title: String, name: String?, phone: String?, gst: String?, mo
     Column(modifier = modifier) {
         Textview(title, size = font_11, color = appColors.textSecondary)
         Textview(name ?: "-", size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-        phone?.takeIf { it.isNotBlank() }?.let { Textview(it, size = font_11, color = appColors.textSecondary) }
+        // the other person's phone number is not printed on the receipt (see Privacy.kt)
+        if (com.cranezo.utils.Privacy.PARTY_PHONES) phone?.takeIf { it.isNotBlank() }?.let { Textview(it, size = font_11, color = appColors.textSecondary) }
         gst?.let { Textview("GSTIN $it", size = font_10, color = appColors.textSecondary) }
     }
 }

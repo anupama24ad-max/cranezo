@@ -458,7 +458,8 @@ fun TrackScreen(
                         Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(operator.full_name ?: stringResource(R.string.bk_operator), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     }
-                    if (!operator.mobile_number.isNullOrBlank()) {
+                    // calling the operator directly is switched off (see Privacy.kt)
+                    if (com.cranezo.utils.Privacy.PARTY_CALLS && !operator.mobile_number.isNullOrBlank()) {
                         CraneSmallButton(
                             text = stringResource(R.string.bk_call),
                             icon = Icons.Default.Call,
