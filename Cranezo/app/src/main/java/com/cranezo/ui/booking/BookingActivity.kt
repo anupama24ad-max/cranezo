@@ -6,6 +6,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -65,14 +66,13 @@ class BookingActivity :
     }
 
     /** Opens Razorpay Checkout for an order made by the server (UPI, cards, net banking) */
-    private fun openCheckout(order: com.cranezo.ui.booking.request.PayOrder) {
+    private fun openCheckout(order: com.cranezo.ui.booking.request.PayOrder, method: com.cranezo.utils.PayMethod? = null) {
         val options = org.json.JSONObject()
             .put("name", order.name ?: "Cranezo")
             .put("description", order.description.orEmpty())
             .put("order_id", order.order_id)
             .put("currency", order.currency ?: "INR")
             .put("amount", order.amount_paise ?: 0L)
-            .put("theme", org.json.JSONObject().put("color", "#FFA000"))
             .put(
                 "prefill",
                 org.json.JSONObject().apply {
@@ -81,7 +81,8 @@ class BookingActivity :
                 }
             )
         runCatching {
-            com.razorpay.Checkout().apply { setKeyID(order.key_id) }.open(this, options)
+            // the Cranezo logo, colour, UPI first and a time limit (see CheckoutStyle)
+            com.cranezo.utils.CheckoutStyle.open(this, order.key_id, options, method)
         }.onFailure { requestVm.onPaymentError(order.order_id, it.message) }
     }
 
@@ -137,9 +138,17 @@ class BookingActivity :
         // Crane requests (send to every nearby owner, pay the advance) have their own view model
         val requestVm = this@BookingActivity.requestVm
         val payState by requestVm.ui.collectAsStateWithLifecycle()
-        // a Razorpay order is ready: open Checkout once
+        // a Razorpay order is ready: the customer picks UPI / card / net banking in the app, then Checkout opens on it
+        var pickOrder by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<com.cranezo.ui.booking.request.PayOrder?>(null) }
         LaunchedEffect(payState.pendingOrder) {
-            if (payState.pendingOrder != null) requestVm.consumeOrder()?.let { openCheckout(it) }
+            if (payState.pendingOrder != null) pickOrder = requestVm.consumeOrder()
+        }
+        pickOrder?.let { order ->
+            com.cranezo.ui.components.PaymentMethodSheet(
+                amountText = com.cranezo.utils.rupees((order.amount_paise ?: 0L) / 100.0),
+                onPick = { method -> pickOrder = null; openCheckout(order, method) },
+                onDismiss = { pickOrder = null }
+            )
         }
         // final balance paid online: show Payment Successful
         LaunchedEffect(payState.finalPaidBookingId) {

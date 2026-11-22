@@ -229,6 +229,16 @@
     <string name="sub_from">ప్రారంభం</string>
     <string name="sub_due">గడువు తేదీ</string>
     <string name="sub_due_on">గడువు %1$s</string>
+    <string name="pm_title">చెల్లింపు పద్ధతిని ఎంచుకోండి</string>
+    <string name="pm_upi">UPI</string>
+    <string name="pm_upi_sub">ఏదైనా UPI యాప్‌తో చెల్లించండి</string>
+    <string name="pm_card">క్రెడిట్ / డెబిట్ కార్డ్</string>
+    <string name="pm_card_sub">Visa, MasterCard, Rupay మొదలైనవి</string>
+    <string name="pm_netbanking">నెట్ బ్యాంకింగ్</string>
+    <string name="pm_netbanking_sub">అన్ని ప్రధాన బ్యాంకులు</string>
+    <string name="pm_more">మరిన్ని చెల్లింపు ఎంపికలు</string>
+    <string name="pm_more_sub">వాలెట్లు, EMI మరియు మరిన్ని</string>
+    <string name="pm_pay">%1$s చెల్లించండి</string>
     <string name="mp_profile_complete">ప్రొఫైల్ పూర్తయింది</string>
     <string name="mp_profile_missing">ఇంకా నింపాల్సినవి: %1$s</string>
     <string name="sub_trial_title">మొదటి నెల ఉచితం</string>

@@ -230,6 +230,16 @@
     <string name="sub_from">From</string>
     <string name="sub_due">Due date</string>
     <string name="sub_due_on">Due %1$s</string>
+    <string name="pm_title">Select Payment Method</string>
+    <string name="pm_upi">UPI</string>
+    <string name="pm_upi_sub">Pay using any UPI app</string>
+    <string name="pm_card">Credit / Debit Card</string>
+    <string name="pm_card_sub">Visa, MasterCard, Rupay, etc.</string>
+    <string name="pm_netbanking">Net Banking</string>
+    <string name="pm_netbanking_sub">All major banks supported</string>
+    <string name="pm_more">More Payment Options</string>
+    <string name="pm_more_sub">Wallets, EMI and more</string>
+    <string name="pm_pay">Pay %1$s</string>
     <string name="mp_profile_complete">Profile completed</string>
     <string name="mp_profile_missing">Still to fill: %1$s</string>
     <string name="sub_trial_title">First month free</string>

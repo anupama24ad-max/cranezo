@@ -174,9 +174,9 @@
     <string name="home_owner_subtitle">Manage your cranes and grow your business.</string>
     <string name="home_fleet_overview">Fleet Overview</string>
     <string name="home_total_cranes">Total Cranes</string>
-    <string name="home_available_cranes">Available Cranes</string>
-    <string name="home_busy_cranes">Busy Cranes</string>
-    <string name="home_pending_verification">Pending Verification</string>
+    <string name="home_available_cranes">Available</string>
+    <string name="home_busy_cranes">On Job</string>
+    <string name="home_pending_verification">Pending</string>
     <string name="home_todays_jobs">Today\'s Jobs</string>
     <string name="home_jobs_scheduled">Jobs scheduled today</string>
     <string name="home_earnings">Earnings</string>

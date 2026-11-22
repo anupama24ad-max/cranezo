@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -57,7 +58,7 @@ class SubscriptionActivity :
 
     private var lastOrderId: String? = null
 
-    private fun openCheckout(order: SubOrder) {
+    private fun openCheckout(order: SubOrder, method: com.cranezo.utils.PayMethod? = null) {
         lastOrderId = order.order_id
         val options = org.json.JSONObject()
             .put("name", order.name ?: "Cranezo")
@@ -65,7 +66,6 @@ class SubscriptionActivity :
             .put("order_id", order.order_id)
             .put("currency", order.currency ?: "INR")
             .put("amount", order.amount_paise ?: 0L)
-            .put("theme", org.json.JSONObject().put("color", "#FFA000"))
             .put(
                 "prefill",
                 org.json.JSONObject().apply {
@@ -74,7 +74,7 @@ class SubscriptionActivity :
                 }
             )
         runCatching {
-            com.razorpay.Checkout().apply { setKeyID(order.key_id) }.open(this, options)
+            com.cranezo.utils.CheckoutStyle.open(this, order.key_id, options, method)
         }.onFailure { viewModel.onPaymentError(order.order_id) }
     }
 
@@ -87,7 +87,16 @@ class SubscriptionActivity :
     override fun Content(vm: SubscriptionViewModel) {
         val state by vm.state.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) { vm.load() }
-        LaunchedEffect(state.order) { vm.consumeOrder()?.let { openCheckout(it) } }
+        // the owner picks UPI / card / net banking in the app, then Checkout opens on it
+        var pickOrder by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf<SubOrder?>(null) }
+        LaunchedEffect(state.order) { vm.consumeOrder()?.let { pickOrder = it } }
+        pickOrder?.let { order ->
+            com.cranezo.ui.components.PaymentMethodSheet(
+                amountText = com.cranezo.utils.rupees((order.amount_paise ?: 0L) / 100.0),
+                onPick = { method -> pickOrder = null; openCheckout(order, method) },
+                onDismiss = { pickOrder = null }
+            )
+        }
         LaunchedEffect(state.done) { if (state.done) continueSignup() }
 
         MyProfileScaffold(title = stringResource(R.string.sub_title), onBack = { finish() }) {

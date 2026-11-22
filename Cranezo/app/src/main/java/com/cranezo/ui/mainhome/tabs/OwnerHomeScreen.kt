@@ -96,8 +96,8 @@ fun OwnerHomeScreen(
         // Subscription: the free trial, a due date that is near (red), overdue or expired. Nothing when all is well.
         val subContext = androidx.compose.ui.platform.LocalContext.current
         val subRed = state.owner.subLevel == "red"
-        // always shown once the owner has a plan, so they can see which plan they are on and when it is due
-        if (state.owner.subState != "none" && (state.owner.subMessage.isNotBlank() || state.owner.subPlanLabel.isNotBlank())) {
+        // The plan itself (name, due date) lives in My Profile. Home only warns when the plan is ending soon, overdue or expired.
+        if (subRed && state.owner.subMessage.isNotBlank()) {
             val tone = if (subRed) androidx.compose.ui.graphics.Color(0xFFEF4444) else AmberPrimary
             GlassCard(
                 contentPadding = dimen_14, borderColor = tone,
@@ -183,23 +183,7 @@ fun OwnerHomeScreen(
             }
         }
 
-        // Detailed report: operator payments and platform fees
-        val reportContext = androidx.compose.ui.platform.LocalContext.current
-        GlassCard(
-            contentPadding = dimen_14,
-            onClick = { reportContext.startActivity(com.cranezo.ui.finance.FinanceActivity.intent(reportContext, com.cranezo.ui.finance.FinanceRoutes.REPORT)) }
-        ) {
-            androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Textview(stringResource(R.string.rep_title), size = font_15, color = appColors.textPrimary, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                    Textview(stringResource(R.string.rep_sub), size = font_12, color = appColors.textSecondary)
-                }
-                androidx.compose.material3.Icon(
-                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null, tint = AmberPrimary
-                )
-            }
-        }
+        // The Detailed report moved to My Profile. The "Pay operators" card above shows only while an operator is waiting to be paid.
 
         // The two things an owner acts on first, at the top: customer requests near the cranes (scroll sideways),
         // and paid jobs still waiting for an operator

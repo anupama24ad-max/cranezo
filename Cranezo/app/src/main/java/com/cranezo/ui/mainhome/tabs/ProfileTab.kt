@@ -44,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -92,7 +93,34 @@ private fun appearanceName(mode: AppThemeMode): String = stringResource(
 private fun ProfileAvatar(profile: ProfileData?, fallbackName: String, onClick: () -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val photo = fileUrl(profile?.profile_image)
-    Box(modifier = Modifier.size(dimen_70)) {
+    // how complete the profile is: the ring around the photo fills up and changes colour
+    // red (under 40%), orange (40-79%), green (80% and more)
+    val percent = (profile?.profile_completion?.percent ?: 0).coerceIn(0, 100)
+    val hasPercent = profile?.profile_completion?.percent != null
+    val ringColor = when {
+        percent >= 80 -> SuccessGreen
+        percent >= 40 -> androidx.compose.ui.graphics.Color(0xFFFF9800)
+        else -> androidx.compose.ui.graphics.Color(0xFFEF4444)
+    }
+    val trackColor = appColors.subtleFill
+    Box(
+        modifier = Modifier
+            .size(dimen_80)
+            .then(
+                if (!hasPercent) Modifier else Modifier.drawBehind {
+                    val stroke = 4.dp.toPx()
+                    val inset = stroke / 2
+                    val arcSize = androidx.compose.ui.geometry.Size(size.width - stroke, size.height - stroke)
+                    val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
+                    drawArc(trackColor, 0f, 360f, false, topLeft, arcSize, style = androidx.compose.ui.graphics.drawscope.Stroke(stroke))
+                    drawArc(
+                        ringColor, -90f, 360f * percent / 100f, false, topLeft, arcSize,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(stroke, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+                    )
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
         Box(
             modifier = Modifier
                 .size(dimen_66)
@@ -121,6 +149,19 @@ private fun ProfileAvatar(profile: ProfileData?, fallbackName: String, onClick: 
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.matchParentSize()
                 )
+            }
+        }
+        // the percentage, on the ring, in the same colour
+        if (hasPercent) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .clip(RoundedCornerShape(dimen_10))
+                    .background(ringColor)
+                    .padding(horizontal = dimen_6, vertical = dimen_2)
+                    .clickable { onClick() }
+            ) {
+                Textview("$percent%", size = font_10, color = androidx.compose.ui.graphics.Color.White, fontWeight = FontWeight.Bold)
             }
         }
         Box(
@@ -296,6 +337,12 @@ fun HomeProfileScreen(
                     onClick = { context.startActivity(FinanceActivity.intent(context)) }
                 )
                 if (role == UserRole.CRANE_OWNER) {
+                    MenuRow(
+                        icon = Icons.Default.Description,
+                        title = stringResource(R.string.rep_title),
+                        subtitle = stringResource(R.string.rep_sub),
+                        onClick = { context.startActivity(FinanceActivity.intent(context, com.cranezo.ui.finance.FinanceRoutes.REPORT)) }
+                    )
                     MenuRow(
                         icon = Icons.Default.AccountBalanceWallet,
                         title = stringResource(R.string.sub_menu_title),

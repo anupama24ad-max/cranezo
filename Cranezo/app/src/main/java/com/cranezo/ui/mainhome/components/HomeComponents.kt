@@ -449,14 +449,16 @@ fun StatTile(
     ) {
         IconBadge(iconRes = icon, accent = accent, size = dimen_36)
         Spacer(modifier = Modifier.width(dimen_10))
-        Column {
+        // weight(1f): the text gets only the room left of the icon, so it can never run over the tile edge
+        Column(modifier = Modifier.weight(1f)) {
             Textview(
                 text = value,
                 size = font_18,
                 color = appColors.textPrimary,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
-            Textview(text = label, size = font_10, color = appColors.textSecondary, maxLines = 2)
+            Textview(text = label, size = font_10, color = appColors.textSecondary, maxLines = 1)
         }
     }
 }
@@ -486,7 +488,9 @@ fun MetricCard(
                 text = title,
                 size = font_11,
                 color = appColors.textSecondary,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                maxLines = 1,
+                modifier = Modifier.weight(1f)
             )
         }
         Spacer(modifier = Modifier.height(dimen_14))

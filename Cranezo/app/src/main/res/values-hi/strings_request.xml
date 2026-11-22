@@ -229,6 +229,16 @@
     <string name="sub_from">शुरू</string>
     <string name="sub_due">देय तिथि</string>
     <string name="sub_due_on">देय %1$s</string>
+    <string name="pm_title">भुगतान का तरीका चुनें</string>
+    <string name="pm_upi">UPI</string>
+    <string name="pm_upi_sub">किसी भी UPI ऐप से भुगतान करें</string>
+    <string name="pm_card">क्रेडिट / डेबिट कार्ड</string>
+    <string name="pm_card_sub">Visa, MasterCard, Rupay आदि</string>
+    <string name="pm_netbanking">नेट बैंकिंग</string>
+    <string name="pm_netbanking_sub">सभी प्रमुख बैंक उपलब्ध</string>
+    <string name="pm_more">और भुगतान विकल्प</string>
+    <string name="pm_more_sub">वॉलेट, EMI और अन्य</string>
+    <string name="pm_pay">%1$s का भुगतान करें</string>
     <string name="mp_profile_complete">प्रोफ़ाइल पूरी</string>
     <string name="mp_profile_missing">भरना बाकी: %1$s</string>
     <string name="sub_trial_title">पहला महीना मुफ़्त</string>
