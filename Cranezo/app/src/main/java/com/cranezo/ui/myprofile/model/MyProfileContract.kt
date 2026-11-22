@@ -41,6 +41,14 @@ object PKey {
     const val PAN_FILE = "pan_card_file"
     const val OTHER_FILE = "other_document_file"
 
+    // Owner (company name, address, city, established date and experience reuse the keys above)
+    const val OWNER_TYPE = "owner_type"
+    const val PARTNERS = "number_of_business_partners"
+    const val OWNERSHIP_TYPE = "business_ownership_type"
+    const val CATEGORY = "business_category"
+    const val OWNER_STATE = "state"
+    const val PINCODE = "pincode"
+
     const val PROFILE_IMAGE = "profile_image"
 
     val INDIVIDUAL = listOf(AADHAR, PAN, CITY, STATE)
@@ -55,7 +63,10 @@ object PKey {
         NATURE to 13,
         STATE to 14,
         EXPERIENCE to 3,
-        OPERATOR_TYPE to 10
+        OPERATOR_TYPE to 10,
+        OWNER_TYPE to 2,
+        PARTNERS to 4,
+        OWNERSHIP_TYPE to 5
     )
 }
 

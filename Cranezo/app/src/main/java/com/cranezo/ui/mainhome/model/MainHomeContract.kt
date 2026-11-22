@@ -102,7 +102,10 @@ data class OwnerHomeData(
     // subscription: state (trial, active, grace, expired), level (ok, info, red) and the message to show
     val subState: String = "none",
     val subLevel: String = "ok",
-    val subMessage: String = ""
+    val subMessage: String = "",
+    // the plan name ("Monthly Plan") and the date it is due, to show the owner what they have
+    val subPlanLabel: String = "",
+    val subDueAt: String = ""
 )
 
 data class BookingItem(

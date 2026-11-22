@@ -823,7 +823,15 @@
     <string name="sp_describe_hint">बताएँ क्या हुआ…</string>
     <string name="sp_photos">फ़ोटो (वैकल्पिक, 5 तक)</string>
     <string name="sp_submit">भेजें</string>
+    <string name="sp_agent_name">क्रेनज़ो सपोर्ट</string>
+    <string name="sp_agent_status">ऑनलाइन · कुछ ही मिनटों में जवाब</string>
     <string name="sp_request_sent">आपका अनुरोध भेज दिया गया</string>
+    <string name="sp_sent_sub">धन्यवाद। हमें आपका संदेश मिल गया है और हमारी टीम इसे देखेगी।</string>
+    <string name="sp_request_id">अनुरोध आईडी</string>
+    <string name="sp_next_title">आगे क्या होगा</string>
+    <string name="sp_next_1">हमारी सपोर्ट टीम आपका अनुरोध पढ़ेगी।</string>
+    <string name="sp_next_2">आपको यहाँ जवाब और नोटिफ़िकेशन मिलेगा, आमतौर पर कुछ ही मिनटों में।</string>
+    <string name="sp_next_3">चैट करने या और जानकारी जोड़ने के लिए कभी भी अनुरोध देखें दबाएँ।</string>
     <string name="sp_view_request">अनुरोध देखें</string>
     <string name="sp_done">हो गया</string>
     <string name="sp_msg_describe">कृपया समस्या का वर्णन करें (कम से कम 5 अक्षर)</string>

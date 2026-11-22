@@ -228,6 +228,9 @@
     <string name="sub_plan_line">%1$s ప్లాన్</string>
     <string name="sub_from">ప్రారంభం</string>
     <string name="sub_due">గడువు తేదీ</string>
+    <string name="sub_due_on">గడువు %1$s</string>
+    <string name="mp_profile_complete">ప్రొఫైల్ పూర్తయింది</string>
+    <string name="mp_profile_missing">ఇంకా నింపాల్సినవి: %1$s</string>
     <string name="sub_trial_title">మొదటి నెల ఉచితం</string>
     <string name="sub_trial_sub">%1$d రోజులు ఉచితం. ఇప్పుడు చెల్లింపు అవసరం లేదు.</string>
     <string name="sub_start_trial">ఉచిత ట్రయల్ ప్రారంభించండి</string>

@@ -229,6 +229,9 @@
     <string name="sub_plan_line">%1$s plan</string>
     <string name="sub_from">From</string>
     <string name="sub_due">Due date</string>
+    <string name="sub_due_on">Due %1$s</string>
+    <string name="mp_profile_complete">Profile completed</string>
+    <string name="mp_profile_missing">Still to fill: %1$s</string>
     <string name="sub_trial_title">First month free</string>
     <string name="sub_trial_sub">%1$d days free. No payment now.</string>
     <string name="sub_start_trial">Start free trial</string>

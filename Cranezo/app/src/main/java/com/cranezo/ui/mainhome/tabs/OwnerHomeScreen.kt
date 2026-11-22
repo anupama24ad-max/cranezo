@@ -96,7 +96,8 @@ fun OwnerHomeScreen(
         // Subscription: the free trial, a due date that is near (red), overdue or expired. Nothing when all is well.
         val subContext = androidx.compose.ui.platform.LocalContext.current
         val subRed = state.owner.subLevel == "red"
-        if (state.owner.subMessage.isNotBlank() && (subRed || state.owner.subState == "trial")) {
+        // always shown once the owner has a plan, so they can see which plan they are on and when it is due
+        if (state.owner.subState != "none" && (state.owner.subMessage.isNotBlank() || state.owner.subPlanLabel.isNotBlank())) {
             val tone = if (subRed) androidx.compose.ui.graphics.Color(0xFFEF4444) else AmberPrimary
             GlassCard(
                 contentPadding = dimen_14, borderColor = tone,
@@ -104,10 +105,24 @@ fun OwnerHomeScreen(
             ) {
                 androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Textview(
-                            state.owner.subMessage, size = font_14, color = if (subRed) tone else appColors.textPrimary,
-                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
-                        )
+                        if (state.owner.subPlanLabel.isNotBlank()) {
+                            Textview(
+                                stringResource(R.string.sub_plan_line, state.owner.subPlanLabel), size = font_16, color = appColors.textPrimary,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                            )
+                            if (state.owner.subDueAt.isNotBlank()) {
+                                Textview(
+                                    stringResource(R.string.sub_due_on, com.cranezo.utils.formatServerDate(state.owner.subDueAt)),
+                                    size = font_12, color = appColors.textSecondary
+                                )
+                            }
+                        }
+                        if (state.owner.subMessage.isNotBlank()) {
+                            Textview(
+                                state.owner.subMessage, size = font_13, color = if (subRed) tone else appColors.textPrimary,
+                                fontWeight = if (subRed) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Normal
+                            )
+                        }
                         Textview(stringResource(R.string.sub_home_action), size = font_12, color = appColors.textSecondary)
                     }
                     androidx.compose.material3.Icon(

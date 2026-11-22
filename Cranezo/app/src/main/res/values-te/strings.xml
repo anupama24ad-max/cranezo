@@ -823,7 +823,15 @@
     <string name="sp_describe_hint">ఏమి జరిగిందో చెప్పండి…</string>
     <string name="sp_photos">ఫోటోలు (ఐచ్ఛికం, 5 వరకు)</string>
     <string name="sp_submit">పంపండి</string>
+    <string name="sp_agent_name">క్రేన్‌జో సపోర్ట్</string>
+    <string name="sp_agent_status">ఆన్‌లైన్ · కొన్ని నిమిషాల్లో సమాధానం</string>
     <string name="sp_request_sent">మీ అభ్యర్థన పంపబడింది</string>
+    <string name="sp_sent_sub">ధన్యవాదాలు. మీ సందేశం మాకు అందింది, మా టీమ్ దాన్ని పరిశీలిస్తుంది.</string>
+    <string name="sp_request_id">అభ్యర్థన ID</string>
+    <string name="sp_next_title">తర్వాత ఏమి జరుగుతుంది</string>
+    <string name="sp_next_1">మా సపోర్ట్ టీమ్ మీ అభ్యర్థనను చదువుతుంది.</string>
+    <string name="sp_next_2">మీకు ఇక్కడ సమాధానం మరియు నోటిఫికేషన్ వస్తుంది, సాధారణంగా కొన్ని నిమిషాల్లో.</string>
+    <string name="sp_next_3">చాట్ చేయడానికి లేదా మరిన్ని వివరాలు జోడించడానికి ఎప్పుడైనా అభ్యర్థన చూడండి నొక్కండి.</string>
     <string name="sp_view_request">అభ్యర్థన చూడండి</string>
     <string name="sp_done">పూర్తయింది</string>
     <string name="sp_msg_describe">దయచేసి సమస్యను వివరించండి (కనీసం 5 అక్షరాలు)</string>

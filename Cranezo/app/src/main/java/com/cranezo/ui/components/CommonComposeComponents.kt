@@ -2898,3 +2898,16 @@ fun GlassPhoneField(
 }
 
 
+
+/**
+ * The one success tick of the app (the same image as Payment Successful). Use it for every big
+ * "done / sent / accepted" mark instead of a drawn check icon.
+ */
+@Composable
+fun SuccessTick(modifier: Modifier = Modifier, size: Dp = dimen_100) {
+    Image(
+        painter = painterResource(R.drawable.ic_payment_success),
+        contentDescription = null,
+        modifier = modifier.size(size)
+    )
+}

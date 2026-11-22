@@ -103,7 +103,7 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
     if (done) {
         FinPage(stringResource(R.string.as_done_title), onBack, subtitle = job?.booking_code) {
             Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_24), horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = FinGreen, modifier = Modifier.size(dimen_70))
+                com.cranezo.ui.components.SuccessTick(size = dimen_80)
                 Spacer(modifier = Modifier.height(dimen_12))
                 Textview(stringResource(R.string.as_done_title), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(dimen_8))

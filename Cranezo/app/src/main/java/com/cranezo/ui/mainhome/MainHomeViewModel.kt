@@ -142,7 +142,9 @@ class MainHomeViewModel @Inject constructor(
                                 dueJobsNoCommission = int(d.getAsJsonObject("operator_dues"), "jobs_without_commission"),
                                 subState = d.getAsJsonObject("subscription")?.get("state")?.takeIf { v -> !v.isJsonNull }?.asString ?: "none",
                                 subLevel = d.getAsJsonObject("subscription")?.get("level")?.takeIf { v -> !v.isJsonNull }?.asString ?: "ok",
-                                subMessage = d.getAsJsonObject("subscription")?.get("message")?.takeIf { v -> !v.isJsonNull }?.asString.orEmpty()
+                                subMessage = d.getAsJsonObject("subscription")?.get("message")?.takeIf { v -> !v.isJsonNull }?.asString.orEmpty(),
+                                subPlanLabel = d.getAsJsonObject("subscription")?.get("plan_label")?.takeIf { v -> !v.isJsonNull }?.asString.orEmpty(),
+                                subDueAt = d.getAsJsonObject("subscription")?.get("due_at")?.takeIf { v -> !v.isJsonNull }?.asString.orEmpty()
                             )
                         )
                     }

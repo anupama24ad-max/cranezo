@@ -228,6 +228,9 @@
     <string name="sub_plan_line">%1$s प्लान</string>
     <string name="sub_from">शुरू</string>
     <string name="sub_due">देय तिथि</string>
+    <string name="sub_due_on">देय %1$s</string>
+    <string name="mp_profile_complete">प्रोफ़ाइल पूरी</string>
+    <string name="mp_profile_missing">भरना बाकी: %1$s</string>
     <string name="sub_trial_title">पहला महीना मुफ़्त</string>
     <string name="sub_trial_sub">%1$d दिन मुफ़्त। अभी कोई भुगतान नहीं।</string>
     <string name="sub_start_trial">मुफ़्त ट्रायल शुरू करें</string>

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -149,8 +150,9 @@ fun OwnerEarningsTab(
         }
 
         // Hero card: the period's net earnings, the date, jobs done and the change, with an amber glow on the right
-        GlassCard(contentPadding = dimen_16, shape = RoundedCornerShape(dimen_20), minHeight = dimen_140) {
-            Box(modifier = Modifier.fillMaxWidth()) {
+        // no padding or minimum height on the card itself: the box inside fills the whole card, so the glow reaches top to bottom
+        GlassCard(contentPadding = androidx.compose.ui.unit.Dp(0f), shape = RoundedCornerShape(dimen_20), minHeight = androidx.compose.ui.unit.Dp(0f)) {
+            Box(modifier = Modifier.fillMaxWidth().heightIn(min = dimen_140).clip(RoundedCornerShape(dimen_20))) {
                 Box(
                     modifier = Modifier
                         .matchParentSize()
@@ -161,7 +163,7 @@ fun OwnerEarningsTab(
                             )
                         )
                 )
-                Column {
+                Column(modifier = Modifier.padding(dimen_16)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Textview(
                             stringResource(when (state.period) { "week" -> R.string.oe_week_earnings; "month" -> R.string.oe_month_earnings; "all" -> R.string.oe_total_earnings; else -> R.string.op_todays_earnings }),

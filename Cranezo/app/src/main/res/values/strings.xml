@@ -976,7 +976,15 @@
     <string name="sp_describe_hint">Tell us what happened…</string>
     <string name="sp_photos">Photos (optional, up to 5)</string>
     <string name="sp_submit">Submit</string>
+    <string name="sp_agent_name">Cranezo Support</string>
+    <string name="sp_agent_status">Online · replies within a few minutes</string>
     <string name="sp_request_sent">Your request was sent</string>
+    <string name="sp_sent_sub">Thank you. We have your message and our team will look into it.</string>
+    <string name="sp_request_id">Request ID</string>
+    <string name="sp_next_title">What happens next</string>
+    <string name="sp_next_1">Our support team reads your request.</string>
+    <string name="sp_next_2">You get a reply here and a notification, usually within a few minutes.</string>
+    <string name="sp_next_3">Tap View request any time to chat or add more details.</string>
     <string name="sp_view_request">View request</string>
     <string name="sp_done">Done</string>
     <string name="sp_msg_describe">Please describe the problem (at least 5 characters)</string>

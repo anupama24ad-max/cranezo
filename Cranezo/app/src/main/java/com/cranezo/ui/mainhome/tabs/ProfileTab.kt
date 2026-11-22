@@ -299,7 +299,11 @@ fun HomeProfileScreen(
                     MenuRow(
                         icon = Icons.Default.AccountBalanceWallet,
                         title = stringResource(R.string.sub_menu_title),
-                        subtitle = stringResource(R.string.sub_menu_sub),
+                        // the plan the owner is on and its due date, or the generic text before any plan
+                        subtitle = if (state.owner.subPlanLabel.isNotBlank()) {
+                            stringResource(R.string.sub_plan_line, state.owner.subPlanLabel) +
+                                if (state.owner.subDueAt.isNotBlank()) " · " + stringResource(R.string.sub_due_on, com.cranezo.utils.formatServerDate(state.owner.subDueAt)) else ""
+                        } else stringResource(R.string.sub_menu_sub),
                         onClick = { context.startActivity(com.cranezo.ui.subscription.SubscriptionActivity.intent(context)) }
                     )
                 }

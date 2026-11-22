@@ -94,10 +94,21 @@ class SubscriptionViewModel @Inject constructor(
             showError(string(R.string.sub_payment_failed))
             return
         }
-        call("owner/subscription/sync", JSONObject().put("order_id", orderId), SubscriptionInfo::class.java) { info ->
-            val paid = info?.state == "active"
-            _state.update { it.copy(info = info ?: it.info, done = paid) }
-            if (!paid) showError(string(R.string.sub_payment_failed))
+        _state.update { it.copy(busy = true) }
+        runWhenOnline {
+            repo.financePost("owner/subscription/sync", headers(), JSONObject().put("order_id", orderId)).isRequestCallSuspendSuccess(
+                success = { r ->
+                    val info = r?.data?.takeIf { !it.isJsonNull }?.let { gson.fromJson(it, SubscriptionInfo::class.java) }
+                    val paid = info?.state == "active"
+                    _state.update { it.copy(busy = false, loaded = true, info = info ?: it.info, done = paid) }
+                    if (!paid) showError(string(R.string.sub_payment_failed))
+                },
+                // the check itself failed (e.g. "forbidden"): the owner only cancelled, so show the plain message, not the server's
+                failure = { _, _, _ ->
+                    _state.update { it.copy(busy = false, loaded = true) }
+                    showError(string(R.string.sub_payment_failed))
+                }
+            )
         }
     }
 }

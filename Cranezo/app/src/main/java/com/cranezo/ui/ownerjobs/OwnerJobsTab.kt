@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -143,30 +143,40 @@ fun OwnerJobsTab(
         }
 
         // Tabs with their counts
-        Row(modifier = Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
-            val counts = state.counts
-            listOf(
-                Triple("all", R.string.jf_all, counts?.all),
-                Triple("new_requests", R.string.oj_tab_new_requests, counts?.new_requests),
-                Triple("upcoming", R.string.oj_tab_upcoming, counts?.upcoming),
-                Triple("active", R.string.oj_tab_active, counts?.active),
-                Triple("completed", R.string.op_tab_completed, counts?.completed),
-                Triple("closed", R.string.oj_tab_closed, counts?.closed)
-            ).forEach { (key, label, count) ->
-                val selected = key == state.tab
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(dimen_16))
-                        .background(if (selected) AmberPrimary.copy(alpha = 0.18f) else appColors.subtleFill)
-                        .clickable { onIntent(OwnerJobsIntent.SelectTab(key)) }
-                        .padding(horizontal = dimen_12, vertical = dimen_6),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Textview(stringResource(label), size = font_11, color = if (selected) appColors.primaryText else appColors.textPrimary, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal, maxLines = 1)
-                    if (count != null) {
-                        Spacer(modifier = Modifier.width(dimen_6))
-                        Box(modifier = Modifier.size(dimen_16).clip(CircleShape).background(if (key == "new_requests" && count > 0) Red else AmberPrimary.copy(alpha = 0.4f)), contentAlignment = Alignment.Center) {
-                            Textview(count.toString(), size = font_10, color = Color.White, fontWeight = FontWeight.Bold)
+        // A 3 x 2 grid of tiles: every status is on the screen at once, so nothing is hidden off the edge and nothing needs a dropdown
+        val counts = state.counts
+        val tabs = listOf(
+            Triple("all", R.string.jf_all, counts?.all),
+            Triple("new_requests", R.string.oj_tab_new_requests, counts?.new_requests),
+            Triple("upcoming", R.string.oj_tab_upcoming, counts?.upcoming),
+            Triple("active", R.string.oj_tab_active, counts?.active),
+            Triple("completed", R.string.op_tab_completed, counts?.completed),
+            Triple("closed", R.string.oj_tab_closed, counts?.closed)
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(dimen_8)) {
+            tabs.chunked(3).forEach { rowTabs ->
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(dimen_8)) {
+                    rowTabs.forEach { (key, label, count) ->
+                        val selected = key == state.tab
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(dimen_14))
+                                .background(if (selected) AmberPrimary.copy(alpha = 0.18f) else appColors.subtleFill)
+                                .border(dimen_1, if (selected) AmberPrimary else Color.Transparent, RoundedCornerShape(dimen_14))
+                                .clickable { onIntent(OwnerJobsIntent.SelectTab(key)) }
+                                .padding(vertical = dimen_10, horizontal = dimen_4),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Textview(
+                                (count ?: 0).toString(), size = font_18, fontWeight = FontWeight.Bold,
+                                color = if (key == "new_requests" && (count ?: 0) > 0) Red else if (selected) appColors.primaryText else appColors.textPrimary
+                            )
+                            Textview(
+                                stringResource(label), size = font_11, textAlign = TextAlign.Center, maxLines = 1,
+                                color = if (selected) appColors.primaryText else appColors.textSecondary,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                            )
                         }
                     }
                 }

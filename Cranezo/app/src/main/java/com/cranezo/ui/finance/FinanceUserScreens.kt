@@ -57,8 +57,8 @@ fun FinanceHubScreen(role: String, onBack: () -> Unit, onOpen: (String) -> Unit)
             FinMenuRow(Icons.Filled.Groups, stringResource(R.string.fin_pay_operators), stringResource(R.string.fin_pay_operators_sub)) { onOpen(FinanceRoutes.OPERATOR_DUES) }
             FinMenuRow(Icons.Filled.AccountBalance, stringResource(R.string.fin_platform_title), stringResource(R.string.fin_platform_sub)) { onOpen(FinanceRoutes.PLATFORM) }
             FinMenuRow(Icons.Filled.Payments, stringResource(R.string.fin_payments_title), stringResource(R.string.fin_payments_sub)) { onOpen(FinanceRoutes.TRANSACTIONS) }
-            // the page keeps the advance, per km and default commission settings; GST and charges inside it are commented out for now
-            FinMenuRow(Icons.Filled.Percent, stringResource(R.string.fin_billing_title), stringResource(R.string.fin_billing_subtitle)) { onOpen(FinanceRoutes.BILLING) }
+            // "GST & Charges" is gone from the owner's menu: the super admin sets GST, charges and the advance %,
+            // and the operator's pay is chosen by the owner when assigning the operator (OwnerBillingScreen is kept but not linked)
             FinMenuRow(Icons.Filled.ReportProblem, stringResource(R.string.fin_complaints_title), stringResource(R.string.fin_complaints_owner_sub)) { onOpen(FinanceRoutes.COMPLAINTS) }
         }
         "OPERATOR" -> FinPage(stringResource(R.string.fin_hub_operator), onBack) {

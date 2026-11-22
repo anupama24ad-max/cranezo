@@ -138,7 +138,7 @@ class MyProfileViewModel @Inject constructor(
     private fun dropdownTypes(): List<Int> = when (role) {
         UserRole.CUSTOMER -> listOf(11, 14, 12, 13)
         UserRole.OPERATOR -> listOf(3, 10)
-        UserRole.CRANE_OWNER -> emptyList()
+        UserRole.CRANE_OWNER -> listOf(2, 3, 4, 5)
     }
 
     /** POST /dropdowns { type }, one after another (parallel calls cancel each other's network check). */
@@ -203,6 +203,20 @@ class MyProfileViewModel @Inject constructor(
             choice(PKey.EXPERIENCE, o.years_of_experience)
             choice(PKey.OPERATOR_TYPE, o.operator_type)
             text(PKey.OWNER_ID, o.owner?.member_id)
+        }
+
+        profile.owner?.let { o ->
+            text(PKey.COMPANY, o.company_name)
+            choice(PKey.OWNER_TYPE, o.owner_type)
+            choice(PKey.EXPERIENCE, o.years_of_experience)
+            choice(PKey.PARTNERS, o.partners)
+            choice(PKey.OWNERSHIP_TYPE, o.ownership_type)
+            text(PKey.CATEGORY, o.business_category)
+            text(PKey.ESTABLISHED, o.company_date_establishment)
+            text(PKey.ADDRESS, o.business_address)
+            text(PKey.CITY, o.city)
+            text(PKey.OWNER_STATE, o.state)
+            text(PKey.PINCODE, o.pincode)
         }
 
         val business = profile.customer?.is_business == true
@@ -320,7 +334,10 @@ class MyProfileViewModel @Inject constructor(
                 send(PKey.OWNER_ID)
             }
 
-            UserRole.CRANE_OWNER -> Unit
+            UserRole.CRANE_OWNER -> listOf(
+                PKey.COMPANY, PKey.OWNER_TYPE, PKey.EXPERIENCE, PKey.PARTNERS, PKey.OWNERSHIP_TYPE, PKey.CATEGORY,
+                PKey.ESTABLISHED, PKey.ADDRESS, PKey.CITY, PKey.OWNER_STATE, PKey.PINCODE
+            ).forEach { send(it) }
         }
         return body
     }
@@ -366,7 +383,17 @@ class MyProfileViewModel @Inject constructor(
                 }
             }
 
-            UserRole.CRANE_OWNER -> Unit
+            UserRole.CRANE_OWNER -> {
+                if (value(PKey.COMPANY).isEmpty()) return string(R.string.msg_fill_required)
+                val pin = value(PKey.PINCODE)
+                if (changed(state, PKey.PINCODE) && pin.isNotEmpty() && !Regex("^\\d{6}$").matches(pin)) {
+                    return string(R.string.msg_invalid_pincode)
+                }
+                val date = value(PKey.ESTABLISHED)
+                if (changed(state, PKey.ESTABLISHED) && date.isNotEmpty() && !ProfileValidation.isNotInFuture(date)) {
+                    return string(R.string.msg_establishment_future)
+                }
+            }
         }
         return null
     }

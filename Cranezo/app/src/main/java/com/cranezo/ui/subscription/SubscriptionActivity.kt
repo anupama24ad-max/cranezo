@@ -168,7 +168,6 @@ private fun SubscriptionContent(
         val save = if (monthly?.price != null && monthly.price > 0 && it.price != null) (((monthly.price * 12 - it.price) / (monthly.price * 12)) * 100).toInt() else 0
         PlanCard(it, stringResource(R.string.sub_unit_year), if (save > 0) stringResource(R.string.sub_save_percent, save) else null, has, state.busy, onBuy, current = running && info?.plan == it.plan)
     }
-    Textview(stringResource(R.string.sub_fee_note), size = font_11, color = appColors.textHint)
 }
 
 private fun formatPrice(value: Double?): String = com.cranezo.utils.formatAmount(value ?: 0.0)

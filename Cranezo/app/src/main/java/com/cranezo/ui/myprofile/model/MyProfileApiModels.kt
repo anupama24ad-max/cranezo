@@ -27,7 +27,16 @@ data class ProfileData(
     val language: LanguageRef? = null,
     val customer: CustomerBlock? = null,
     val operator: OperatorBlock? = null,
-    val owner: OwnerBlock? = null
+    val owner: OwnerBlock? = null,
+    // how much of the profile is filled, for every role
+    val profile_completion: ProfileCompletion? = null
+)
+
+data class ProfileCompletion(
+    val percent: Int? = null,
+    val filled: Int? = null,
+    val total: Int? = null,
+    val missing: List<String>? = null
 )
 
 data class LanguageRef(val id: Int? = null, val name: String? = null, val description: String? = null)
@@ -117,6 +126,12 @@ data class OperatorDocument(
 
 data class OwnerBlock(
     val company_name: String? = null,
+    val owner_type: NamedItem? = null,
+    val years_of_experience: NamedItem? = null,
+    val partners: NamedItem? = null,
+    val ownership_type: NamedItem? = null,
+    val business_category: String? = null,
+    val company_date_establishment: String? = null,
     val business_address: String? = null,
     val city: String? = null,
     val state: String? = null,

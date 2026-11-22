@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.border
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -510,11 +512,39 @@ fun CreateTicketScreen(
         }
     ) {
         if (created != null) {
-            Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_24), horizontalAlignment = Alignment.CenterHorizontally) {
-                IconBadge(icon = Icons.Default.CheckCircle, accent = SuccessGreen, size = dimen_56, filled = true)
-                Spacer(modifier = Modifier.height(dimen_10))
-                Textview(stringResource(R.string.sp_request_sent), size = font_18, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
-                Textview(created.ticket_code.orEmpty(), size = font_14, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
+            Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_16), horizontalAlignment = Alignment.CenterHorizontally) {
+                com.cranezo.ui.components.SuccessTick(size = dimen_100)
+                Spacer(modifier = Modifier.height(dimen_12))
+                Textview(stringResource(R.string.sp_request_sent), size = font_22, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(dimen_4))
+                Textview(
+                    stringResource(R.string.sp_sent_sub), size = font_13, color = appColors.textSecondary,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(horizontal = dimen_16)
+                )
+                Spacer(modifier = Modifier.height(dimen_20))
+                // the request number, big, so it is easy to quote
+                GlassCard(contentPadding = dimen_16, borderColor = AmberPrimary) {
+                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Textview(stringResource(R.string.sp_request_id), size = font_11, color = appColors.textSecondary)
+                        Textview(created.ticket_code.orEmpty(), size = font_26, color = appColors.primaryText, fontWeight = FontWeight.Bold)
+                    }
+                }
+                Spacer(modifier = Modifier.height(dimen_16))
+                // what happens next
+                GlassCard(contentPadding = dimen_16) {
+                    Textview(stringResource(R.string.sp_next_title), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    listOf(R.string.sp_next_1, R.string.sp_next_2, R.string.sp_next_3).forEachIndexed { i, text ->
+                        Spacer(modifier = Modifier.height(dimen_10))
+                        Row(verticalAlignment = Alignment.Top) {
+                            Box(
+                                modifier = Modifier.size(dimen_22).clip(androidx.compose.foundation.shape.CircleShape).background(AmberPrimary.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) { Textview("${i + 1}", size = font_11, color = appColors.primaryText, fontWeight = FontWeight.Bold) }
+                            Spacer(modifier = Modifier.width(dimen_10))
+                            Textview(stringResource(text), size = font_13, color = appColors.textSecondary, modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
             }
             return@BookingScaffold
         }
@@ -646,32 +676,84 @@ fun TicketsScreen(vm: SupportViewModel? = null, onBack: () -> Unit = {}, onOpen:
 private fun MessageBubble(m: TicketMessage) {
     val context = LocalContext.current
     when {
-        m.sender_type == "system" -> Textview(
-            m.body.orEmpty(), size = font_11, color = appColors.textSecondary, textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(vertical = dimen_6, horizontal = dimen_24)
-        )
+        // notices ("Hi! How can we help you?") sit in the middle as a small pill
+        m.sender_type == "system" -> Box(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_6), contentAlignment = Alignment.Center) {
+            Textview(
+                m.body.orEmpty(), size = font_11, color = appColors.textSecondary, textAlign = TextAlign.Center,
+                modifier = Modifier.clip(RoundedCornerShape(dimen_16)).background(appColors.subtleFill).padding(horizontal = dimen_14, vertical = dimen_6)
+            )
+        }
         else -> {
             val mine = m.is_mine == true
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = if (mine) Arrangement.End else Arrangement.Start) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (mine) Arrangement.End else Arrangement.Start,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                // the support team has a round avatar next to its messages
+                if (!mine) {
+                    Box(
+                        modifier = Modifier.size(dimen_30).clip(CircleShape).background(AmberPrimary.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) { Icon(Icons.Default.SupportAgent, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_18)) }
+                    Spacer(modifier = Modifier.width(dimen_6))
+                }
                 Column(
                     modifier = Modifier.widthIn(max = dimen_280)
-                        // the corner next to the sender is square: it reads as a speech bubble
-                        .clip(RoundedCornerShape(topStart = dimen_16, topEnd = dimen_16, bottomStart = if (mine) dimen_16 else dimen_4, bottomEnd = if (mine) dimen_4 else dimen_16))
-                        .background(if (mine) AmberPrimary else appColors.subtleFill)
-                        .padding(horizontal = dimen_12, vertical = dimen_8)
+                        // the corner next to the sender is small: it reads as a speech bubble
+                        .clip(RoundedCornerShape(topStart = dimen_20, topEnd = dimen_20, bottomStart = if (mine) dimen_20 else dimen_4, bottomEnd = if (mine) dimen_4 else dimen_20))
+                        .then(
+                            if (mine) Modifier.background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(AmberPrimary, AmberSecondary)))
+                            else Modifier.background(appColors.subtleFill).border(dimen_1, appColors.textHint.copy(alpha = 0.18f), RoundedCornerShape(topStart = dimen_20, topEnd = dimen_20, bottomStart = dimen_4, bottomEnd = dimen_20))
+                        )
+                        .padding(horizontal = dimen_14, vertical = dimen_10)
                 ) {
-                    if (!mine) Textview(m.sender_label.orEmpty(), size = font_10, color = appColors.primaryText, fontWeight = FontWeight.SemiBold)
+                    if (!mine) Textview(m.sender_label.orEmpty(), size = font_11, color = appColors.primaryText, fontWeight = FontWeight.Bold)
                     if (!m.body.isNullOrBlank()) Textview(m.body, size = font_14, color = if (mine) Color.Black else appColors.textPrimary)
                     m.attachments.orEmpty().forEach { path ->
                         ShimmerImage(
                             model = fileUrl(path), contentDescription = null, contentScale = ContentScale.Crop,
-                            modifier = Modifier.padding(top = dimen_6).size(dimen_100).clip(RoundedCornerShape(dimen_8))
+                            modifier = Modifier.padding(top = dimen_6).size(dimen_140).clip(RoundedCornerShape(dimen_12))
                                 .clickable { com.cranezo.ui.cranes.openFile(context, path) }
                         )
                     }
                     Textview(formatServerTime(m.created_at), size = font_10, color = if (mine) Color.Black.copy(alpha = 0.6f) else appColors.textHint, modifier = Modifier.align(Alignment.End).padding(top = dimen_2))
                 }
             }
+        }
+    }
+}
+
+/** The small date pill shown when a new day starts in the conversation */
+@Composable
+private fun DayDivider(iso: String?) {
+    Box(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_8), contentAlignment = Alignment.Center) {
+        Textview(
+            formatServerDate(iso), size = font_10, color = appColors.textSecondary, fontWeight = FontWeight.Medium,
+            modifier = Modifier.clip(RoundedCornerShape(dimen_12)).background(appColors.subtleFill).padding(horizontal = dimen_12, vertical = dimen_4)
+        )
+    }
+}
+
+/** Top of the live chat: who the user is talking to, with a green "online" dot */
+@Composable
+private fun SupportAgentStrip() {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = dimen_20, vertical = dimen_8)
+            .glassEffect(RoundedCornerShape(dimen_16)).padding(dimen_12),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(contentAlignment = Alignment.BottomEnd) {
+            Box(
+                modifier = Modifier.size(dimen_44).clip(CircleShape).background(AmberPrimary.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) { Icon(Icons.Default.SupportAgent, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_26)) }
+            Box(modifier = Modifier.size(dimen_12).clip(CircleShape).background(SuccessGreen))
+        }
+        Spacer(modifier = Modifier.width(dimen_12))
+        Column {
+            Textview(stringResource(R.string.sp_agent_name), size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+            Textview(stringResource(R.string.sp_agent_status), size = font_11, color = SuccessGreen)
         }
     }
 }
@@ -779,13 +861,19 @@ fun ConversationScreen(
                     onCancel = { confirmClose = false }
                 )
             }
+            if (chat) SupportAgentStrip()
+            val messages = ticket?.messages.orEmpty()
             LazyColumn(
                 state = listState,
-                modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = dimen_20),
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = dimen_16),
                 verticalArrangement = Arrangement.spacedBy(dimen_8)
             ) {
-                item { Spacer(modifier = Modifier.height(dimen_8)) }
-                items(ticket?.messages.orEmpty()) { MessageBubble(it) }
+                item { Spacer(modifier = Modifier.height(dimen_4)) }
+                itemsIndexed(messages) { i, m ->
+                    // a date pill whenever the day changes
+                    if (i == 0 || messages[i - 1].created_at?.take(10) != m.created_at?.take(10)) DayDivider(m.created_at)
+                    MessageBubble(m)
+                }
                 item { Spacer(modifier = Modifier.height(dimen_8)) }
             }
             if (ticket != null && ticket.can_reply != true) {

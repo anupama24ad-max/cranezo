@@ -879,7 +879,7 @@ private fun CompletedScreen(job: OperatorJob, onClose: () -> Unit) {
         bottom = { CommonGradientButton(text = stringResource(R.string.op_view_earnings), onClick = { PendingTab.route = "earnings"; onClose() }) }
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(top = dimen_16), horizontalAlignment = Alignment.CenterHorizontally) {
-            IconBadge(icon = Icons.Default.CheckCircle, accent = SuccessGreen, size = dimen_70, filled = true)
+            com.cranezo.ui.components.SuccessTick(size = dimen_80)
             Spacer(modifier = Modifier.height(dimen_8))
             Textview(stringResource(R.string.op_completed_title), size = font_20, color = SuccessGreen, fontWeight = FontWeight.Bold)
             Textview(stringResource(R.string.op_completed_sub), size = font_12, color = SuccessGreen)

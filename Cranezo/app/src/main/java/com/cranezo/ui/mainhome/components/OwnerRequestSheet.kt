@@ -252,10 +252,7 @@ private fun NewRequestContent(request: OwnerRequest, secondsLeft: Int, onAccept:
 @Composable
 private fun AcceptedContent(request: OwnerRequest, onDone: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier.size(dimen_56).clip(CircleShape).background(SuccessGreen),
-            contentAlignment = Alignment.Center
-        ) { Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(dimen_30)) }
+        com.cranezo.ui.components.SuccessTick(size = dimen_80)
         Spacer(modifier = Modifier.height(dimen_8))
         Textview(stringResource(R.string.bk_booking_accepted), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
         Textview(stringResource(R.string.bk_booking_accepted_sub), size = font_12, color = appColors.textSecondary)

@@ -3,6 +3,8 @@ package com.cranezo.ui.myprofile
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -144,6 +146,8 @@ fun PersonalInfoScreen(
             )
         }
 
+        CompletionCard(profile)
+
         GlassCard(contentPadding = dimen_14) {
             Column(verticalArrangement = Arrangement.spacedBy(dimen_14)) {
                 BasicDetails(state, role, onIntent)
@@ -155,7 +159,7 @@ fun PersonalInfoScreen(
             UserRole.CUSTOMER -> if (state.isBusiness) BusinessSection(state, onIntent)
 
             UserRole.OPERATOR -> OperatorSection(state, onIntent)
-            UserRole.CRANE_OWNER -> OwnerSection(profile)
+            UserRole.CRANE_OWNER -> OwnerSection(state, onIntent)
         }
 
         Spacer(modifier = Modifier.height(dimen_8))
@@ -416,31 +420,97 @@ private fun OperatorSection(state: MyProfileUiState, onIntent: (MyProfileIntent)
     }
 }
 
-/** Owners only edit name, photo and email for now; their company details are shown read only. */
+/** Every detail an owner gave at registration, all of them editable */
 @Composable
-private fun OwnerSection(profile: ProfileData?) {
-    val owner = profile?.owner ?: return
-    val rows = listOf(
-        R.string.field_company_name to owner.company_name,
-        R.string.field_business_address to owner.business_address,
-        R.string.field_city to owner.city,
-        R.string.field_state to owner.state,
-        R.string.field_pincode to owner.pincode
-    ).filter { !it.second.isNullOrBlank() }
-    if (rows.isEmpty()) return
+private fun OwnerSection(state: MyProfileUiState, onIntent: (MyProfileIntent) -> Unit) {
     GlassCard(contentPadding = dimen_14) {
-        Column(verticalArrangement = Arrangement.spacedBy(dimen_10)) {
-            rows.forEach { (label, value) ->
-                Column {
-                    Textview(text = stringResource(label), size = font_11, color = appColors.textSecondary)
-                    Textview(
-                        text = value.orEmpty(),
-                        size = font_14,
-                        color = appColors.textPrimary,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
+        Column(verticalArrangement = Arrangement.spacedBy(dimen_14)) {
+            GlassInputField(
+                label = stringResource(R.string.field_company_name),
+                value = state.form[PKey.COMPANY].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.COMPANY, it)) },
+                placeholder = stringResource(R.string.field_company_name_hint),
+                leftIcon = Icons.Default.Business,
+                capitalization = KeyboardCapitalization.Words
+            )
+            ChoiceField(state, PKey.OWNER_TYPE, stringResource(R.string.field_owner_type), stringResource(R.string.field_owner_type_hint), onIntent, Icons.Default.Person)
+            ChoiceField(state, PKey.EXPERIENCE, stringResource(R.string.field_experience), stringResource(R.string.field_experience_hint), onIntent)
+            ChoiceField(state, PKey.PARTNERS, stringResource(R.string.field_partners), stringResource(R.string.field_partners_hint), onIntent)
+            ChoiceField(state, PKey.OWNERSHIP_TYPE, stringResource(R.string.field_ownership_type), stringResource(R.string.field_ownership_type_hint), onIntent)
+            GlassInputField(
+                label = stringResource(R.string.field_business_category),
+                value = state.form[PKey.CATEGORY].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.CATEGORY, it)) },
+                placeholder = stringResource(R.string.field_business_category_hint)
+            )
+            GlassDateField(
+                label = stringResource(R.string.field_established_on),
+                value = state.form[PKey.ESTABLISHED].orEmpty(),
+                placeholder = stringResource(R.string.field_established_on_hint),
+                onDateSelected = { onIntent(MyProfileIntent.FieldChanged(PKey.ESTABLISHED, it)) },
+                allowFutureDates = false
+            )
+        }
+    }
+    GlassCard(contentPadding = dimen_14) {
+        Column(verticalArrangement = Arrangement.spacedBy(dimen_14)) {
+            GlassInputField(
+                label = stringResource(R.string.field_business_address),
+                value = state.form[PKey.ADDRESS].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.ADDRESS, it)) },
+                placeholder = stringResource(R.string.field_business_address_hint),
+                leftIcon = Icons.Default.LocationOn
+            )
+            GlassInputField(
+                label = stringResource(R.string.field_city),
+                value = state.form[PKey.CITY].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.CITY, it)) },
+                placeholder = stringResource(R.string.field_city_hint),
+                leftIcon = Icons.Default.LocationOn,
+                capitalization = KeyboardCapitalization.Words
+            )
+            GlassInputField(
+                label = stringResource(R.string.field_state),
+                value = state.form[PKey.OWNER_STATE].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.OWNER_STATE, it)) },
+                placeholder = stringResource(R.string.field_state_text_hint),
+                leftIcon = Icons.Default.LocationCity,
+                capitalization = KeyboardCapitalization.Words
+            )
+            GlassInputField(
+                label = stringResource(R.string.field_pincode),
+                value = state.form[PKey.PINCODE].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.PINCODE, it.filter { c -> c.isDigit() }.take(6))) },
+                placeholder = stringResource(R.string.field_pincode_hint),
+                leftIcon = Icons.Default.LocationOn,
+                keyboardType = KeyboardType.Number
+            )
+        }
+    }
+}
+
+/** How much of the profile is filled (every role) and what is still missing */
+@Composable
+private fun CompletionCard(profile: ProfileData?) {
+    val c = profile?.profile_completion ?: return
+    val percent = (c.percent ?: 0).coerceIn(0, 100)
+    val done = percent >= 100
+    val tone = if (done) SuccessGreen else AmberPrimary
+    GlassCard(contentPadding = dimen_14, borderColor = tone) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Textview(stringResource(R.string.mp_profile_complete), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Textview("$percent%", size = font_18, color = tone, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(dimen_8))
+        androidx.compose.material3.LinearProgressIndicator(
+            progress = { percent / 100f },
+            modifier = Modifier.fillMaxWidth().height(dimen_8).clip(androidx.compose.foundation.shape.RoundedCornerShape(dimen_4)),
+            color = tone, trackColor = appColors.subtleFill
+        )
+        val missing = c.missing.orEmpty()
+        if (missing.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(dimen_8))
+            Textview(stringResource(R.string.mp_profile_missing, missing.joinToString(", ")), size = font_11, color = appColors.textSecondary)
         }
     }
 }

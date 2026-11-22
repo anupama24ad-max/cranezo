@@ -227,10 +227,7 @@ fun BookingConfirmedScreen(
         }
     ) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier.size(dimen_56).clip(CircleShape).background(SuccessGreen.copy(alpha = 0.2f)),
-                contentAlignment = Alignment.Center
-            ) { Icon(Icons.Default.Check, contentDescription = null, tint = SuccessGreen, modifier = Modifier.size(dimen_30)) }
+            com.cranezo.ui.components.SuccessTick(size = dimen_80)
             Spacer(modifier = Modifier.height(dimen_8))
             Textview(booking.status_label.orEmpty(), size = font_20, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
             Textview(booking.status_message.orEmpty(), size = font_12, color = appColors.textSecondary, textAlign = TextAlign.Center)
