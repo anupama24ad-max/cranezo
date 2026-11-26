@@ -195,7 +195,7 @@ fun AssignOperatorScreen(vm: FinanceViewModel, bookingId: String, onBack: () -> 
             } else GlassInputField(
                 label = commissionValueLabel(type), value = value,
                 onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } },
-                placeholder = "0", keyboardType = KeyboardType.Decimal
+                placeholder = "0", keyboardType = KeyboardType.Decimal, groupDigits = type != "percent"
             )
             if (type == "percent" && commission?.job_value != null) {
                 Spacer(modifier = Modifier.height(dimen_6))

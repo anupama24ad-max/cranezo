@@ -155,8 +155,8 @@ fun PersonalInfoScreen(
         }
 
         when (role) {
-            // individual customers: no Aadhaar / PAN section any more
-            UserRole.CUSTOMER -> if (state.isBusiness) BusinessSection(state, onIntent)
+            // customers are all individual users: no company section, no Aadhaar / PAN, but the city and state asked at sign-up
+            UserRole.CUSTOMER -> CustomerSection(state, onIntent)
 
             UserRole.OPERATOR -> OperatorSection(state, onIntent)
             UserRole.CRANE_OWNER -> OwnerSection(state, onIntent)
@@ -250,6 +250,28 @@ private fun ChoiceField(
         leftIcon = icon,
         onSelected = { onIntent(MyProfileIntent.OptionSelected(key, it)) }
     )
+}
+
+/** The details a customer gave at sign-up besides name, mobile and email: the city and the state */
+@Composable
+private fun CustomerSection(state: MyProfileUiState, onIntent: (MyProfileIntent) -> Unit) {
+    GlassCard(contentPadding = dimen_14) {
+        Column(verticalArrangement = Arrangement.spacedBy(dimen_14)) {
+            GlassInputField(
+                label = stringResource(R.string.field_city),
+                value = state.form[PKey.CITY].orEmpty(),
+                onValueChange = { onIntent(MyProfileIntent.FieldChanged(PKey.CITY, it)) },
+                placeholder = stringResource(R.string.field_city_hint),
+                leftIcon = Icons.Default.LocationOn,
+                isRequired = true,
+                capitalization = KeyboardCapitalization.Words
+            )
+            ChoiceField(
+                state, PKey.STATE, stringResource(R.string.field_state),
+                stringResource(R.string.field_state_select_hint), onIntent, Icons.Default.LocationCity
+            )
+        }
+    }
 }
 
 @Composable

@@ -426,7 +426,7 @@ fun OperatorJobsTab(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+        verticalArrangement = Arrangement.spacedBy(CardGap)
     ) {
         Textview(stringResource(R.string.op_jobs_title), size = font_24, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
         Textview(stringResource(R.string.op_jobs_subtitle), size = font_12, color = appColors.textSecondary)
@@ -540,7 +540,7 @@ fun OperatorEarningsTab(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+        verticalArrangement = Arrangement.spacedBy(CardGap)
     ) {
         Textview(stringResource(R.string.op_earnings_title), size = font_24, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
         // period filter: today, 6 months, 1 year or overall

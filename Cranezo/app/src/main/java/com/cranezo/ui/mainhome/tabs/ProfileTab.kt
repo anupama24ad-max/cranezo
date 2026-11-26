@@ -25,6 +25,7 @@ import com.cranezo.ui.finance.FinanceActivity
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Gavel
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
@@ -227,7 +228,7 @@ fun HomeProfileScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = dimen_20, vertical = dimen_16),
-        verticalArrangement = Arrangement.spacedBy(dimen_12)
+        verticalArrangement = Arrangement.spacedBy(CardGap)
     ) {
         Textview(
             text = stringResource(if (role == UserRole.OPERATOR) R.string.tab_profile else R.string.mp_my_profile),
@@ -338,6 +339,13 @@ fun HomeProfileScreen(
                     onClick = { context.startActivity(FinanceActivity.intent(context)) }
                 )
                 if (role == UserRole.CRANE_OWNER) {
+                    // the owner's operator team: add, find a registered operator and send a request, how each is paid
+                    MenuRow(
+                        icon = Icons.Default.Groups,
+                        title = stringResource(R.string.ot_title),
+                        subtitle = stringResource(R.string.ot_row_sub),
+                        onClick = { context.startActivity(com.cranezo.ui.owneroperators.OperatorTeamActivity.intent(context)) }
+                    )
                     MenuRow(
                         icon = Icons.Default.Description,
                         title = stringResource(R.string.rep_title),
@@ -376,8 +384,18 @@ fun HomeProfileScreen(
                 )
             }
 
-            // one phone number can be an owner, an operator and a customer: switch between them without signing in again
-            MenuGroup {
+            // Operator and owner extras (owner requests, ratings). A customer has none of them, and Switch role is commented out,
+            // so for a customer this group would be an empty box: it is only drawn when it has a row.
+            if (role == UserRole.OPERATOR || role == UserRole.CRANE_OWNER) MenuGroup {
+                // an operator sees the owners who asked them to join a team, and accepts or declines
+                if (role == UserRole.OPERATOR) {
+                    MenuRow(
+                        icon = Icons.Default.Groups,
+                        title = stringResource(R.string.ot_invites_title),
+                        subtitle = stringResource(R.string.ot_invites_sub),
+                        onClick = { context.startActivity(com.cranezo.ui.owneroperators.OperatorInvitesActivity.intent(context)) }
+                    )
+                }
                 // operators and owners read the feedback customers gave them, star by star
                 if (role == UserRole.OPERATOR || role == UserRole.CRANE_OWNER) {
                     MenuRow(
@@ -387,13 +405,16 @@ fun HomeProfileScreen(
                         onClick = { showRatings = true }
                     )
                 }
-                // Switch role: second phase for crane owners (hidden for them)
+                // Switch role: switched off for now (commented out, the code and the SwitchRoleSheet are kept).
+                // To bring it back, remove the comment marks around this block.
+                /*
                 if (role != UserRole.CRANE_OWNER) MenuRow(
                     icon = Icons.Default.SwapHoriz,
                     title = stringResource(R.string.sw_row_title),
                     subtitle = stringResource(R.string.sw_row_sub),
                     onClick = { showSwitchRole = true }
                 )
+                */
             }
 
             GroupLabel(stringResource(R.string.mp_group_support))

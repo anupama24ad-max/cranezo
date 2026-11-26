@@ -50,6 +50,7 @@ import com.cranezo.ui.components.Textview
 import com.cranezo.ui.finance.model.BillLine
 import com.cranezo.ui.finance.model.Charge
 import com.cranezo.ui.finance.model.IdName
+import com.cranezo.ui.finance.model.JobLine
 import com.cranezo.ui.finance.model.SettlementItem
 import com.cranezo.ui.finance.model.TransactionItem
 import com.cranezo.ui.theme.*
@@ -279,7 +280,8 @@ fun OwnerBillingScreen(vm: FinanceViewModel, onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(dimen_10))
             GlassInputField(
                 label = stringResource(R.string.rq_per_km_label), value = perKm,
-                onValueChange = { perKm = it.filter { c -> c.isDigit() || c == '.' } }, placeholder = "50", keyboardType = KeyboardType.Decimal
+                onValueChange = { perKm = it.filter { c -> c.isDigit() || c == '.' } }, placeholder = "50", keyboardType = KeyboardType.Decimal,
+                groupDigits = true
             )
             Textview(stringResource(R.string.rq_advance_hint), size = font_12, color = appColors.textSecondary, modifier = Modifier.padding(top = dimen_6))
         }
@@ -419,7 +421,8 @@ fun OwnerCommissionScreen(vm: FinanceViewModel, bookingId: String, onBack: () ->
                 Spacer(modifier = Modifier.height(dimen_8))
                 GlassInputField(
                     label = commissionValueLabel(type), value = value,
-                    onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } }, placeholder = "0", keyboardType = KeyboardType.Decimal
+                    onValueChange = { value = it.filter { ch -> ch.isDigit() || ch == '.' } }, placeholder = "0", keyboardType = KeyboardType.Decimal,
+                    groupDigits = type != "percent"
                 )
                 // updates while typing: what the operator will get for this job
                 val entered = value.toDoubleOrNull()
@@ -484,6 +487,14 @@ fun OperatorDuesScreen(vm: FinanceViewModel, onBack: () -> Unit, onOpen: (String
     }
 }
 
+/** A job can be paid when its commission is set, or when its commission was paid already and only a tip is left */
+private fun canPayJob(j: JobLine): Boolean =
+    if (j.commission_pending == false) (j.operator_tip_due ?: 0.0) > 0 else j.commission_set == true
+
+/** What paying this job pays the operator: the commission still due plus the tip still due */
+private fun jobAmount(j: JobLine): Double =
+    (if (j.commission_pending != false && j.commission_set == true) j.operator_commission ?: 0.0 else 0.0) + (j.operator_tip_due ?: 0.0)
+
 @Composable
 fun PayOperatorScreen(vm: FinanceViewModel, operatorId: String, operatorName: String, onBack: () -> Unit, onPaid: () -> Unit) {
     val state by vm.ui.collectAsStateWithLifecycle()
@@ -494,13 +505,14 @@ fun PayOperatorScreen(vm: FinanceViewModel, operatorId: String, operatorName: St
     LaunchedEffect(jobs) {
         if (!initialised && jobs.isNotEmpty()) {
             selected.clear()
-            selected.addAll(jobs.filter { it.commission_set == true }.mapNotNull { it.booking_id })
+            selected.addAll(jobs.filter { canPayJob(it) }.mapNotNull { it.booking_id })
             initialised = true
         }
     }
     var method by rememberSaveable { mutableStateOf("cash") }
     var reference by rememberSaveable { mutableStateOf("") }
-    val total = jobs.filter { it.booking_id in selected }.sumOf { it.operator_commission ?: 0.0 }
+    // what is paid for a job: its commission (while not paid yet) plus the tip the customer gave the operator
+    val total = jobs.filter { it.booking_id in selected }.sumOf { jobAmount(it) }
     val methods = state.dues?.payout_methods?.takeIf { it.isNotEmpty() } ?: listOf(
         IdName("cash", stringResource(R.string.fin_method_cash)), IdName("upi", "UPI"), IdName("bank_transfer", stringResource(R.string.fin_method_bank))
     )
@@ -509,7 +521,7 @@ fun PayOperatorScreen(vm: FinanceViewModel, operatorId: String, operatorName: St
         FinSection(stringResource(R.string.fin_step_choose_jobs)) {
             if ("due_jobs" in state.loaded && jobs.isEmpty()) EmptyText(stringResource(R.string.fin_no_operator_dues))
             jobs.forEach { j ->
-                val canPay = j.commission_set == true
+                val canPay = canPayJob(j)
                 val on = j.booking_id in selected
                 Row(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(dimen_10))
@@ -528,8 +540,10 @@ fun PayOperatorScreen(vm: FinanceViewModel, operatorId: String, operatorName: St
                         Textview(j.booking_code.orEmpty(), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                         Textview(formatServerDate(j.completed_at), size = font_12, color = appColors.textSecondary)
                         if (!canPay) Textview(stringResource(R.string.fin_set_commission_first), size = font_12, color = FinRed)
+                        // the customer paid a tip online: it is all the operator's and is paid with this job
+                        if ((j.operator_tip_due ?: 0.0) > 0) Textview(stringResource(R.string.fin_incl_tip, amountText(j.operator_tip_due)), size = font_12, color = FinGreen)
                     }
-                    Textview(if (canPay) amountText(j.operator_commission) else "-", size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Textview(if (canPay) amountText(jobAmount(j)) else "-", size = font_15, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                 }
             }
             Box(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_6).height(dimen_1).background(appColors.subtleBorder))

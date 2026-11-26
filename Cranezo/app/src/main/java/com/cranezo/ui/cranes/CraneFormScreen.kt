@@ -312,7 +312,8 @@ fun CraneFormScreen(
 
                 // 2. Photos
                 NumberedSection(
-                    2, stringResource(R.string.crane_section_photos),
+                    // at least one photo is required: marked with a star like the other required fields
+                    2, stringResource(R.string.crane_section_photos) + " *",
                     subtitle = stringResource(R.string.crane_section_photos_subtitle)
                 ) {
                     PhotosRow(
@@ -336,7 +337,8 @@ fun CraneFormScreen(
                                 val typeId = type.id ?: return@forEach
                                 val entry = form.documents[typeId]
                                 DocumentRow(
-                                    title = type.name.orEmpty() + if (type.required == false) " · " + stringResource(R.string.crane_doc_optional) else "",
+                                    // a required document has a star, an optional one says so
+                                    title = type.name.orEmpty() + if (type.required == false) " · " + stringResource(R.string.crane_doc_optional) else " *",
                                     upload = entry?.upload,
                                     expiry = entry?.expiry.orEmpty(),
                                     onPick = {
@@ -421,6 +423,8 @@ fun CraneFormScreen(
                             placeholder = stringResource(R.string.crane_field_rate_hint),
                             isRequired = true,
                             keyboardType = KeyboardType.Decimal,
+                            // 1,25,000 while typing
+                            groupDigits = true,
                             modifier = Modifier.weight(1f)
                         )
                         GlassInputField(

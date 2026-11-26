@@ -17,6 +17,8 @@ val dimen_12 = 12.dp
 val dimen_14 = 14.dp
 val dimen_15 = 15.dp
 val dimen_16 = 16.dp
+/** The space between two cards stacked on a screen: one value for the whole app (it used to be 8, 12 or 16 from screen to screen) */
+val CardGap = 16.dp
 val dimen_17 = 17.dp
 val dimen_18 = 18.dp
 val dimen_20 = 20.dp

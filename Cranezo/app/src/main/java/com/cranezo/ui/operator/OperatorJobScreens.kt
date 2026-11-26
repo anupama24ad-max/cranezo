@@ -419,7 +419,8 @@ private fun JobRequestScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> 
                 }
             }
         }
-        if (accepted && job.customer?.mobile_number != null) {
+        // calling the customer directly is switched off (see Privacy.kt)
+        if (com.cranezo.utils.Privacy.PARTY_CALLS && accepted && job.customer?.mobile_number != null) {
             CommonGradientButton(
                 text = stringResource(R.string.op_call_customer), leftIcon = Icons.Default.Call, onClick = { dial(context, job.customer) },
                 gradientColors = listOf(appColors.subtleFill, appColors.subtleFill), textColor = appColors.textPrimary
@@ -451,13 +452,16 @@ private fun JourneyScreen(job: OperatorJob, state: OperatorJobState, onIntent: (
     // "I have reached" works only when the operator's phone is within 50 m of the job site
     val meters = if (state.myLatitude != null && state.myLongitude != null && siteLat != null && siteLng != null)
         metersBetween(state.myLatitude, state.myLongitude, siteLat, siteLng) else null
-    val reachedReady = meters != null && meters <= REACHED_RADIUS_M
+    // testing: with TESTING_RIDE_STATUS=true on the server the button is always there; otherwise only within 50 m (the regular flow)
+    val testing = job.testing_ride == true
+    val reachedReady = testing || (meters != null && meters <= REACHED_RADIUS_M)
     var confirmReached by remember { mutableStateOf(false) }
     if (confirmReached) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { confirmReached = false },
             title = { Textview(stringResource(R.string.op_reached_confirm_title), size = font_16, color = appColors.textPrimary, fontWeight = FontWeight.Bold) },
-            text = { Textview(stringResource(R.string.op_reached_confirm_msg), size = font_14, color = appColors.textSecondary) },
+            // in test mode the alert says the operator is treated as within 50 m of the site
+            text = { Textview(stringResource(if (testing) R.string.op_reached_test_msg else R.string.op_reached_confirm_msg), size = font_14, color = appColors.textSecondary) },
             confirmButton = {
                 androidx.compose.material3.TextButton(onClick = { confirmReached = false; onIntent(OperatorJobIntent.Arrived) }) {
                     Textview(stringResource(R.string.op_reached_confirm_yes), size = font_14, color = AmberPrimary, fontWeight = FontWeight.Bold)
@@ -569,7 +573,9 @@ private fun StartJobScreen(job: OperatorJob, onIntent: (OperatorJobIntent) -> Un
     ) {
         OperatorStepHeader(job.next_action)
         SafetyReminderCard()
-        job.start_checks.orEmpty().forEach { check ->
+        // The green checks (Crane Verified, Operator Verified, Documents Valid, Arrival Completed) are not shown any more.
+        // A check that is NOT ok still is: it is the reason the Start Job button is off. Remove the filter to show all again.
+        job.start_checks.orEmpty().filter { it.ok != true }.forEach { check ->
             GlassCard(contentPadding = dimen_12) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {

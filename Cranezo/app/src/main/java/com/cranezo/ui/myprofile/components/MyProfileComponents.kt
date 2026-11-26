@@ -105,7 +105,7 @@ fun MyProfileScaffold(
                     .fillMaxWidth()
                     .verticalScroll(if (followKeyboard) rememberImeScrollState() else androidx.compose.foundation.rememberScrollState())
                     .padding(horizontal = dimen_20),
-                verticalArrangement = Arrangement.spacedBy(dimen_12),
+                verticalArrangement = Arrangement.spacedBy(CardGap),
                 content = content
             )
             if (bottom != null) {

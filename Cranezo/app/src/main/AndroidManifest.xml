@@ -121,6 +121,15 @@
             android:exported="false"
             android:theme="@style/Theme.Cranezo" />
         <activity
+            android:name=".ui.owneroperators.OperatorTeamActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
+            android:name=".ui.owneroperators.OperatorInvitesActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Cranezo" />
+        <activity
             android:name=".ui.finance.FinanceActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"

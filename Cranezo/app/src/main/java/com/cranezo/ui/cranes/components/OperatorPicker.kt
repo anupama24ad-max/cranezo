@@ -324,7 +324,8 @@ private fun AddOperatorForm(
             value = salary,
             onValueChange = { salary = it.filter { c -> c.isDigit() || c == '.' }.take(9) },
             placeholder = stringResource(R.string.crane_operator_salary_hint),
-            keyboardType = KeyboardType.Decimal
+            keyboardType = KeyboardType.Decimal,
+            groupDigits = true
         )
     }
 

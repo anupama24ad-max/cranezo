@@ -78,6 +78,7 @@
     <string name="fin_step_how_paid">2. कैसे भुगतान किया?</string>
     <string name="fin_set_commission_first">पहले इस काम का ऑपरेटर भुगतान तय करें</string>
     <string name="fin_you_pay_now">अभी आप देंगे</string>
+    <string name="fin_incl_tip">टिप %1$s शामिल</string>
     <string name="fin_method_cash">नकद</string>
     <string name="fin_method_bank">बैंक ट्रांसफ़र</string>
     <string name="fin_reference">रेफ़रेंस नंबर</string>

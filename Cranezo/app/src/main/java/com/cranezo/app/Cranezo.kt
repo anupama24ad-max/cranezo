@@ -11,7 +11,7 @@ import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 
 @HiltAndroidApp
-class Cranezo : Application(), Application.ActivityLifecycleCallbacks {
+class Cranezo : Application(), Application.ActivityLifecycleCallbacks, coil.ImageLoaderFactory {
 
     lateinit var sm: SessionManager
 
@@ -39,6 +39,29 @@ class Cranezo : Application(), Application.ActivityLifecycleCallbacks {
         //  val channel = sm.getData(AppStrings.SessionValues.tripChannel, "")
     }
 
+
+    /**
+     * Uploaded photos and documents are private on the server: a request for /public/uploads is answered only when it carries
+     * the login token. Every image the app shows goes through this loader, so the token is added here.
+     */
+    override fun newImageLoader(): coil.ImageLoader =
+        coil.ImageLoader.Builder(this)
+            .okHttpClient {
+                okhttp3.OkHttpClient.Builder()
+                    .addInterceptor { chain ->
+                        val request = chain.request()
+                        if (request.url.encodedPath.startsWith("/public/uploads")) {
+                            val token = sm.getData<String>(AppStrings.SessionValues.accessToken, "").toString()
+                            if (token.isNotBlank()) {
+                                val bearer = if (token.startsWith("Bearer ", ignoreCase = true)) token else "Bearer $token"
+                                return@addInterceptor chain.proceed(request.newBuilder().header("Authorization", bearer).build())
+                            }
+                        }
+                        chain.proceed(request)
+                    }
+                    .build()
+            }
+            .build()
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
     override fun onActivityStarted(activity: Activity) {

@@ -85,6 +85,7 @@
     <string name="fin_step_how_paid">2. How did you pay?</string>
     <string name="fin_set_commission_first">Set operator pay for this job first</string>
     <string name="fin_you_pay_now">You pay now</string>
+    <string name="fin_incl_tip">includes %1$s tip</string>
     <string name="fin_method_cash">Cash</string>
     <string name="fin_method_bank">Bank transfer</string>
     <string name="fin_reference">Reference number</string>

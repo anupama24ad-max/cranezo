@@ -269,7 +269,7 @@ fun OwnerJobDetailsScreen(
                     if (!operator?.role_label.isNullOrBlank()) Textview(operator?.role_label.orEmpty(), size = font_11, color = appColors.textSecondary)
                 }
                 operator?.tag?.let { BookingTag(it, if (it == "Assigned") SuccessGreen else AmberPrimary) }
-                if (operator?.mobile_number != null) {
+                if (com.cranezo.utils.Privacy.PARTY_CALLS && operator?.mobile_number != null) {
                     Spacer(modifier = Modifier.width(dimen_8))
                     Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_22).clickable { openDialer(context, operator.country_code, operator.mobile_number) })
                 }
@@ -293,9 +293,9 @@ fun OwnerJobDetailsScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(modifier = Modifier.weight(1f)) {
                         Textview(stringResource(R.string.rq_site_contact).uppercase(), size = font_10, color = appColors.textSecondary)
-                        Textview(listOfNotNull(c.name, c.phone).joinToString(" · "), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
+                        Textview(listOfNotNull(c.name, if (com.cranezo.utils.Privacy.PARTY_PHONES) c.phone else null).joinToString(" · "), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                     }
-                    if (!c.phone.isNullOrBlank()) {
+                    if (com.cranezo.utils.Privacy.PARTY_CALLS && !c.phone.isNullOrBlank()) {
                         Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_22).clickable { openDialer(context, "+91", c.phone) })
                     }
                 }
@@ -487,7 +487,7 @@ fun LiveLocationScreen(vm: OwnerJobDetailViewModel?, onBack: () -> Unit) {
                         Textview(stringResource(R.string.bk_operator).uppercase(), size = font_10, color = appColors.textSecondary)
                         Textview(operator.full_name ?: stringResource(R.string.bk_operator), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
                     }
-                    if (operator.mobile_number != null) {
+                    if (com.cranezo.utils.Privacy.PARTY_CALLS && operator.mobile_number != null) {
                         Icon(Icons.Default.Call, contentDescription = null, tint = AmberPrimary, modifier = Modifier.size(dimen_24).clickable { openDialer(context, operator.country_code, operator.mobile_number) })
                     }
                 }
@@ -605,17 +605,22 @@ fun TransactionHistory(list: List<com.cranezo.ui.finance.model.TransactionItem>?
         Spacer(modifier = Modifier.height(dimen_8))
         if (list.isEmpty()) Textview(stringResource(R.string.tx_none), size = font_12, color = appColors.textSecondary)
         list.forEach { t ->
-            Row(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_6), verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = dimen_8), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     Textview(t.kind_label ?: t.method_name.orEmpty(), size = font_13, color = appColors.textPrimary, fontWeight = FontWeight.SemiBold)
                     Textview(listOfNotNull(t.method_name, formatServerDateTime(t.created_at)).joinToString(" · "), size = font_11, color = appColors.textSecondary)
                     (t.gateway_payment_id ?: t.transaction_code)?.let { Textview(it, size = font_10, color = appColors.textHint) }
                 }
+                // room between the text on the left and the amount and status on the right
+                Spacer(modifier = Modifier.width(dimen_16))
                 Column(horizontalAlignment = Alignment.End) {
                     Textview(rupees(t.amount), size = font_14, color = appColors.textPrimary, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(dimen_6))
                     BookingTag(t.status_label.orEmpty(), com.cranezo.ui.finance.statusTone(t.status))
                 }
             }
+            // a thin line between two transactions
+            if (t !== list.last()) Box(modifier = Modifier.fillMaxWidth().height(dimen_1).background(appColors.subtleBorder))
         }
     }
 }

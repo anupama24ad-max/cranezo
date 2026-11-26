@@ -154,7 +154,9 @@ fun GlassInputField(
     minHeight: Dp = dimen_52,
     keyboardType: KeyboardType = KeyboardType.Text,
     capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
-    rightContent: (@Composable () -> Unit)? = null
+    rightContent: (@Composable () -> Unit)? = null,
+    // an amount: shown with commas while typing (1,25,000); the value itself stays plain digits
+    groupDigits: Boolean = false
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         GlassFieldLabel(label, isRequired)
@@ -179,6 +181,7 @@ fun GlassInputField(
                 value = value,
                 onValueChange = { if (!readOnly) onValueChange(it) },
                 readOnly = readOnly,
+                visualTransformation = if (groupDigits) IndianNumberTransformation else androidx.compose.ui.text.input.VisualTransformation.None,
                 singleLine = singleLine,
                 modifier = Modifier
                     .weight(1f)
